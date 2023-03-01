@@ -2,7 +2,21 @@
 name = "grass"
 version = "0.1.0"
 edition = "2021"
+default-run = "grass"
 
+[[bin]]
+name = "grass"
+path = "src/cli/main.rs"
+test = true
+required-features = ["cli"]
+
+[features]
+cli = ["dep:clap"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[dependencies.clap]
+version = "4.1.8"
+optional = true
+features = ["derive"]
