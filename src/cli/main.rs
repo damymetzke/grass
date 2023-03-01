@@ -21,12 +21,16 @@ fn handle_ls(command: LsCommand) {
         return;
     };
 
-    let category = list_repos_by_category(category);
+    let (category, repositories) = if let Some(category) = list_repos_by_category(&category) {
+        (category.category, category.repositories)
+    } else {
+        eprintln!("Category '{}' does not exist", &category);
+        return;
+    };
     println!(
         "Repos for category '{}':\n\n{}",
-        category.category,
-        category
-            .repositories
+        category,
+        repositories
             .iter()
             .map(|category| format!("* {}", category))
             .join("\n")

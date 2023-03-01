@@ -30,9 +30,14 @@ pub struct SimpleCategoryDescription {
 /// assert_eq!("general", result_general.category);
 /// assert_eq!("work", result_work.category);
 /// ```
-pub fn list_repos_by_category<T: AsRef<str>>(category_name: T) -> SimpleCategoryDescription {
-    SimpleCategoryDescription {
-        category: String::from(category_name.as_ref()),
-        repositories: vec![String::from("first"), String::from("second")],
+pub fn list_repos_by_category<T: AsRef<str>>(
+    category_name: T,
+) -> Option<SimpleCategoryDescription> {
+    match category_name.as_ref() {
+        "general" | "work" => Some(SimpleCategoryDescription {
+            category: String::from(category_name.as_ref()),
+            repositories: vec![String::from("first"), String::from("second")],
+        }),
+        _ => None,
     }
 }
