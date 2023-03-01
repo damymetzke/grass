@@ -1,4 +1,5 @@
 use clap::Parser;
+use grass::get_hello;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -13,6 +14,6 @@ fn main() {
    let args = Args::parse();
 
    for _ in 0..args.count {
-       println!("Hello World!")
+       println!("{}", get_hello("Worlds"))
    }
 }
