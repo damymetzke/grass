@@ -1,19 +1,30 @@
-use clap::Parser;
-use grass::get_hello;
+use clap::{Parser, Subcommand};
+use grass::list_categories;
+use itertools::Itertools;
+
+#[derive(Debug, Subcommand)]
+enum Command {
+    Ls,
+}
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-   /// Number of times to greet
-   #[arg(short, long, default_value_t = 1)]
-   count: u8,
+    #[command(subcommand)]
+    command: Command,
 }
 
 fn main() {
-   let args = Args::parse();
+    let args = Args::parse();
 
-   for _ in 0..args.count {
-       println!("{}", get_hello("Worlds"))
-   }
+    match args.command {
+        Command::Ls => println!(
+            "Categories:\n\n{}",
+            list_categories()
+                .iter()
+                .map(|category| format!("* {}", category))
+                .join("\n")
+        ),
+    }
 }

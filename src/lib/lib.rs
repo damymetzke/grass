@@ -1,12 +1,12 @@
-/// Trivial function to test lib
+/// List categories
 ///
 /// # Example:
 ///
 /// ```
-/// # use grass::get_hello;
+/// # use grass::list_categories;
 ///
-/// assert_eq!("Hello Damy!", get_hello("Damy"));
+/// assert_eq!(vec!{"general", "work"}, list_categories());
 /// ```
-pub fn get_hello(name: &str) -> String {
-    format!("Hello {}!", name)
+pub fn list_categories() -> Vec<String> {
+    vec!{String::from("general"), String::from("work")}
 }
