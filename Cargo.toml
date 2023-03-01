@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 default-run = "grass"
 
+[lib]
+name = "grass"
+path = "src/lib/lib.rs"
+test = true
+
 [[bin]]
 name = "grass"
 path = "src/cli/main.rs"
