@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use grass::{list_categories, list_repos_by_category};
+use grass::{list_categories, list_repos_by_category, config};
 use itertools::Itertools;
 
 #[derive(Parser, Debug)]
@@ -11,6 +11,7 @@ fn handle_ls(command: LsCommand) {
     let category = if let Some(result) = command.category {
         result
     } else {
+
         println!(
             "Categories:\n\n{}",
             list_categories()
@@ -18,6 +19,7 @@ fn handle_ls(command: LsCommand) {
                 .map(|category| format!("* {}", category))
                 .join("\n")
         );
+        println!("{:?}", config::load_user_config().unwrap());
         return;
     };
 

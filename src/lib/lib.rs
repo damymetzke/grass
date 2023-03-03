@@ -1,3 +1,7 @@
+pub mod config;
+
+use itertools::Itertools;
+
 /// List categories
 ///
 /// # Examples
@@ -8,7 +12,14 @@
 /// assert_eq!(vec!{"general", "work"}, list_categories());
 /// ```
 pub fn list_categories() -> Vec<String> {
-    vec![String::from("general"), String::from("work")]
+    let user_config = config::load_user_config().unwrap_or_default();
+    user_config
+        .grass
+        .category
+        .keys()
+        .map(String::from)
+        .sorted()
+        .collect()
 }
 
 pub struct SimpleCategoryDescription {
