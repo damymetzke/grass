@@ -11,8 +11,7 @@ use itertools::Itertools;
 ///
 /// assert_eq!(vec!{"general", "work"}, list_categories());
 /// ```
-pub fn list_categories() -> Vec<String> {
-    let user_config = config::load_user_config().unwrap_or_default();
+pub fn list_categories(user_config: &config::RootConfig) -> Vec<String> {
     user_config
         .grass
         .category

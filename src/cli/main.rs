@@ -14,12 +14,11 @@ fn handle_ls(command: LsCommand) {
 
         println!(
             "Categories:\n\n{}",
-            list_categories()
+            list_categories(&config::load_user_config().unwrap_or_default())
                 .iter()
                 .map(|category| format!("* {}", category))
                 .join("\n")
         );
-        println!("{:?}", config::load_user_config().unwrap());
         return;
     };
 
