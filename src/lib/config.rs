@@ -28,3 +28,14 @@ pub fn load_user_config() -> Result<RootConfig, Box<dyn std::error::Error>> {
     let config: RootConfig = toml::from_str(&contents)?;
     Ok(config)
 }
+
+pub fn load_example_config() -> RootConfig {
+    RootConfig {
+        grass: GrassConfig {
+            category: HashMap::from([
+                (String::from("general"), GrassCategory {}),
+                (String::from("work"), GrassCategory {}),
+            ]),
+        },
+    }
+}

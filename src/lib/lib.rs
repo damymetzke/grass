@@ -7,9 +7,11 @@ use itertools::Itertools;
 /// # Examples
 ///
 /// ```
-/// # use grass::list_categories;
+/// # use grass::config;
 ///
-/// assert_eq!(vec!{"general", "work"}, list_categories());
+/// let user_config = config::load_example_config();
+///
+/// assert_eq!(vec!{"general", "work"}, grass::list_categories(&user_config));
 /// ```
 pub fn list_categories(user_config: &config::RootConfig) -> Vec<String> {
     user_config
@@ -33,8 +35,8 @@ pub struct SimpleCategoryDescription {
 /// ```
 /// # use grass::list_repos_by_category;
 ///
-/// let result_general = list_repos_by_category("general");
-/// let result_work = list_repos_by_category("work");
+/// let result_general = list_repos_by_category("general").unwrap();
+/// let result_work = list_repos_by_category("work").unwrap();
 ///
 /// assert_eq!(vec!["first", "second"], result_general.repositories);
 /// assert_eq!("general", result_general.category);
