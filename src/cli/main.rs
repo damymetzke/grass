@@ -8,10 +8,10 @@ struct LsCommand {
 }
 
 fn handle_ls(command: LsCommand) {
+    let user_config = config::load_user_config().unwrap_or_default();
     let category = if let Some(result) = command.category {
         result
     } else {
-        let user_config = config::load_user_config().unwrap_or_default();
         let categories = list_categories(&user_config);
         println!(
             "┌Categories:\n│\n{}",
@@ -28,7 +28,7 @@ fn handle_ls(command: LsCommand) {
         return;
     };
 
-    let (category, repositories) = if let Some(category) = list_repos_by_category(&category) {
+    let (category, repositories) = if let Some(category) = list_repos_by_category(&user_config, &category) {
         (category.category, category.repositories)
     } else {
         eprintln!("Category '{}' does not exist", &category);

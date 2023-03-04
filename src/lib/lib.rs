@@ -1,5 +1,8 @@
 pub mod config;
 
+use std::fs;
+
+use config::RootConfig;
 use itertools::Itertools;
 
 /// List categories
@@ -13,7 +16,7 @@ use itertools::Itertools;
 ///
 /// assert_eq!(vec!{"general", "work"}, grass::list_categories(&user_config));
 /// ```
-pub fn list_categories(user_config: &config::RootConfig) -> Vec<String> {
+pub fn list_categories(user_config: &RootConfig) -> Vec<String> {
     user_config
         .grass
         .category
@@ -42,14 +45,31 @@ pub struct SimpleCategoryDescription {
 /// assert_eq!("general", result_general.category);
 /// assert_eq!("work", result_work.category);
 /// ```
-pub fn list_repos_by_category<T: AsRef<str>>(
+pub fn list_repos_by_category<T>(
+    user_config: &RootConfig,
     category_name: T,
-) -> Option<SimpleCategoryDescription> {
-    match category_name.as_ref() {
-        "general" | "work" => Some(SimpleCategoryDescription {
-            category: String::from(category_name.as_ref()),
-            repositories: vec![String::from("first"), String::from("second")],
-        }),
-        _ => None,
-    }
+) -> Option<SimpleCategoryDescription>
+where
+    T: AsRef<str>,
+{
+    user_config.grass.category.get(category_name.as_ref())?;
+    let root_folder = dirs::home_dir()?.join("repos").join(category_name.as_ref());
+
+    let repositories: Vec<String> = if let Ok(entries) = fs::read_dir(root_folder) {
+        entries
+            .filter_map(|entry| entry.ok())
+            .filter_map(|entry| match entry.metadata() {
+                Ok(metadata) if metadata.is_dir() => Some(entry.file_name().into_string().ok()?),
+                _ => None,
+            })
+            .sorted()
+            .collect()
+    } else {
+        return None;
+    };
+
+    Some(SimpleCategoryDescription {
+        category: String::from(category_name.as_ref()),
+        repositories,
+    })
 }
