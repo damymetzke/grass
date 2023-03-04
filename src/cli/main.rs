@@ -14,32 +14,38 @@ fn handle_ls(command: LsCommand) {
     } else {
         let categories = list_categories(&user_config);
         println!(
-            "┌Categories:\n│\n{}",
+            "┌ Categories:\n│\n{}",
             categories
                 .iter()
                 .enumerate()
                 .map(|(i, category)| if i == categories.len() - 1 {
-                    format!("└─{}", category)
+                    format!("└─ {}", category)
                 } else {
-                    format!("├─{}", category)
+                    format!("├─ {}", category)
                 })
                 .join("\n")
         );
         return;
     };
 
-    let (category, repositories) = if let Some(category) = list_repos_by_category(&user_config, &category) {
-        (category.category, category.repositories)
-    } else {
-        eprintln!("Category '{}' does not exist", &category);
-        return;
-    };
+    let (category, repositories) =
+        if let Some(category) = list_repos_by_category(&user_config, &category) {
+            (category.category, category.repositories)
+        } else {
+            eprintln!("Category '{}' does not exist", &category);
+            return;
+        };
     println!(
-        "Repos for category '{}':\n\n{}",
+        "┌ Repos for category '{}':\n│\n{}",
         category,
         repositories
             .iter()
-            .map(|category| format!("* {}", category))
+            .enumerate()
+            .map(|(i, category)| if i == repositories.len() - 1 {
+                format!("└─ {}", category)
+            } else {
+                format!("├─ {}", category)
+            })
             .join("\n")
     );
 }
