@@ -5,12 +5,40 @@ use itertools::Itertools;
 #[derive(Parser, Debug)]
 struct LsCommand {
     category: Option<String>,
+    #[clap(short, long)]
+    all: bool,
 }
 
 fn handle_ls(command: LsCommand) {
     let user_config = config::load_user_config().unwrap_or_default();
     let category = if let Some(result) = command.category {
         result
+    } else if command.all {
+        let categories = grass::list_all_repositories(&user_config);
+
+        println!(
+            "{}",
+            categories
+                .iter()
+                .map(|category| format!(
+                    "┌ Repos for category '{}':\n│\n{}",
+                    category.category,
+                    category
+                        .repositories
+                        .iter()
+                        .enumerate()
+                        .map(
+                            |(i, category_name)| if i == category.repositories.len() - 1 {
+                                format!("└─ {}", category_name)
+                            } else {
+                                format!("├─ {}", category_name)
+                            }
+                        )
+                        .join("\n")
+                ))
+                .join("\n\n")
+        );
+        return;
     } else {
         let categories = list_categories(&user_config);
         println!(

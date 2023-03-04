@@ -73,3 +73,12 @@ where
         repositories,
     })
 }
+
+pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDescription> {
+    user_config
+        .grass
+        .category
+        .iter()
+        .filter_map(|(key, _)| list_repos_by_category(user_config, key))
+        .collect()
+}
