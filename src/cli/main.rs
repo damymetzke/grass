@@ -1,3 +1,5 @@
+#[cfg(debug_assertions)]
+mod debug;
 mod more_itertools;
 
 use clap::{Parser, Subcommand};
@@ -79,6 +81,8 @@ fn handle_ls(command: LsCommand) {
 #[derive(Debug, Subcommand)]
 enum Command {
     Ls(LsCommand),
+    #[cfg(debug_assertions)]
+    Debug(debug::DebugCommand),
 }
 
 #[derive(Parser, Debug)]
@@ -93,5 +97,7 @@ fn main() {
 
     match args.command {
         Command::Ls(command) => handle_ls(command),
+        #[cfg(debug_assertions)]
+        Command::Debug(command) => debug::handle_debug(command),
     }
 }

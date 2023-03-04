@@ -1,15 +1,17 @@
 mod load;
 
 use std::{
-    collections::hash_map::HashMap,
+    collections::hash_map::{Entry, HashMap},
     fs::{self, File},
     io::Read,
 };
 
-use self::load::{LoadGrassCategory, LoadRootConfig};
+use self::load::LoadRootConfig;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
-pub struct GrassCategory {}
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
+pub struct GrassCategory {
+    name: String,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct GrassConfig {
@@ -21,12 +23,6 @@ pub struct RootConfig {
     pub grass: GrassConfig,
 }
 
-impl From<LoadGrassCategory> for GrassCategory {
-    fn from(_value: LoadGrassCategory) -> GrassCategory {
-        GrassCategory {}
-    }
-}
-
 impl RootConfig {
     pub fn merge(&mut self, next: LoadRootConfig) -> &mut Self {
         let grass = if let Some(grass) = next.grass {
@@ -35,10 +31,14 @@ impl RootConfig {
             return self;
         };
 
-        for (key, grass_category) in grass.category {
-            if let std::collections::hash_map::Entry::Vacant(e) = self.grass.category.entry(key) {
-                e.insert(grass_category.into());
-            } else {
+        for (key, _) in grass.category {
+            match self.grass.category.entry(key.clone()) {
+                Entry::Vacant(e) => {
+                    e.insert(GrassCategory { name: key });
+                }
+                Entry::Occupied(mut e) => {
+                    e.get_mut().name = key;
+                }
             };
         }
 
@@ -90,8 +90,18 @@ pub fn load_example_config() -> RootConfig {
     RootConfig {
         grass: GrassConfig {
             category: HashMap::from([
-                (String::from("general"), GrassCategory {}),
-                (String::from("work"), GrassCategory {}),
+                (
+                    String::from("general"),
+                    GrassCategory {
+                        name: String::from("general"),
+                    },
+                ),
+                (
+                    String::from("work"),
+                    GrassCategory {
+                        name: String::from("work"),
+                    },
+                ),
             ]),
         },
     }
