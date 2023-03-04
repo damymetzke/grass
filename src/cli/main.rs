@@ -1,6 +1,9 @@
+mod more_itertools;
+
 use clap::{Parser, Subcommand};
 use grass::{config, list_categories, list_repos_by_category};
 use itertools::Itertools;
+use more_itertools::MoreItertools;
 
 #[derive(Parser, Debug)]
 struct LsCommand {
@@ -26,13 +29,10 @@ fn handle_ls(command: LsCommand) {
                     category
                         .repositories
                         .iter()
-                        .enumerate()
-                        .map(
-                            |(i, category_name)| if i == category.repositories.len() - 1 {
-                                format!("└─ {}", category_name)
-                            } else {
-                                format!("├─ {}", category_name)
-                            }
+                        .sandwich_map(
+                            |category_name| format!("├─ {}", category_name),
+                            |category_name| format!("├─ {}", category_name),
+                            |category_name| format!("└─ {}", category_name),
                         )
                         .join("\n")
                 ))
@@ -45,12 +45,11 @@ fn handle_ls(command: LsCommand) {
             "┌ Categories:\n│\n{}",
             categories
                 .iter()
-                .enumerate()
-                .map(|(i, category)| if i == categories.len() - 1 {
-                    format!("└─ {}", category)
-                } else {
-                    format!("├─ {}", category)
-                })
+                .sandwich_map(
+                    |category_name| format!("├─ {}", category_name),
+                    |category_name| format!("├─ {}", category_name),
+                    |category_name| format!("└─ {}", category_name),
+                )
                 .join("\n")
         );
         return;
@@ -68,12 +67,11 @@ fn handle_ls(command: LsCommand) {
         category,
         repositories
             .iter()
-            .enumerate()
-            .map(|(i, category)| if i == repositories.len() - 1 {
-                format!("└─ {}", category)
-            } else {
-                format!("├─ {}", category)
-            })
+            .sandwich_map(
+                |category| format!("├─ {}", category),
+                |category| format!("├─ {}", category),
+                |category| format!("└─ {}", category),
+            )
             .join("\n")
     );
 }
