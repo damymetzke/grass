@@ -1,6 +1,6 @@
 pub mod config;
 
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use config::RootConfig;
 use itertools::Itertools;
@@ -52,7 +52,9 @@ pub fn list_repos_by_category<T>(
 where
     T: AsRef<str>,
 {
-    let category = user_config.grass.get_from_category_or_alias(&category_name)?;
+    let category = user_config
+        .grass
+        .get_from_category_or_alias(&category_name)?;
     let root_folder = dirs::home_dir()?.join("repos").join(&category.name);
 
     let repositories: Vec<String> = if let Ok(entries) = fs::read_dir(root_folder) {
@@ -81,4 +83,15 @@ pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDesc
         .iter()
         .filter_map(|(key, _)| list_repos_by_category(user_config, key))
         .collect()
+}
+
+pub fn get_category_path<T>(user_config: &RootConfig, category: T) -> Option<PathBuf>
+where
+    T: AsRef<str>,
+{
+    let category = user_config
+        .grass
+        .get_from_category_or_alias(category.as_ref())?;
+
+    Some(PathBuf::from(&user_config.grass.base_dir).join(&category.name))
 }

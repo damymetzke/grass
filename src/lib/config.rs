@@ -16,10 +16,21 @@ pub struct GrassCategory {
     pub alias: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct GrassConfig {
     pub category: HashMap<String, Rc<RefCell<GrassCategory>>>,
     pub aliases: HashMap<String, Rc<RefCell<GrassCategory>>>,
+    pub base_dir: String,
+}
+
+impl Default for GrassConfig {
+    fn default() -> Self {
+        GrassConfig {
+            category: HashMap::default(),
+            aliases: HashMap::default(),
+            base_dir: String::from("~/.repos"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -45,6 +56,10 @@ impl RootConfig {
             grass
         } else {
             return self;
+        };
+
+        if let Some(base_dir) = &grass.base_dir {
+            self.grass.base_dir = base_dir.clone();
         };
 
         for (key, category) in &grass.category {
@@ -129,6 +144,7 @@ pub fn load_example_config() -> RootConfig {
                 (String::from("general"), general),
                 (String::from("work"), work),
             ]),
+            base_dir: String::from("~/repos"),
         },
     }
 }

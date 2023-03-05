@@ -10,6 +10,7 @@ pub struct LoadGrassCategory {
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct LoadGrassConfig {
     pub category: HashMap<String, LoadGrassCategory>,
+    pub base_dir: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, Default)]

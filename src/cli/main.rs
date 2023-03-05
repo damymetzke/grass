@@ -1,11 +1,13 @@
 #[cfg(debug_assertions)]
 mod debug;
 mod more_itertools;
+mod script_command;
 
 use clap::{Parser, Subcommand};
 use grass::{config, list_categories, list_repos_by_category};
 use itertools::Itertools;
 use more_itertools::MoreItertools;
+use script_command::ScriptCommand;
 
 #[derive(Parser, Debug)]
 struct LsCommand {
@@ -81,6 +83,7 @@ fn handle_ls(command: LsCommand) {
 #[derive(Debug, Subcommand)]
 enum Command {
     Ls(LsCommand),
+    Script(ScriptCommand),
     #[cfg(debug_assertions)]
     Debug(debug::DebugCommand),
 }
@@ -97,6 +100,7 @@ fn main() {
 
     match args.command {
         Command::Ls(command) => handle_ls(command),
+        Command::Script(command) => script_command::handle_script(&command),
         #[cfg(debug_assertions)]
         Command::Debug(command) => debug::handle_debug(command),
     }
