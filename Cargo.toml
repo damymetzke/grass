@@ -17,6 +17,7 @@ required-features = ["cli"]
 
 [features]
 cli = ["dep:clap"]
+default = ["cli"]
 
 [dependencies]
 itertools = "0.10.5"
