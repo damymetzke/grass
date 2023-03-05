@@ -11,6 +11,7 @@ use self::load::LoadRootConfig;
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct GrassCategory {
     name: String,
+    alias: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -24,20 +25,23 @@ pub struct RootConfig {
 }
 
 impl RootConfig {
-    pub fn merge(&mut self, next: LoadRootConfig) -> &mut Self {
-        let grass = if let Some(grass) = next.grass {
+    pub fn merge(&mut self, next: &LoadRootConfig) -> &mut Self {
+        let grass = if let Some(grass) = &next.grass {
             grass
         } else {
             return self;
         };
 
-        for (key, _) in grass.category {
+        for (key, category) in &grass.category {
             match self.grass.category.entry(key.clone()) {
                 Entry::Vacant(e) => {
-                    e.insert(GrassCategory { name: key });
+                    e.insert(GrassCategory {
+                        name: key.clone(),
+                        alias: category.alias.clone(),
+                    });
                 }
                 Entry::Occupied(mut e) => {
-                    e.get_mut().name = key;
+                    e.get_mut().name = key.clone();
                 }
             };
         }
@@ -57,7 +61,7 @@ pub fn load_user_config() -> Result<RootConfig, Box<dyn std::error::Error>> {
     file.read_to_string(&mut contents)?;
     let mut config = RootConfig::default();
     let load_config: LoadRootConfig = toml::from_str(&contents)?;
-    config.merge(load_config);
+    config.merge(&load_config);
 
     let mut config = RootConfig::default();
 
@@ -79,7 +83,7 @@ pub fn load_user_config() -> Result<RootConfig, Box<dyn std::error::Error>> {
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
             let load_config: LoadRootConfig = toml::from_str(&contents)?;
-            config.merge(load_config);
+            config.merge(&load_config);
         }
     }
 
@@ -94,12 +98,14 @@ pub fn load_example_config() -> RootConfig {
                     String::from("general"),
                     GrassCategory {
                         name: String::from("general"),
+                        alias: vec![String::from("gen")],
                     },
                 ),
                 (
                     String::from("work"),
                     GrassCategory {
                         name: String::from("work"),
+                        alias: Vec::new(),
                     },
                 ),
             ]),
