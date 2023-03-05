@@ -16,13 +16,13 @@ pub struct GrassCategory {
     alias: Vec<String>,
 }
 
-#[derive(Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct GrassConfig {
     pub category: HashMap<String, Rc<RefCell<GrassCategory>>>,
     pub aliases: HashMap<String, Rc<RefCell<GrassCategory>>>,
 }
 
-#[derive(Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct RootConfig {
     pub grass: GrassConfig,
 }

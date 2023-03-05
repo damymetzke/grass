@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-//use grass::config;
+use grass::config;
 
 #[derive(Debug, Subcommand)]
 enum Command {
@@ -14,7 +14,6 @@ pub struct DebugCommand {
 
 pub fn handle_debug(command: DebugCommand) {
     match command.command {
-        //Command::Config => println!("{:?}", config::load_user_config().unwrap()),
-        Command::Config => println!("Debug is currently not implemented"),
+        Command::Config => println!("{:?}", config::load_user_config().unwrap()),
     }
 }
