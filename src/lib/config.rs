@@ -1,7 +1,7 @@
 mod load;
 
 use std::{
-    cell::RefCell,
+    cell::{Ref, RefCell},
     collections::hash_map::{Entry, HashMap},
     fs::{self, File},
     io::Read,
@@ -12,8 +12,8 @@ use self::load::LoadRootConfig;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct GrassCategory {
-    name: String,
-    alias: Vec<String>,
+    pub name: String,
+    pub alias: Vec<String>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -25,6 +25,18 @@ pub struct GrassConfig {
 #[derive(Debug, Clone, Default)]
 pub struct RootConfig {
     pub grass: GrassConfig,
+}
+
+impl GrassConfig {
+    pub fn get_from_category_or_alias<T>(&self, name: T) -> Option<Ref<GrassCategory>>
+    where
+        T: AsRef<str>,
+    {
+        self.category
+            .get(name.as_ref())
+            .or_else(|| self.aliases.get(name.as_ref()))
+            .map(|value| value.borrow())
+    }
 }
 
 impl RootConfig {

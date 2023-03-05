@@ -52,8 +52,8 @@ pub fn list_repos_by_category<T>(
 where
     T: AsRef<str>,
 {
-    user_config.grass.category.get(category_name.as_ref())?;
-    let root_folder = dirs::home_dir()?.join("repos").join(category_name.as_ref());
+    let category = user_config.grass.get_from_category_or_alias(&category_name)?;
+    let root_folder = dirs::home_dir()?.join("repos").join(&category.name);
 
     let repositories: Vec<String> = if let Ok(entries) = fs::read_dir(root_folder) {
         entries
