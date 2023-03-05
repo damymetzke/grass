@@ -31,6 +31,14 @@ pub struct SimpleCategoryDescription {
     pub repositories: Vec<String>,
 }
 
+fn get_base_directory(user_config: &RootConfig) -> Option<PathBuf> {
+    let base_directory = &user_config.grass.base_dir;
+    Some(match base_directory.chars().next_tuple() {
+        Some(('~', '/')) => dirs::home_dir()?.join(base_directory.get(2..)?),
+        _ => PathBuf::from(base_directory),
+    })
+}
+
 /// List repositories in a single category
 ///
 /// # Examples
@@ -55,7 +63,7 @@ where
     let category = user_config
         .grass
         .get_from_category_or_alias(&category_name)?;
-    let root_folder = dirs::home_dir()?.join("repos").join(&category.name);
+    let root_folder = get_base_directory(user_config)?.join(&category.name);
 
     let repositories: Vec<String> = if let Ok(entries) = fs::read_dir(root_folder) {
         entries
@@ -89,9 +97,31 @@ pub fn get_category_path<T>(user_config: &RootConfig, category: T) -> Option<Pat
 where
     T: AsRef<str>,
 {
-    let category = user_config
-        .grass
-        .get_from_category_or_alias(category.as_ref())?;
+    let category = user_config.grass.get_from_category_or_alias(&category)?;
 
     Some(PathBuf::from(&user_config.grass.base_dir).join(&category.name))
+}
+
+pub fn get_repository_path<T, U>(
+    user_config: &RootConfig,
+    category: T,
+    repository: U,
+) -> Option<PathBuf>
+where
+    T: AsRef<str>,
+    U: AsRef<str>,
+{
+    let category = user_config.grass.get_from_category_or_alias(&category)?;
+
+    let result = get_base_directory(user_config)?
+        .join(&category.name)
+        .join(repository.as_ref());
+
+    let dir_metadata = fs::metadata(&result).ok()?;
+
+    if !dir_metadata.is_dir() {
+        return None;
+    };
+
+    Some(result)
 }

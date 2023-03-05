@@ -13,19 +13,14 @@ fn handle_path(command: &PathCommand) {
         PathCommand {
             category,
             repository: None,
-        } => String::from(
-            grass::get_category_path(&user_config, category)
-                .unwrap_or_default()
-                .to_str()
-                .unwrap_or_default(),
-        ),
+        } => grass::get_category_path(&user_config, category),
         PathCommand {
-            category: _category,
-            repository: Some(_repository),
-        } => String::new(),
+            category,
+            repository: Some(repository),
+        } => grass::get_repository_path(&user_config, category, repository),
     };
 
-    print!("{}", path);
+    print!("{}", path.unwrap_or_default().to_str().unwrap_or_default());
 }
 
 #[derive(Debug, Subcommand)]
