@@ -1,9 +1,11 @@
 mod load;
 
 use std::{
+    cell::RefCell,
     collections::hash_map::{Entry, HashMap},
     fs::{self, File},
     io::Read,
+    rc::Rc,
 };
 
 use self::load::LoadRootConfig;
@@ -14,12 +16,13 @@ pub struct GrassCategory {
     alias: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Clone, Default)]
 pub struct GrassConfig {
-    pub category: HashMap<String, GrassCategory>,
+    pub category: HashMap<String, Rc<RefCell<GrassCategory>>>,
+    pub aliases: HashMap<String, Rc<RefCell<GrassCategory>>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Clone, Default)]
 pub struct RootConfig {
     pub grass: GrassConfig,
 }
@@ -33,17 +36,25 @@ impl RootConfig {
         };
 
         for (key, category) in &grass.category {
-            match self.grass.category.entry(key.clone()) {
+            let category_rc = match self.grass.category.entry(key.clone()) {
                 Entry::Vacant(e) => {
-                    e.insert(GrassCategory {
+                    let result = Rc::from(RefCell::from(GrassCategory {
                         name: key.clone(),
                         alias: category.alias.clone(),
-                    });
+                    }));
+                    e.insert(result).clone()
                 }
-                Entry::Occupied(mut e) => {
-                    e.get_mut().name = key.clone();
+                Entry::Occupied(e) => {
+                    e.get().borrow_mut().name = key.clone();
+                    e.get().clone()
                 }
             };
+
+            for alias in &category.alias {
+                self.grass
+                    .aliases
+                    .insert(alias.clone(), category_rc.clone());
+            }
         }
 
         self
@@ -91,23 +102,20 @@ pub fn load_user_config() -> Result<RootConfig, Box<dyn std::error::Error>> {
 }
 
 pub fn load_example_config() -> RootConfig {
+    let general = Rc::from(RefCell::from(GrassCategory {
+        name: String::from("general"),
+        alias: vec![String::from("gen")],
+    }));
+    let work = Rc::from(RefCell::from(GrassCategory {
+        name: String::from("work"),
+        alias: Vec::new(),
+    }));
     RootConfig {
         grass: GrassConfig {
+            aliases: HashMap::from([(String::from("gen"), general.clone())]),
             category: HashMap::from([
-                (
-                    String::from("general"),
-                    GrassCategory {
-                        name: String::from("general"),
-                        alias: vec![String::from("gen")],
-                    },
-                ),
-                (
-                    String::from("work"),
-                    GrassCategory {
-                        name: String::from("work"),
-                        alias: Vec::new(),
-                    },
-                ),
+                (String::from("general"), general),
+                (String::from("work"), work),
             ]),
         },
     }
