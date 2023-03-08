@@ -2,7 +2,6 @@ mod command;
 #[cfg(debug_assertions)]
 mod debug;
 mod more_itertools;
-mod script_command;
 
 use clap::Parser;
 use command::Command;

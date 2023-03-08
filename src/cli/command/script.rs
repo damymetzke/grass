@@ -34,8 +34,10 @@ pub struct ScriptCommand {
     command: Command,
 }
 
-pub fn handle_script(command: &ScriptCommand) {
-    match &command.command {
-        Command::Path(path_command) => handle_path(path_command),
+impl ScriptCommand {
+    pub fn handle(&self) {
+        match &self.command {
+            Command::Path(path_command) => handle_path(path_command),
+        }
     }
 }
