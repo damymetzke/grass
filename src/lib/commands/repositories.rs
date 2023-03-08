@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf};
 
 use itertools::Itertools;
 
-use crate::{config::RootConfig, get_base_directory, types::SimpleCategoryDescription};
+use crate::{config::RootConfig, types::SimpleCategoryDescription, util::get_base_directory};
 
 /// List repositories in a single category
 ///
