@@ -1,24 +1,25 @@
+mod command;
 #[cfg(debug_assertions)]
 mod debug;
 mod more_itertools;
 mod script_command;
 
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use command::Command;
 use grass::{config, list_categories, list_repos_by_category};
 use itertools::Itertools;
 use more_itertools::MoreItertools;
-use script_command::ScriptCommand;
 
 #[derive(Parser, Debug)]
-struct LsCommand {
+pub struct LsCommand {
     category: Option<String>,
     #[clap(short, long)]
     all: bool,
 }
 
-fn handle_ls(command: LsCommand) {
+fn handle_ls(command: &LsCommand) {
     let user_config = config::load_user_config().unwrap_or_default();
-    let category = if let Some(result) = command.category {
+    let category = if let Some(result) = &command.category {
         result
     } else if command.all {
         let categories = grass::list_all_repositories(&user_config);
@@ -60,7 +61,7 @@ fn handle_ls(command: LsCommand) {
     };
 
     let (category, repositories) =
-        if let Some(category) = list_repos_by_category(&user_config, &category) {
+        if let Some(category) = list_repos_by_category(&user_config, category) {
             (category.category, category.repositories)
         } else {
             eprintln!("Category '{}' does not exist", &category);
@@ -80,14 +81,6 @@ fn handle_ls(command: LsCommand) {
     );
 }
 
-#[derive(Debug, Subcommand)]
-enum Command {
-    Ls(LsCommand),
-    Script(ScriptCommand),
-    #[cfg(debug_assertions)]
-    Debug(debug::DebugCommand),
-}
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -98,10 +91,5 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    match args.command {
-        Command::Ls(command) => handle_ls(command),
-        Command::Script(command) => script_command::handle_script(&command),
-        #[cfg(debug_assertions)]
-        Command::Debug(command) => debug::handle_debug(command),
-    }
+    args.command.handle();
 }

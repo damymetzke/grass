@@ -12,7 +12,7 @@ pub struct DebugCommand {
     command: Command,
 }
 
-pub fn handle_debug(command: DebugCommand) {
+pub fn handle_debug(command: &DebugCommand) {
     match command.command {
         Command::Config => println!("{:?}", config::load_user_config().unwrap()),
     }
