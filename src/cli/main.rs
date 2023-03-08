@@ -1,8 +1,8 @@
-mod command;
+mod grass_command;
 mod more_itertools;
 
 use clap::Parser;
-use command::GrassCommand;
+use grass_command::GrassCommand;
 
 fn main() {
     let grass_command = GrassCommand::parse();
