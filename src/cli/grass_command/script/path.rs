@@ -2,8 +2,15 @@ use clap::Parser;
 use grass::config;
 
 #[derive(Parser, Debug)]
+/// Print the path of a category root, or a repository
+/// 
+/// The output will be a single string with no trailing newline.
 pub struct PathCommand {
+    /// The category to display, can be an alias
     category: String,
+    /// The repository to display
+    ///
+    /// When omitted will print the repository directory instead.
     repository: Option<String>,
 }
 

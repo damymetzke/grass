@@ -5,8 +5,16 @@ use itertools::Itertools;
 use crate::more_itertools::MoreItertools;
 
 #[derive(Parser, Debug)]
+/// List categories and repositories
+///
+/// Invoke with no commands to list the available categories.
+/// Categories are defined in the configuration file.
 pub struct LsCommand {
+    /// The category to list, can be an alias
+    ///
+    /// When given will list the repositories in the category.
     category: Option<String>,
+    /// List all repositories in all categories
     #[clap(short, long)]
     all: bool,
 }

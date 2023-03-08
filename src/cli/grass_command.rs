@@ -13,7 +13,12 @@ pub enum GrassSubcommand {
 }
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about)]
+/// GRAss: GLobal Repository Assistent
+///
+/// GRAss is a utility which aims to assit you into managing repositories.
+/// For more information see:
+/// <https://github.com/damymetzke/grass>
 pub struct GrassCommand {
     #[command(subcommand)]
     command: GrassSubcommand,
