@@ -1,25 +1,32 @@
 mod ls;
 mod script;
-use clap::Subcommand;
+use clap::{Parser, Subcommand};
 
 #[cfg(debug_assertions)]
 use crate::debug;
 
 #[derive(Debug, Subcommand)]
-pub enum Command {
+pub enum GrassSubcommand {
     Ls(ls::LsCommand),
     Script(script::ScriptCommand),
     #[cfg(debug_assertions)]
     Debug(debug::DebugCommand),
 }
 
-impl Command {
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+pub struct GrassCommand {
+    #[command(subcommand)]
+    command: GrassSubcommand,
+}
+
+impl GrassCommand {
     pub fn handle(&self) {
-        match self {
-            Command::Ls(command) => command.handle(),
-            Command::Script(command) => command.handle(),
+        match &self.command {
+            GrassSubcommand::Ls(command) => command.handle(),
+            GrassSubcommand::Script(command) => command.handle(),
             #[cfg(debug_assertions)]
-            Command::Debug(command) => debug::handle_debug(command),
+            GrassSubcommand::Debug(command) => debug::handle_debug(command),
         }
     }
 }

@@ -4,17 +4,10 @@ mod debug;
 mod more_itertools;
 
 use clap::Parser;
-use command::Command;
-
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    #[command(subcommand)]
-    command: Command,
-}
+use command::GrassCommand;
 
 fn main() {
-    let args = Args::parse();
+    let grass_command = GrassCommand::parse();
 
-    args.command.handle();
+    grass_command.handle();
 }
