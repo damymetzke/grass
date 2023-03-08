@@ -9,12 +9,8 @@ use itertools::Itertools;
 pub use commands::{
     categories::{get_category_path, list_categories},
     repositories::{get_repository_path, list_all_repositories, list_repos_by_category},
+    types,
 };
-
-pub struct SimpleCategoryDescription {
-    pub category: String,
-    pub repositories: Vec<String>,
-}
 
 fn get_base_directory(user_config: &RootConfig) -> Option<PathBuf> {
     let base_directory = &user_config.grass.base_dir;
