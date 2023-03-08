@@ -1,9 +1,8 @@
+#[cfg(debug_assertions)]
+mod debug;
 mod ls;
 mod script;
 use clap::{Parser, Subcommand};
-
-#[cfg(debug_assertions)]
-use crate::debug;
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
@@ -26,7 +25,7 @@ impl GrassCommand {
             GrassSubcommand::Ls(command) => command.handle(),
             GrassSubcommand::Script(command) => command.handle(),
             #[cfg(debug_assertions)]
-            GrassSubcommand::Debug(command) => debug::handle_debug(command),
+            GrassSubcommand::Debug(command) => command.handle(),
         }
     }
 }

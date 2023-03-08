@@ -1,6 +1,4 @@
 mod command;
-#[cfg(debug_assertions)]
-mod debug;
 mod more_itertools;
 
 use clap::Parser;
