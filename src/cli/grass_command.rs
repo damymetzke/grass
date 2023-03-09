@@ -3,6 +3,7 @@ mod debug;
 mod ls;
 mod script;
 mod shell_insert;
+mod session;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
@@ -10,6 +11,8 @@ pub enum GrassSubcommand {
     Ls(ls::LsCommand),
     Script(script::ScriptCommand),
     ShellInsert(shell_insert::ShellInsertCommand),
+    Session(session::SessionCommand),
+    Cs(session::create::CreateCommand),
     #[cfg(debug_assertions)]
     Debug(debug::DebugCommand),
 }
@@ -32,6 +35,8 @@ impl GrassCommand {
             GrassSubcommand::Ls(command) => command.handle(),
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
+            GrassSubcommand::Session(command) => command.handle(),
+            GrassSubcommand::Cs(command) => command.handle(),
             #[cfg(debug_assertions)]
             GrassSubcommand::Debug(command) => command.handle(),
         }
