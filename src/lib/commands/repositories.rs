@@ -2,7 +2,11 @@ use std::{fs, path::PathBuf};
 
 use itertools::Itertools;
 
-use crate::{config::RootConfig, types::SimpleCategoryDescription, util::get_base_directory};
+use crate::{
+    config::RootConfig,
+    types::{SimpleCategoryDescription, SimpleRepositoryDescription},
+    util::get_base_directory,
+};
 
 /// List repositories in a single category
 ///
@@ -56,6 +60,33 @@ pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDesc
         .iter()
         .filter_map(|(key, _)| list_repos_by_category(user_config, key))
         .collect()
+}
+
+pub fn get_repository<T, U>(
+    user_config: &RootConfig,
+    category: T,
+    repository: U,
+) -> Option<SimpleRepositoryDescription>
+where
+    T: AsRef<str>,
+    U: AsRef<str>,
+{
+    let category = user_config.grass.get_from_category_or_alias(&category)?;
+
+    let result = get_base_directory(user_config)?
+        .join(&category.name)
+        .join(repository.as_ref());
+
+    let dir_metadata = fs::metadata(result).ok()?;
+
+    if !dir_metadata.is_dir() {
+        return None;
+    };
+
+    Some(SimpleRepositoryDescription {
+        category: String::from(&category.name),
+        repository: String::from(repository.as_ref()),
+    })
 }
 
 pub fn get_repository_path<T, U>(
