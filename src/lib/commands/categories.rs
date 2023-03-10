@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use itertools::Itertools;
 
-use crate::config::RootConfig;
+use crate::{config::RootConfig, util};
 
 /// List categories
 ///
@@ -31,5 +31,9 @@ where
 {
     let category = user_config.grass.get_from_category_or_alias(&category)?;
 
-    Some(PathBuf::from(&user_config.grass.base_dir).join(&category.name))
+    Some(
+        util::get_base_directory(user_config)
+            .map(|path| path.join(&category.name))
+            .unwrap_or_default(),
+    )
 }
