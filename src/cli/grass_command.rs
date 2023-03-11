@@ -2,8 +2,8 @@
 mod debug;
 mod ls;
 mod script;
-mod shell_insert;
 mod session;
+mod shell_insert;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]

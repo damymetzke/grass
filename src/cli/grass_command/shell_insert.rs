@@ -29,7 +29,9 @@ impl ShellInsertCommand {
                 .output()
                 .map(|output| str::from_utf8(&output.stdout).map(String::from))
             {
-                if let [repository, category] = output.trim().split('@').collect::<Vec<_>>().as_slice() {
+                if let [repository, category] =
+                    output.trim().split('@').collect::<Vec<_>>().as_slice()
+                {
                     if let Some(Some(path)) =
                         grass::get_repository_path(&user_config, category, repository)
                             .map(|path| path.to_str().map(String::from))

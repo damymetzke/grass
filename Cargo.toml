@@ -24,7 +24,7 @@ itertools = "0.10.5"
 serde = { version = "1.0.152", features = ["derive"] }
 dirs = "4.0.0"
 toml = "0.7.2"
-dialoguer = "0.10.3"
+dialoguer = { version = "0.10.3", features = ["fuzzy-select"]}
 
 [dependencies.clap]
 version = "4.1.8"

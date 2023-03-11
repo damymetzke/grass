@@ -2,7 +2,6 @@ pub mod create;
 
 use clap::{Parser, Subcommand};
 
-
 #[derive(Debug, Subcommand)]
 pub enum SessionSubcommand {
     Create(create::CreateCommand),
