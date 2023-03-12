@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 use crate::{
     config::RootConfig,
-    types::{SimpleCategoryDescriptionV2, SimpleRepositoryDescription},
+    types::{SimpleCategoryDescription, SimpleRepositoryDescription},
     util::get_base_directory,
 };
 
@@ -25,7 +25,7 @@ use crate::{
 pub fn list_repos_by_category<T>(
     user_config: &RootConfig,
     category_name: T,
-) -> Option<SimpleCategoryDescriptionV2>
+) -> Option<SimpleCategoryDescription>
 where
     T: AsRef<str>,
 {
@@ -50,14 +50,14 @@ where
         return None;
     };
 
-    Some(SimpleCategoryDescriptionV2::new(
+    Some(SimpleCategoryDescription::new(
         user_config,
         category_name.as_ref(),
         repositories,
     ))
 }
 
-pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDescriptionV2> {
+pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDescription> {
     user_config
         .grass
         .category

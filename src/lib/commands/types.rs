@@ -7,19 +7,13 @@ pub struct SimpleRepositoryDescription {
     pub repository: String,
 }
 
-pub struct SimpleCategoryDescriptionV2 {
+pub struct SimpleCategoryDescription {
     category_directory: PathBuf,
     pub category: String,
     pub repositories: Vec<SimpleRepositoryDescription>,
 }
 
-#[deprecated = "Use SimpleCategoryDescriptionV2 instead"]
-pub struct SimpleCategoryDescription {
-    pub category: String,
-    pub repositories: Vec<String>,
-}
-
-impl IntoIterator for SimpleCategoryDescriptionV2 {
+impl IntoIterator for SimpleCategoryDescription {
     type Item = SimpleRepositoryDescription;
 
     type IntoIter = std::vec::IntoIter<Self::Item>;
@@ -29,7 +23,7 @@ impl IntoIterator for SimpleCategoryDescriptionV2 {
     }
 }
 
-impl SimpleCategoryDescriptionV2 {
+impl SimpleCategoryDescription {
     pub fn new<T, U>(config: &RootConfig, category: T, repositories: U) -> Self
     where
         T: Into<String>,
