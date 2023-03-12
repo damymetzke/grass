@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 use crate::{
     config::RootConfig,
-    types::{SimpleCategoryDescription, SimpleRepositoryDescription},
+    types::{SimpleCategoryDescriptionV2, SimpleRepositoryDescription},
     util::get_base_directory,
 };
 
@@ -25,7 +25,7 @@ use crate::{
 pub fn list_repos_by_category<T>(
     user_config: &RootConfig,
     category_name: T,
-) -> Option<SimpleCategoryDescription>
+) -> Option<SimpleCategoryDescriptionV2>
 where
     T: AsRef<str>,
 {
@@ -34,7 +34,7 @@ where
         .get_from_category_or_alias(&category_name)?;
     let root_folder = get_base_directory(user_config)?.join(&category.name);
 
-    let repositories: Vec<String> = if let Ok(entries) = fs::read_dir(root_folder) {
+    let repositories = if let Ok(entries) = fs::read_dir(root_folder) {
         entries
             .filter_map(|entry| entry.ok())
             .filter_map(|entry| match entry.metadata() {
@@ -42,18 +42,22 @@ where
                 _ => None,
             })
             .sorted()
-            .collect()
+            .map(|repository| SimpleRepositoryDescription {
+                category: category.name.clone(),
+                repository,
+            })
     } else {
         return None;
     };
 
-    Some(SimpleCategoryDescription {
-        category: String::from(category_name.as_ref()),
+    Some(SimpleCategoryDescriptionV2::new(
+        user_config,
+        category_name.as_ref(),
         repositories,
-    })
+    ))
 }
 
-pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDescription> {
+pub fn list_all_repositories(user_config: &RootConfig) -> Vec<SimpleCategoryDescriptionV2> {
     user_config
         .grass
         .category

@@ -1,4 +1,4 @@
-use crate::iterators::SimpleCategoryDescriptionIterator;
+use crate::{config::RootConfig, iterators::SimpleCategoryDescriptionIterator, util};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -8,7 +8,7 @@ pub struct SimpleRepositoryDescription {
 }
 
 pub struct SimpleCategoryDescriptionV2 {
-    pub category_directory: PathBuf,
+    category_directory: PathBuf,
     pub category: String,
     pub repositories: Vec<SimpleRepositoryDescription>,
 }
@@ -25,7 +25,23 @@ impl IntoIterator for SimpleCategoryDescriptionV2 {
     type IntoIter = SimpleCategoryDescriptionIterator;
 
     fn into_iter(self) -> Self::IntoIter {
-        SimpleCategoryDescriptionIterator::new(self)
+        SimpleCategoryDescriptionIterator::new(self.repositories, self.category_directory)
+    }
+}
+
+impl SimpleCategoryDescriptionV2 {
+    pub fn new<T, U>(config: &RootConfig, category: T, repositories: U) -> Self
+    where
+        T: Into<String>,
+        U: IntoIterator<Item = SimpleRepositoryDescription>,
+    {
+        // TODO: Do error checking
+        let category = category.into();
+        Self {
+            category_directory: util::get_base_directory(config).unwrap().join(&category),
+            category,
+            repositories: repositories.into_iter().collect(),
+        }
     }
 }
 

@@ -47,7 +47,13 @@ impl CreateCommand {
         let category = grass::list_repos_by_category(user_config, category).unwrap();
 
         let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
-            .items(&category.repositories)
+            .items(
+                &category
+                    .repositories
+                    .iter()
+                    .map(|repository| &repository.repository)
+                    .collect::<Vec<_>>(),
+            )
             .default(0)
             .interact()
             .unwrap();
@@ -55,7 +61,7 @@ impl CreateCommand {
         Self::create_session(
             user_config,
             &category.category,
-            &category.repositories[selection],
+            &category.repositories[selection].repository,
         );
     }
 

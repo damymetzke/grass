@@ -1,6 +1,6 @@
 mod commands;
 pub mod config;
-mod util;
+pub mod util;
 
 pub use commands::{
     categories::{get_category_path, list_categories},
