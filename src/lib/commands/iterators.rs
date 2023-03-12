@@ -2,14 +2,14 @@ use std::path::PathBuf;
 
 use crate::types::SimpleRepositoryDescription;
 
-pub struct SimpleCategoryDescriptionIterator {
-    collection: Vec<SimpleRepositoryDescription>,
-    category_directory: PathBuf,
+pub struct SimpleCategoryDescriptionIterator<'a> {
+    collection: &'a Vec<SimpleRepositoryDescription>,
+    category_directory: &'a PathBuf,
     index: usize,
 }
 
-impl SimpleCategoryDescriptionIterator {
-    pub fn new(collection: Vec<SimpleRepositoryDescription>, category_directory: PathBuf) -> Self {
+impl<'a> SimpleCategoryDescriptionIterator<'a> {
+    pub fn new(collection: &'a Vec<SimpleRepositoryDescription>, category_directory: &'a PathBuf) -> Self {
         SimpleCategoryDescriptionIterator {
             collection,
             category_directory,
@@ -18,7 +18,7 @@ impl SimpleCategoryDescriptionIterator {
     }
 }
 
-impl Iterator for SimpleCategoryDescriptionIterator {
+impl<'a> Iterator for SimpleCategoryDescriptionIterator<'a> {
     type Item = PathBuf;
 
     fn next(&mut self) -> Option<Self::Item> {

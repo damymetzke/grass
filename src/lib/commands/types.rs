@@ -20,12 +20,12 @@ pub struct SimpleCategoryDescription {
 }
 
 impl IntoIterator for SimpleCategoryDescriptionV2 {
-    type Item = PathBuf;
+    type Item = SimpleRepositoryDescription;
 
-    type IntoIter = SimpleCategoryDescriptionIterator;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
-        SimpleCategoryDescriptionIterator::new(self.repositories, self.category_directory)
+        self.repositories.into_iter()
     }
 }
 
@@ -42,6 +42,10 @@ impl SimpleCategoryDescriptionV2 {
             category,
             repositories: repositories.into_iter().collect(),
         }
+    }
+
+    pub fn iter_paths(&self) -> SimpleCategoryDescriptionIterator {
+        SimpleCategoryDescriptionIterator::new(&self.repositories, &self.category_directory)
     }
 }
 
