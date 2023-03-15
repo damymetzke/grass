@@ -22,6 +22,7 @@ impl ShellInsertCommand {
 
     fn handle_bash() {
         let user_config = config::load_user_config().unwrap_or_default();
+        println!(r#"gr() {{ cd "$(grass script path $@)"; }}"#);
         // Check for TMUX variable
         if env::var("TMUX").is_ok() {
             if let Ok(Ok(output)) = ProcessCommand::new("tmux")
