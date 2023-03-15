@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::{
     config::RootConfig,
+    repository,
     types::{SimpleCategoryDescription, SimpleRepositoryDescription},
     util::get_base_directory,
 };
@@ -115,4 +116,23 @@ where
     };
 
     Some(result)
+}
+
+pub fn get_uncommitted_repositories<T>(
+    user_config: &RootConfig,
+    category: T,
+) -> Vec<SimpleRepositoryDescription>
+where
+    T: AsRef<str>,
+{
+    // TODO: Handle errors
+    let repositories = list_repos_by_category(user_config, category).unwrap();
+
+    repository::get_all_repository_changes(repositories.iter_paths())
+        .zip(repositories.repositories.iter())
+        .filter_map(|((_, has_changes), repository)| match has_changes {
+            true => Some(repository.clone()),
+            false => None,
+        })
+        .collect()
 }
