@@ -17,6 +17,9 @@ pub struct LsCommand {
     /// List all repositories in all categories
     #[clap(short, long)]
     all: bool,
+    /// Only show repositories with uncommitted changes
+    #[clap(long)]
+    uncommitted: bool,
 }
 
 impl LsCommand {
@@ -36,13 +39,14 @@ impl LsCommand {
         )
     }
 
-    fn generate_output_all_repositories_by_category<'a, T>(categories: T) -> String
+    fn generate_output_all_repositories_by_category<T, U>(categories: T) -> String
     where
-        T: IntoIterator<Item = &'a SimpleCategoryDescription>,
+        T: IntoIterator<Item = U>,
+        U: std::borrow::Borrow<SimpleCategoryDescription>,
     {
         categories
             .into_iter()
-            .map(Self::generate_output_repositories_for_category)
+            .map(|category| Self::generate_output_repositories_for_category(category.borrow()))
             .join("\n\n")
     }
 
@@ -71,20 +75,41 @@ impl LsCommand {
             LsCommand {
                 category: None,
                 all: false,
+                uncommitted: false,
             } => Self::generate_output_category_name_only(
                 grass::list_categories(&user_config).iter(),
             ),
             LsCommand {
                 category: Some(category),
                 all: false,
+                uncommitted: false,
             } => Self::generate_output_repositories_for_category(
                 &grass::list_repos_by_category(&user_config, category).unwrap(),
             ),
             LsCommand {
                 category: None,
                 all: true,
+                uncommitted: false,
+            } => Self::generate_output_all_repositories_by_category(grass::list_all_repositories(
+                &user_config,
+            )),
+            LsCommand {
+                category: Some(category),
+                all: false,
+                uncommitted: true,
+            } => Self::generate_output_repositories_for_category(
+                &grass::list_repos_by_category(&user_config, category)
+                    .unwrap()
+                    .uncommitted_changes_only(),
+            ),
+            LsCommand {
+                category: None,
+                all: true,
+                uncommitted: true,
             } => Self::generate_output_all_repositories_by_category(
-                grass::list_all_repositories(&user_config).iter(),
+                grass::list_all_repositories(&user_config)
+                    .into_iter()
+                    .map(|repository| repository.uncommitted_changes_only()),
             ),
             _ => {
                 // TODO: Generate more specific output

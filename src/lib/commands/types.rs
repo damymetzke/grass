@@ -7,6 +7,7 @@ pub struct SimpleRepositoryDescription {
     pub repository: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct SimpleCategoryDescription {
     pub category_directory: PathBuf,
     pub category: String,
