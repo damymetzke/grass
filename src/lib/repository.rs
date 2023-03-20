@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use git2::Repository;
 
@@ -20,16 +20,4 @@ where
         .files_changed(), 0);
 
     result
-}
-
-pub fn get_all_repository_changes<T, U>(items: T) -> impl Iterator<Item = (PathBuf, bool)>
-where
-    T: IntoIterator<Item = U>,
-    U: Into<PathBuf>,
-{
-    items.into_iter().map(|path| {
-        let path: PathBuf = path.into();
-
-        (path.clone(), repository_has_changes(&path))
-    })
 }

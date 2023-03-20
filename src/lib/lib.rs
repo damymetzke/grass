@@ -1,4 +1,5 @@
 mod commands;
+mod category_filter;
 pub mod config;
 mod repository;
 pub mod util;

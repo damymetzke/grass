@@ -8,7 +8,7 @@ pub struct SimpleRepositoryDescription {
 }
 
 pub struct SimpleCategoryDescription {
-    category_directory: PathBuf,
+    pub category_directory: PathBuf,
     pub category: String,
     pub repositories: Vec<SimpleRepositoryDescription>,
 }
