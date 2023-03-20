@@ -38,9 +38,9 @@ impl LsCommand {
                             .repositories
                             .iter()
                             .sandwich_map(
-                                |category| format!("├─ {}", category.category),
-                                |category| format!("├─ {}", category.category),
-                                |category| format!("└─ {}", category.category),
+                                |repository| format!("├─ {}", repository.repository),
+                                |repository| format!("├─ {}", repository.repository),
+                                |repository| format!("└─ {}", repository.repository),
                             )
                             .join("\n")
                     ))
@@ -76,9 +76,9 @@ impl LsCommand {
             repositories
                 .iter()
                 .sandwich_map(
-                    |category| format!("├─ {}", category.category),
-                    |category| format!("├─ {}", category.category),
-                    |category| format!("└─ {}", category.category),
+                    |repository| format!("├─ {}", repository.repository),
+                    |repository| format!("├─ {}", repository.repository),
+                    |repository| format!("└─ {}", repository.repository),
                 )
                 .join("\n")
         );
