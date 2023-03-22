@@ -52,7 +52,7 @@ where
 
     Some(SimpleCategoryDescription::new(
         user_config,
-        category_name.as_ref(),
+        &category.name,
         repositories,
     ))
 }

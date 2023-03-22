@@ -7,17 +7,29 @@ where
     T: AsRef<Path>,
 {
     // TODO: Add error handling
-    let repository = Repository::init(path).unwrap();
-    let head = repository.head().unwrap().peel_to_tree().unwrap();
-    let result = !matches!(repository
-        .diff_tree_to_workdir(
-            Some(&head),
-            None,
-        )
-        .unwrap()
-        .stats()
-        .unwrap()
-        .files_changed(), 0);
+    // TODO: Be more specific on errors
+    let repository = Repository::init(path).ok();
+    let repository = if let Some(repository) = repository {
+        repository
+    } else {
+        return false;
+    };
+    let head = repository.head().ok().map(|head| head.peel_to_tree().ok());
+    let head = if let Some(Some(head)) = head {
+        head
+    } else {
+        return false;
+    };
+
+    let result = !matches!(
+        repository
+            .diff_tree_to_workdir(Some(&head), None,)
+            .unwrap()
+            .stats()
+            .unwrap()
+            .files_changed(),
+        0
+    );
 
     result
 }
