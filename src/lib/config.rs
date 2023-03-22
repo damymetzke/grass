@@ -48,6 +48,24 @@ impl GrassConfig {
             .or_else(|| self.aliases.get(name.as_ref()))
             .map(|value| value.borrow())
     }
+
+    pub fn get_by_category<T>(&self, category_name: T) -> Option<Ref<GrassCategory>>
+    where
+        T: AsRef<str>,
+    {
+        self.category
+            .get(category_name.as_ref())
+            .map(|value| value.borrow())
+    }
+
+    pub fn get_by_alias<T>(&self, alias_name: T) -> Option<Ref<GrassCategory>>
+    where
+        T: AsRef<str>,
+    {
+        self.aliases
+            .get(alias_name.as_ref())
+            .map(|value| value.borrow())
+    }
 }
 
 impl RootConfig {
@@ -190,6 +208,45 @@ mod tests {
         assert_eq!(
             config.grass.aliases.get("gen").unwrap().borrow().name,
             "general"
+        );
+    }
+
+    #[test]
+    fn test_config_get_category() {
+        let config = load_example_config();
+
+        let result_work = config.grass.get_by_category("work").unwrap();
+        let result_general = config.grass.get_by_category("general").unwrap();
+
+        assert_eq!(
+            *result_work,
+            GrassCategory {
+                name: String::from("work"),
+                alias: vec![]
+            }
+        );
+
+        assert_eq!(
+            *result_general,
+            GrassCategory {
+                name: String::from("general"),
+                alias: vec![String::from("gen")]
+            }
+        );
+    }
+
+    #[test]
+    fn test_config_get_alias() {
+        let config = load_example_config();
+
+        let result_gen = config.grass.get_by_alias("gen").unwrap();
+
+        assert_eq!(
+            *result_gen,
+            GrassCategory {
+                name: String::from("general"),
+                alias: vec![String::from("gen")]
+            }
         );
     }
 }
