@@ -148,3 +148,48 @@ pub fn load_example_config() -> RootConfig {
         },
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        load::{LoadGrassCategory, LoadGrassConfig},
+        *,
+    };
+
+    fn get_load_config() -> LoadRootConfig {
+        LoadRootConfig {
+            grass: Some(LoadGrassConfig {
+                category: HashMap::from([
+                    (String::from("work"), LoadGrassCategory { alias: vec![] }),
+                    (
+                        String::from("general"),
+                        LoadGrassCategory {
+                            alias: vec![String::from("gen")],
+                        },
+                    ),
+                ]),
+                base_dir: Some(String::from("~/my-repositories")),
+            }),
+        }
+    }
+
+    #[test]
+    fn test_config_merge() {
+        let mut config = RootConfig::default();
+        config.merge(&get_load_config());
+
+        assert_eq!(config.grass.base_dir, "~/my-repositories");
+        assert_eq!(
+            config.grass.category.get("work").unwrap().borrow().name,
+            "work"
+        );
+        assert_eq!(
+            config.grass.category.get("general").unwrap().borrow().name,
+            "general"
+        );
+        assert_eq!(
+            config.grass.aliases.get("gen").unwrap().borrow().name,
+            "general"
+        );
+    }
+}
