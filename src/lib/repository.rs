@@ -31,5 +31,8 @@ where
         0
     );
 
+    // Clippy gives a false positive here.
+    // Inlining this return won't compile due to borrow rules.
+    #[allow(clippy::let_and_return)]
     result
 }
