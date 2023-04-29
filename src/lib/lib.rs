@@ -1,10 +1,10 @@
-mod commands;
+mod public;
 mod category_filter;
 pub mod config;
 mod repository;
 pub mod util;
 
-pub use commands::{
+pub use public::{
     categories::{get_category_path, list_categories},
     iterators,
     repositories::{
