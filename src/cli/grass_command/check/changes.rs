@@ -1,5 +1,5 @@
 use clap::Parser;
-use grass::config;
+use grass::{config, repository::RepositoryChangeStatus};
 use itertools::Itertools;
 
 use crate::more_itertools::MoreItertools;
@@ -21,16 +21,22 @@ impl ChangesCommand {
             return;
         };
 
+        let repositories = grass::list_repositories_with_change_status(&user_config, &self.category);
+        let repositories = if let Some(repositories) = repositories {
+            repositories.filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate))
+        } else {
+            eprintln!("Category or alias not found");
+            return;
+        };
+
         println!(
             "┌ Repositories with uncommitted changes for '{}':\n│\n{}",
             category.category,
-            category
-                .repositories
-                .iter()
+            repositories
                 .sandwich_map(
-                    |repository| format!("├─ {}", repository.repository),
-                    |repository| format!("├─ {}", repository.repository),
-                    |repository| format!("└─ {}", repository.repository),
+                    |(repository, _)| format!("├─ {}", repository.repository),
+                    |(repository, _)| format!("├─ {}", repository.repository),
+                    |(repository, _)| format!("└─ {}", repository.repository),
                 )
                 .join("\n")
         );

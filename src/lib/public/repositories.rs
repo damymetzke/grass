@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::{
     config::RootConfig,
+    repository::{get_repository_changes, RepositoryChangeStatus},
     types::{SimpleCategoryDescription, SimpleRepositoryDescription},
     util::get_base_directory,
 };
@@ -119,6 +120,23 @@ where
     };
 
     Some(result)
+}
+
+pub fn list_repositories_with_change_status<T>(
+    user_config: &RootConfig,
+    category: T,
+) -> Option<impl Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)>>
+where
+    T: AsRef<str>,
+{
+    let category = list_repos_by_category(user_config, category)?;
+    let category_path = category.category_directory.clone();
+    Some(category.into_iter().map(move |repository| {
+        (
+            repository.clone(),
+            get_repository_changes(category_path.join(&repository.repository)),
+        )
+    }))
 }
 
 pub fn get_uncommitted_repositories<T>(
