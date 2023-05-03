@@ -1,4 +1,4 @@
-use crate::{config::RootConfig, iterators::SimpleCategoryDescriptionIterator, util};
+use crate::{config::RootConfig, util};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -39,8 +39,10 @@ impl SimpleCategoryDescription {
         }
     }
 
-    pub fn iter_paths(&self) -> SimpleCategoryDescriptionIterator {
-        SimpleCategoryDescriptionIterator::new(&self.repositories, &self.category_directory)
+    pub fn iter_paths(&self) -> impl Iterator<Item = PathBuf> + '_ {
+        self.repositories
+            .iter()
+            .map(|repository| self.category_directory.join(&repository.repository))
     }
 }
 
