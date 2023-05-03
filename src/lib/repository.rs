@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use git2::Repository;
+use git2::{Repository, Status};
 
 pub fn repository_has_changes<T>(path: T) -> bool
 where
@@ -8,31 +8,23 @@ where
 {
     // TODO: Add error handling
     // TODO: Be more specific on errors
-    let repository = Repository::init(path).ok();
+    let repository = Repository::open(path.as_ref()).ok();
     let repository = if let Some(repository) = repository {
         repository
     } else {
-        return false;
+        return true;
     };
-    let head = repository.head().ok().map(|head| head.peel_to_tree().ok());
-    let head = if let Some(Some(head)) = head {
-        head
+
+    let statuses = repository.statuses(None).ok();
+    let statuses = if let Some(statuses) = statuses {
+        statuses
     } else {
-        return false;
+        return true;
     };
 
-    let result = !matches!(
-        repository
-            .diff_tree_to_workdir(Some(&head), None,)
-            .unwrap()
-            .stats()
-            .unwrap()
-            .files_changed(),
-        0
-    );
-
-    // Clippy gives a false positive here.
-    // Inlining this return won't compile due to borrow rules.
-    #[allow(clippy::let_and_return)]
-    result
+    statuses
+        .iter()
+        .filter(|status| !matches!(status.status(), Status::IGNORED))
+        .count()
+        > 0
 }
