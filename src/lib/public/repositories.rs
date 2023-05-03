@@ -138,14 +138,3 @@ where
         )
     }))
 }
-
-pub fn get_uncommitted_repositories<T>(
-    user_config: &RootConfig,
-    category: T,
-) -> Option<SimpleCategoryDescription>
-where
-    T: AsRef<str>,
-{
-    list_repos_by_category(user_config, category)
-        .map(|category| category.uncommitted_changes_only())
-}

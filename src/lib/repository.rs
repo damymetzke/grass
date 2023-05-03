@@ -37,13 +37,3 @@ where
         num_changes => RepositoryChangeStatus::UncommittedChanges(num_changes),
     }
 }
-
-pub fn repository_has_changes<T>(path: T) -> bool
-where
-    T: AsRef<Path>,
-{
-    !matches!(
-        get_repository_changes(path),
-        RepositoryChangeStatus::UpToDate
-    )
-}
