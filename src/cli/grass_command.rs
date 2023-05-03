@@ -1,3 +1,4 @@
+mod check;
 #[cfg(debug_assertions)]
 mod debug;
 mod ls;
@@ -8,6 +9,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
+    Check(check::CheckCommand),
     Ls(ls::LsCommand),
     Script(script::ScriptCommand),
     ShellInsert(shell_insert::ShellInsertCommand),
@@ -32,6 +34,7 @@ pub struct GrassCommand {
 impl GrassCommand {
     pub fn handle(&self) {
         match &self.command {
+            GrassSubcommand::Check(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(),
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
