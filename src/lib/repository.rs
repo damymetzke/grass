@@ -2,7 +2,13 @@ use std::path::Path;
 
 use git2::{Repository, Status};
 
-pub fn repository_has_changes<T>(path: T) -> bool
+pub enum RepositoryChangeStatus {
+    UpToDate,
+    NoRepository,
+    UncommittedChanges(usize),
+}
+
+pub fn get_repository_changes<T>(path: T) -> RepositoryChangeStatus
 where
     T: AsRef<Path>,
 {
@@ -12,19 +18,32 @@ where
     let repository = if let Some(repository) = repository {
         repository
     } else {
-        return true;
+        return RepositoryChangeStatus::NoRepository;
     };
 
     let statuses = repository.statuses(None).ok();
     let statuses = if let Some(statuses) = statuses {
         statuses
     } else {
-        return true;
+        return RepositoryChangeStatus::NoRepository;
     };
 
-    statuses
+    match statuses
         .iter()
         .filter(|status| !matches!(status.status(), Status::IGNORED))
         .count()
-        > 0
+    {
+        0 => RepositoryChangeStatus::UpToDate,
+        num_changes => RepositoryChangeStatus::UncommittedChanges(num_changes),
+    }
+}
+
+pub fn repository_has_changes<T>(path: T) -> bool
+where
+    T: AsRef<Path>,
+{
+    !matches!(
+        get_repository_changes(path),
+        RepositoryChangeStatus::UpToDate
+    )
 }
