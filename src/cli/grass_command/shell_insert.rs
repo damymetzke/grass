@@ -1,7 +1,10 @@
 use std::{env, process::Command as ProcessCommand, str};
 
-use clap::{Parser, ValueEnum};
+use clap::{Parser, ValueEnum, CommandFactory};
+use clap_complete::{Generator, shells::Bash};
 use grass::config;
+
+use super::GrassCommand;
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum Shells {
@@ -20,7 +23,16 @@ impl ShellInsertCommand {
         };
     }
 
+    fn print_shell_complete<T: Generator>(generator: T) {
+        let mut app = GrassCommand::command();
+        let mut buf = Vec::new();
+        clap_complete::generate(generator, &mut app, "grass", &mut buf);
+        println!("{}", String::from_utf8(buf).unwrap_or_default());
+    }
+
     fn handle_bash() {
+        Self::print_shell_complete(Bash);
+
         let user_config = config::load_user_config().unwrap_or_default();
         println!(r#"gr() {{ cd "$(grass script path $@)"; }}"#);
         // Check for TMUX variable
