@@ -147,3 +147,19 @@ where
         }),
     ))
 }
+
+pub fn list_all_repositories_with_change_status(
+    user_config: &RootConfig,
+) -> Vec<
+    FilteredCategoryDescription<
+        impl Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)> + '_,
+        RepositoryChangeStatus,
+    >,
+> {
+    user_config
+        .grass
+        .category
+        .iter()
+        .filter_map(|(key, _)| list_repositories_with_change_status(user_config, key))
+        .collect()
+}

@@ -55,7 +55,13 @@ impl ChangesCommand {
             Self {
                 category: None,
                 all: true,
-            } => todo!(),
+            } => {
+                for category in grass::list_all_repositories_with_change_status(&user_config) {
+                    let category = category
+                        .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate));
+                    Self::handle_category(category);
+                }
+            }
             Self {
                 category: Some(_),
                 all: true,
