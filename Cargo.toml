@@ -24,7 +24,7 @@ itertools = "0.10.5"
 serde = { version = "1.0.152", features = ["derive"] }
 dirs = "5.0.0"
 toml = "0.7.2"
-dialoguer = { version = "0.10.3", features = ["fuzzy-select"]}
+# dialoguer = { version = "0.10.3", features = ["fuzzy-select"]}
 git2 = "0.17.0"
 clap_complete = "4.2.1"
 
@@ -32,3 +32,8 @@ clap_complete = "4.2.1"
 version = "4.1.8"
 optional = true
 features = ["derive"]
+
+[dependencies.dialoguer]
+git = "https://github.com/console-rs/dialoguer.git"
+rev = "c8cdaf3953c8e5e59734ecac14e67c6fc772f5ab"
+features = ["fuzzy-select"]

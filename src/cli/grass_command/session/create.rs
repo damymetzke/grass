@@ -55,6 +55,7 @@ impl CreateCommand {
                     .collect::<Vec<_>>(),
             )
             .default(0)
+            .vim_mode(true)
             .interact()
             .unwrap();
 
@@ -72,6 +73,7 @@ impl CreateCommand {
         let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
             .items(&categories)
             .default(0)
+            .vim_mode(true)
             .interact()
             .unwrap();
 
