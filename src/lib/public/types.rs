@@ -14,6 +14,16 @@ pub struct SimpleCategoryDescription {
     pub repositories: Vec<SimpleRepositoryDescription>,
 }
 
+#[derive(Debug, Clone)]
+pub struct FilteredCategoryDescription<T, U>
+where
+    T: Iterator<Item = (SimpleRepositoryDescription, U)>,
+{
+    pub category_directory: PathBuf,
+    pub category: String,
+    pub repository_iterator: T,
+}
+
 impl IntoIterator for SimpleCategoryDescription {
     type Item = SimpleRepositoryDescription;
 
@@ -43,6 +53,29 @@ impl SimpleCategoryDescription {
         self.repositories
             .iter()
             .map(|repository| self.category_directory.join(&repository.repository))
+    }
+}
+
+impl<T, U> FilteredCategoryDescription<T, U>
+where
+    T: Iterator<Item = (SimpleRepositoryDescription, U)>,
+{
+    pub fn new<V>(config: &RootConfig, category: V, repository_iterator: T) -> Self
+    where
+        V: Into<String>,
+    {
+        // TODO: Do error checking
+        let category = category.into();
+        Self {
+            category_directory: util::get_base_directory(config).unwrap().join(&category),
+            category,
+            repository_iterator,
+        }
+    }
+
+    pub fn iter_paths(self) -> impl Iterator<Item = PathBuf> {
+        self.repository_iterator
+            .map(move |(repository, _)| self.category_directory.join(repository.repository))
     }
 }
 
