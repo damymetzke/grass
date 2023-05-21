@@ -77,6 +77,34 @@ where
         self.repository_iterator
             .map(move |(repository, _)| self.category_directory.join(repository.repository))
     }
+
+    pub fn map<V, W>(
+        self,
+        closure: V,
+    ) -> FilteredCategoryDescription<impl Iterator<Item = (SimpleRepositoryDescription, W)>, W>
+    where
+        V: Fn((SimpleRepositoryDescription, U)) -> (SimpleRepositoryDescription, W),
+    {
+        FilteredCategoryDescription {
+            category_directory: self.category_directory,
+            category: self.category,
+            repository_iterator: self.repository_iterator.map(closure),
+        }
+    }
+
+    pub fn filter<V>(
+        self,
+        closure: V,
+    ) -> FilteredCategoryDescription<impl Iterator<Item = (SimpleRepositoryDescription, U)>, U>
+    where
+        V: Fn(&(SimpleRepositoryDescription, U)) -> bool,
+    {
+        FilteredCategoryDescription {
+            category_directory: self.category_directory,
+            category: self.category,
+            repository_iterator: self.repository_iterator.filter(closure),
+        }
+    }
 }
 
 impl SimpleRepositoryDescription {
