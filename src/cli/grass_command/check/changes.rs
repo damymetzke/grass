@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 use clap::{Parser, ValueEnum};
 use grass::{
     config,
@@ -29,44 +31,40 @@ impl ChangesCommand {
     fn handle_category<T>(
         category: FilteredCategoryDescription<T, RepositoryChangeStatus>,
         format: &Format,
-    ) where
+    ) -> String
+    where
         T: Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)>,
     {
         match format {
-            Format::Fancy => println!(
-                "{}",
-                generate_fancy_vertical_list(
+            Format::Fancy => generate_fancy_vertical_list(
+                format!(
+                    "Repositories with uncommitted changes for '{}'",
+                    category.category
+                ),
+                category.repository_iterator.map(|(repository, status)| {
                     format!(
-                        "Repositories with uncommitted changes for '{}'",
-                        category.category
+                        "{} ({})",
+                        repository.repository.bright_blue(),
+                        status.to_string().red()
+                    )
+                }),
+            ),
+            Format::Simple => category
+                .repository_iterator
+                .map(|(repository, status)| match status {
+                    RepositoryChangeStatus::UpToDate => {
+                        panic!("No up-to-date should exist at this point")
+                    }
+                    RepositoryChangeStatus::NoRepository => format!(
+                        "{}/{} no_repository 0",
+                        repository.category, repository.repository
                     ),
-                    category
-                        .repository_iterator
-                        .map(|(repository, status)| format!(
-                            "{} ({})",
-                            repository.repository.bright_blue(),
-                            status.to_string().red()
-                        ))
-                )
-            ),
-            Format::Simple => print!(
-                "{}",
-                category
-                    .repository_iterator
-                    .map(|(repository, status)| match status {
-                        RepositoryChangeStatus::UpToDate =>
-                            panic!("No up-to-date should exist at this point"),
-                        RepositoryChangeStatus::NoRepository => format!(
-                            "{}/{} no_repository 0",
-                            repository.category, repository.repository
-                        ),
-                        RepositoryChangeStatus::UncommittedChanges(n) => format!(
-                            "{}/{} uncommitted_changes {}",
-                            repository.category, repository.repository, n
-                        ),
-                    })
-                    .join("\n")
-            ),
+                    RepositoryChangeStatus::UncommittedChanges(n) => format!(
+                        "{}/{} uncommitted_changes {}",
+                        repository.category, repository.repository, n
+                    ),
+                })
+                .join("\n"),
         }
     }
 
@@ -94,17 +92,20 @@ impl ChangesCommand {
                 all: true,
                 format,
             } => {
-                let mut insert_newline = false;
-                for category in grass::list_all_repositories_with_change_status(&user_config) {
-                    if insert_newline {
-                        println!();
-                    };
-                    insert_newline = true;
-
-                    let category = category
-                        .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate));
-                    Self::handle_category(category, &format.clone().unwrap_or_default());
-                }
+                let result = grass::list_all_repositories_with_change_status(&user_config)
+                    .into_iter()
+                    .map(|category| {
+                        let category = category.filter(|(_, status)| {
+                            !matches!(status, RepositoryChangeStatus::UpToDate)
+                        });
+                        Self::handle_category(category, &format.clone().unwrap_or_default())
+                    })
+                    .join(match format.clone().unwrap_or_default() {
+                        Format::Fancy => "\n\n",
+                        Format::Simple => "\n",
+                    });
+                print!("{}", result);
+                io::stdout().flush().expect("Unable to flush");
             }
             Self {
                 category: Some(_),
