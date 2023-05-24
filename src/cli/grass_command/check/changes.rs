@@ -4,9 +4,8 @@ use grass::{
     repository::RepositoryChangeStatus,
     types::{FilteredCategoryDescription, SimpleRepositoryDescription},
 };
-use itertools::Itertools;
 
-use crate::more_itertools::MoreItertools;
+use crate::output::generate_fancy_vertical_list;
 use colored::*;
 
 #[derive(Parser, Debug)]
@@ -22,17 +21,21 @@ impl ChangesCommand {
         T: Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)>,
     {
         println!(
-            "┌ Repositories with uncommitted changes for '{}':\n│\n{}",
-            category.category,
-            category
-                .repository_iterator
-                .sandwich_map(
-                    |(repository, status)| format!("├─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
-                    |(repository, status)| format!("├─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
-                    |(repository, status)| format!("└─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
-                )
-                .join("\n")
-        );
+            "{}",
+            generate_fancy_vertical_list(
+                format!(
+                    "Repositories with uncommitted changes for '{}'",
+                    category.category
+                ),
+                category
+                    .repository_iterator
+                    .map(|(repository, status)| format!(
+                        "{} ({})",
+                        repository.repository.bright_blue(),
+                        status.to_string().red()
+                    ))
+            )
+        )
     }
 
     pub fn handle(&self) {

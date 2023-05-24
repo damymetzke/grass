@@ -2,7 +2,7 @@ use clap::Parser;
 use grass::{config, types::SimpleCategoryDescription};
 use itertools::Itertools;
 
-use crate::more_itertools::MoreItertools;
+use crate::output::generate_fancy_vertical_list;
 
 #[derive(Parser, Debug)]
 /// List categories and repositories
@@ -21,18 +21,12 @@ pub struct LsCommand {
 
 impl LsCommand {
     fn generate_output_repositories_for_category(category: &SimpleCategoryDescription) -> String {
-        format!(
-            "┌ Repos for category '{}':\n│\n{}",
-            category.category,
+        generate_fancy_vertical_list(
+            format!("Repos for category '{}'", category.category),
             category
                 .repositories
                 .iter()
-                .sandwich_map(
-                    |repository| format!("├─ {}", repository.repository),
-                    |repository| format!("├─ {}", repository.repository),
-                    |repository| format!("└─ {}", repository.repository),
-                )
-                .join("\n")
+                .map(|repository| &repository.repository),
         )
     }
 
@@ -51,17 +45,7 @@ impl LsCommand {
     where
         T: IntoIterator<Item = &'a String>,
     {
-        format!(
-            "┌ Categories:\n│\n{}",
-            categories
-                .into_iter()
-                .sandwich_map(
-                    |category| format!("├─ {}", category),
-                    |category| format!("├─ {}", category),
-                    |category| format!("└─ {}", category),
-                )
-                .join("\n")
-        )
+        generate_fancy_vertical_list("Categories", categories)
     }
 
     pub fn handle(&self) {
