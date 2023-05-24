@@ -49,12 +49,23 @@ impl ChangesCommand {
                         ))
                 )
             ),
-            Format::Simple => println!(
+            Format::Simple => print!(
                 "{}",
                 category
                     .repository_iterator
-                    .map(|(repository, _)| repository.repository)
-                    .join(" ")
+                    .map(|(repository, status)| match status {
+                        RepositoryChangeStatus::UpToDate =>
+                            panic!("No up-to-date should exist at this point"),
+                        RepositoryChangeStatus::NoRepository => format!(
+                            "{}/{} no_repository 0",
+                            repository.category, repository.repository
+                        ),
+                        RepositoryChangeStatus::UncommittedChanges(n) => format!(
+                            "{}/{} uncommitted_changes {}",
+                            repository.category, repository.repository, n
+                        ),
+                    })
+                    .join("\n")
             ),
         }
     }
@@ -83,7 +94,13 @@ impl ChangesCommand {
                 all: true,
                 format,
             } => {
+                let mut insert_newline = false;
                 for category in grass::list_all_repositories_with_change_status(&user_config) {
+                    if insert_newline {
+                        println!();
+                    };
+                    insert_newline = true;
+
                     let category = category
                         .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate));
                     Self::handle_category(category, &format.clone().unwrap_or_default());
