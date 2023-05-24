@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{fmt::Display, path::Path};
 
 use git2::{Repository, Status};
 
@@ -35,5 +35,15 @@ where
     {
         0 => RepositoryChangeStatus::UpToDate,
         num_changes => RepositoryChangeStatus::UncommittedChanges(num_changes),
+    }
+}
+
+impl Display for RepositoryChangeStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RepositoryChangeStatus::UpToDate => write!(f, "No changes"),
+            RepositoryChangeStatus::NoRepository => write!(f, "No repository"),
+            RepositoryChangeStatus::UncommittedChanges(n) => write!(f, "{} uncommitted changes", n),
+        }
     }
 }

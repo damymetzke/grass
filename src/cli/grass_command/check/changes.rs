@@ -7,6 +7,7 @@ use grass::{
 use itertools::Itertools;
 
 use crate::more_itertools::MoreItertools;
+use colored::*;
 
 #[derive(Parser, Debug)]
 pub struct ChangesCommand {
@@ -16,9 +17,9 @@ pub struct ChangesCommand {
 }
 
 impl ChangesCommand {
-    fn handle_category<T, U>(category: FilteredCategoryDescription<T, U>)
+    fn handle_category<T>(category: FilteredCategoryDescription<T, RepositoryChangeStatus>)
     where
-        T: Iterator<Item = (SimpleRepositoryDescription, U)>,
+        T: Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)>,
     {
         println!(
             "┌ Repositories with uncommitted changes for '{}':\n│\n{}",
@@ -26,9 +27,9 @@ impl ChangesCommand {
             category
                 .repository_iterator
                 .sandwich_map(
-                    |(repository, _)| format!("├─ {}", repository.repository),
-                    |(repository, _)| format!("├─ {}", repository.repository),
-                    |(repository, _)| format!("└─ {}", repository.repository),
+                    |(repository, status)| format!("├─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
+                    |(repository, status)| format!("├─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
+                    |(repository, status)| format!("└─ {} ({})", repository.repository.bright_blue(), status.to_string().red()),
                 )
                 .join("\n")
         );
