@@ -1,8 +1,15 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use grass::{config, types::SimpleCategoryDescription};
 use itertools::Itertools;
 
 use crate::output::generate_fancy_vertical_list;
+
+#[derive(ValueEnum, Debug, Clone, Default)]
+enum Format {
+    #[default]
+    Fancy,
+    Simple,
+}
 
 #[derive(Parser, Debug)]
 /// List categories and repositories
@@ -17,35 +24,55 @@ pub struct LsCommand {
     /// List all repositories in all categories
     #[clap(short, long)]
     all: bool,
+    #[clap(long)]
+    format: Option<Format>,
 }
 
 impl LsCommand {
-    fn generate_output_repositories_for_category(category: &SimpleCategoryDescription) -> String {
-        generate_fancy_vertical_list(
-            format!("Repos for category '{}'", category.category),
-            category
+    fn generate_output_repositories_for_category(
+        category: &SimpleCategoryDescription,
+        format: &Format,
+    ) -> String {
+        match format {
+            Format::Fancy => generate_fancy_vertical_list(
+                format!("Repos for category '{}'", category.category),
+                category
+                    .repositories
+                    .iter()
+                    .map(|repository| &repository.repository),
+            ),
+            Format::Simple => category
                 .repositories
                 .iter()
-                .map(|repository| &repository.repository),
-        )
+                .map(|repository| format!("{}/{}", &repository.category, &repository.repository))
+                .join(" "),
+        }
     }
 
-    fn generate_output_all_repositories_by_category<T, U>(categories: T) -> String
+    fn generate_output_all_repositories_by_category<T, U>(categories: T, format: &Format) -> String
     where
         T: IntoIterator<Item = U>,
         U: std::borrow::Borrow<SimpleCategoryDescription>,
     {
         categories
             .into_iter()
-            .map(|category| Self::generate_output_repositories_for_category(category.borrow()))
-            .join("\n\n")
+            .map(|category| {
+                Self::generate_output_repositories_for_category(category.borrow(), format)
+            })
+            .join(match format {
+                Format::Fancy => "\n\n",
+                Format::Simple => " ",
+            })
     }
 
-    fn generate_output_category_name_only<'a, T>(categories: T) -> String
+    fn generate_output_category_name_only<'a, T>(categories: T, format: &Format) -> String
     where
         T: IntoIterator<Item = &'a String>,
     {
-        generate_fancy_vertical_list("Categories", categories)
+        match format {
+            Format::Fancy => generate_fancy_vertical_list("Categories", categories),
+            Format::Simple => categories.into_iter().join(" "),
+        }
     }
 
     pub fn handle(&self) {
@@ -56,21 +83,27 @@ impl LsCommand {
             LsCommand {
                 category: None,
                 all: false,
+                format,
             } => Self::generate_output_category_name_only(
                 grass::list_categories(&user_config).iter(),
+                &format.clone().unwrap_or_default(),
             ),
             LsCommand {
                 category: Some(category),
                 all: false,
+                format,
             } => Self::generate_output_repositories_for_category(
                 &grass::list_repos_by_category(&user_config, category).unwrap(),
+                &format.clone().unwrap_or_default(),
             ),
             LsCommand {
                 category: None,
                 all: true,
-            } => Self::generate_output_all_repositories_by_category(grass::list_all_repositories(
-                &user_config,
-            )),
+                format,
+            } => Self::generate_output_all_repositories_by_category(
+                grass::list_all_repositories(&user_config),
+                &format.clone().unwrap_or_default(),
+            ),
             _ => {
                 // TODO: Generate more specific output
                 eprintln!("There was a problem with the command");
