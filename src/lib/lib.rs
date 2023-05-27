@@ -13,7 +13,7 @@ pub mod dev {
             list_repositories_with_change_status,
         },
         types,
-        write::clone_repository,
+        write::{clean_repository, clone_repository},
     };
     pub mod config {
         pub use crate::config::*;

@@ -3,6 +3,7 @@ mod clone;
 #[cfg(debug_assertions)]
 mod debug;
 mod ls;
+mod repo;
 mod script;
 mod session;
 mod shell_insert;
@@ -13,6 +14,7 @@ pub enum GrassSubcommand {
     Check(check::CheckCommand),
     Clone(clone::CloneCommand),
     Ls(ls::LsCommand),
+    Repo(repo::RepoCommand),
     Script(script::ScriptCommand),
     ShellInsert(shell_insert::ShellInsertCommand),
     Session(session::SessionCommand),
@@ -39,6 +41,7 @@ impl GrassCommand {
             GrassSubcommand::Check(command) => command.handle(),
             GrassSubcommand::Clone(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(),
+            GrassSubcommand::Repo(command) => command.handle(),
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
             GrassSubcommand::Session(command) => command.handle(),
