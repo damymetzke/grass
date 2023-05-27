@@ -3,7 +3,7 @@ mod public;
 mod repository;
 mod util;
 
-#[cfg(feature="dev")]
+#[cfg(feature = "dev")]
 pub mod dev {
     pub use crate::public::{
         categories::{get_category_path, list_categories},
@@ -13,6 +13,7 @@ pub mod dev {
             list_repositories_with_change_status,
         },
         types,
+        write::clone_repository,
     };
     pub mod config {
         pub use crate::config::*;
