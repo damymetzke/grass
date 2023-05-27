@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use grass::config;
+use grass::dev::config;
 
 #[derive(Debug, Subcommand)]
 enum DebugSubcommand {

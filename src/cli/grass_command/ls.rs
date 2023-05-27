@@ -1,5 +1,5 @@
 use clap::{Parser, ValueEnum};
-use grass::{config, types::SimpleCategoryDescription};
+use grass::dev::{config, types::SimpleCategoryDescription};
 use itertools::Itertools;
 
 use crate::output::generate_fancy_vertical_list;
@@ -85,7 +85,7 @@ impl LsCommand {
                 all: false,
                 format,
             } => Self::generate_output_category_name_only(
-                grass::list_categories(&user_config).iter(),
+                grass::dev::list_categories(&user_config).iter(),
                 &format.clone().unwrap_or_default(),
             ),
             LsCommand {
@@ -93,7 +93,7 @@ impl LsCommand {
                 all: false,
                 format,
             } => Self::generate_output_repositories_for_category(
-                &grass::list_repos_by_category(&user_config, category).unwrap(),
+                &grass::dev::list_repos_by_category(&user_config, category).unwrap(),
                 &format.clone().unwrap_or_default(),
             ),
             LsCommand {
@@ -101,7 +101,7 @@ impl LsCommand {
                 all: true,
                 format,
             } => Self::generate_output_all_repositories_by_category(
-                grass::list_all_repositories(&user_config),
+                grass::dev::list_all_repositories(&user_config),
                 &format.clone().unwrap_or_default(),
             ),
             _ => {

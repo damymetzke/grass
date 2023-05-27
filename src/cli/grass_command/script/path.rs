@@ -1,5 +1,5 @@
 use clap::Parser;
-use grass::config;
+use grass::dev::config;
 
 #[derive(Parser, Debug)]
 /// Print the path of a category root, or a repository
@@ -21,11 +21,11 @@ impl PathCommand {
             PathCommand {
                 category,
                 repository: None,
-            } => grass::get_category_path(&user_config, category),
+            } => grass::dev::get_category_path(&user_config, category),
             PathCommand {
                 category,
                 repository: Some(repository),
-            } => grass::get_repository_path(&user_config, category, repository),
+            } => grass::dev::get_repository_path(&user_config, category, repository),
         };
 
         print!("{}", path.unwrap_or_default().to_str().unwrap_or_default());

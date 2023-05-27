@@ -5,7 +5,7 @@ use itertools::Itertools;
 use crate::{
     config::RootConfig,
     repository::{get_repository_changes, RepositoryChangeStatus},
-    types::{FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription},
+    dev::types::{FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription},
     util::get_base_directory,
 };
 

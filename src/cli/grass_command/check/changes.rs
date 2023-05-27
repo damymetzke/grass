@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use clap::{Parser, ValueEnum};
-use grass::{
+use grass::dev::{
     config,
     repository::RepositoryChangeStatus,
     types::{FilteredCategoryDescription, SimpleRepositoryDescription},
@@ -77,7 +77,7 @@ impl ChangesCommand {
                 all: false,
                 format,
             } => {
-                let category = grass::list_repositories_with_change_status(&user_config, category);
+                let category = grass::dev::list_repositories_with_change_status(&user_config, category);
                 let category = if let Some(repositories) = category {
                     repositories
                         .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate))
@@ -92,7 +92,7 @@ impl ChangesCommand {
                 all: true,
                 format,
             } => {
-                let result = grass::list_all_repositories_with_change_status(&user_config)
+                let result = grass::dev::list_all_repositories_with_change_status(&user_config)
                     .into_iter()
                     .map(|category| {
                         let category = category.filter(|(_, status)| {

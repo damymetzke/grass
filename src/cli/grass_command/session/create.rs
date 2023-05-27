@@ -1,6 +1,6 @@
 use clap::Parser;
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
-use grass::config::RootConfig;
+use grass::dev::config::{self, RootConfig};
 
 use std::process::Command as ProcessCommand;
 
@@ -16,7 +16,7 @@ impl CreateCommand {
         T: AsRef<str>,
         U: AsRef<str>,
     {
-        let category = match grass::get_repository(user_config, category, repository) {
+        let category = match grass::dev::get_repository(user_config, category, repository) {
             Some(category) => category,
             None => {
                 eprintln!("Repository not found");
@@ -48,7 +48,7 @@ impl CreateCommand {
 
     fn select_repository(user_config: &RootConfig, category: &String) {
         // TODO: Handle errors in this entire function
-        let category = grass::list_repos_by_category(user_config, category).unwrap();
+        let category = grass::dev::list_repos_by_category(user_config, category).unwrap();
 
         let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
             .items(
@@ -72,7 +72,7 @@ impl CreateCommand {
 
     fn select_category(user_config: &RootConfig) {
         // TODO: Handle errors in this entire function
-        let categories: Vec<String> = grass::list_all_repositories(user_config)
+        let categories: Vec<String> = grass::dev::list_all_repositories(user_config)
             .iter()
             .flat_map(|category| {
                 category
@@ -99,7 +99,7 @@ impl CreateCommand {
     }
 
     pub fn handle(&self) {
-        let user_config = grass::config::load_user_config().unwrap_or_default();
+        let user_config = config::load_user_config().unwrap_or_default();
         match self {
             CreateCommand {
                 category: Some(category),
