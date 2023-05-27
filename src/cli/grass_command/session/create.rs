@@ -11,7 +11,11 @@ pub struct CreateCommand {
 }
 
 impl CreateCommand {
-    fn create_session(user_config: &RootConfig, category: &String, repository: &String) {
+    fn create_session<T, U>(user_config: &RootConfig, category: T, repository: U)
+    where
+        T: AsRef<str>,
+        U: AsRef<str>,
+    {
         let category = match grass::get_repository(user_config, category, repository) {
             Some(category) => category,
             None => {
@@ -68,7 +72,15 @@ impl CreateCommand {
 
     fn select_category(user_config: &RootConfig) {
         // TODO: Handle errors in this entire function
-        let categories = grass::list_categories(user_config);
+        let categories: Vec<String> = grass::list_all_repositories(user_config)
+            .iter()
+            .flat_map(|category| {
+                category
+                    .repositories
+                    .iter()
+                    .map(|repository| format!("{}/{}", repository.category, repository.repository))
+            })
+            .collect();
 
         let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
             .items(&categories)
@@ -77,7 +89,13 @@ impl CreateCommand {
             .interact()
             .unwrap();
 
-        Self::select_repository(user_config, &categories[selection]);
+        let parts: Vec<&str> = categories[selection].splitn(2, '/').collect();
+
+        let (category, repository) = match parts.as_slice() {
+            [category, repository, ..] => (category, repository),
+            _ => return,
+        };
+        Self::create_session(user_config, category, repository);
     }
 
     pub fn handle(&self) {
