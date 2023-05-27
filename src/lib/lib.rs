@@ -3,6 +3,7 @@ mod public;
 mod repository;
 mod util;
 
+#[cfg(feature="dev")]
 pub mod dev {
     pub use crate::public::{
         categories::{get_category_path, list_categories},
