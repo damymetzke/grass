@@ -1,5 +1,4 @@
 mod check;
-mod clone;
 #[cfg(debug_assertions)]
 mod debug;
 mod ls;
@@ -12,7 +11,6 @@ use clap::{Parser, Subcommand};
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
     Check(check::CheckCommand),
-    Clone(clone::CloneCommand),
     Ls(ls::LsCommand),
     Repo(repo::RepoCommand),
     Script(script::ScriptCommand),
@@ -39,7 +37,6 @@ impl GrassCommand {
     pub fn handle(&self) {
         match &self.command {
             GrassSubcommand::Check(command) => command.handle(),
-            GrassSubcommand::Clone(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(),
             GrassSubcommand::Repo(command) => command.handle(),
             GrassSubcommand::Script(command) => command.handle(),
