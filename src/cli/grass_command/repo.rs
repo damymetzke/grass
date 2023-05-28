@@ -1,6 +1,7 @@
 mod clean;
 mod clone;
 
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
@@ -16,10 +17,10 @@ pub struct RepoCommand {
 }
 
 impl RepoCommand {
-    pub fn handle(&self) {
+    pub fn handle(&self) -> Result<()> {
         match &self.command {
             RepoSubcommand::Clean(command) => command.handle(),
-            RepoSubcommand::Clone(command) => {command.handle().ok();},
+            RepoSubcommand::Clone(command) => command.handle()
         }
     }
 }

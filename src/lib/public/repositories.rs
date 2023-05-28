@@ -98,6 +98,7 @@ where
     })
 }
 
+// TODO: Return a result instead of an Option
 pub fn get_repository_path<T, U>(
     user_config: &RootConfig,
     category: T,

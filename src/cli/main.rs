@@ -9,5 +9,8 @@ use grass_command::GrassCommand;
 fn main() {
     let grass_command = GrassCommand::parse();
 
-    grass_command.handle();
+    match grass_command.handle() {
+        Ok(_) => (),
+        Err(error) => println!("Something went wrong!\n{}", error),
+    };
 }

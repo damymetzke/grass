@@ -1,6 +1,7 @@
 use git2::build::RepoBuilder;
 
 use crate::{config::RootConfig, facades::git};
+use thiserror::Error;
 
 pub fn clone_repository<T, U>(user_config: &RootConfig, remote: T, category: U) -> Option<()>
 where
@@ -22,12 +23,19 @@ where
     Some(())
 }
 
-pub fn clean_repository<T, U>(user_config: &RootConfig, category: T, repository: U) -> Option<()>
+#[derive(Error, Debug)]
+pub enum CleanRepositoryError {
+    #[error(transparent)]
+    Git(#[from] git::Error),
+    #[error("This is an unknown error, due to missing context. This will be a more clear error in the future.")]
+    Unknown,
+}
+
+pub fn clean_repository<T, U>(user_config: &RootConfig, category: T, repository: U) -> Result<(), CleanRepositoryError>
 where
     T: AsRef<str>,
     U: AsRef<str>,
 {
-    let repository_path = crate::dev::get_repository_path(user_config, category, repository)?;
-    // TODO: Handle errors
-    git::clean_repository(repository_path).ok()
+    let repository_path = crate::dev::get_repository_path(user_config, category, repository).ok_or(CleanRepositoryError::Unknown)?;
+    Ok(git::clean_repository(repository_path)?)
 }

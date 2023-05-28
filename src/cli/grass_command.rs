@@ -6,6 +6,8 @@ mod repo;
 mod script;
 mod session;
 mod shell_insert;
+
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 #[derive(Debug, Subcommand)]
@@ -34,17 +36,18 @@ pub struct GrassCommand {
 }
 
 impl GrassCommand {
-    pub fn handle(&self) {
+    pub fn handle(&self) -> Result<()> {
         match &self.command {
             GrassSubcommand::Check(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(),
-            GrassSubcommand::Repo(command) => command.handle(),
+            GrassSubcommand::Repo(command) => command.handle()?,
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
             GrassSubcommand::Session(command) => command.handle(),
             GrassSubcommand::Cs(command) => command.handle(),
             #[cfg(debug_assertions)]
             GrassSubcommand::Debug(command) => command.handle(),
-        }
+        };
+        Ok(())
     }
 }
