@@ -1,10 +1,9 @@
 use clap::Parser;
-use dialoguer::{theme::ColorfulTheme, FuzzySelect};
 use grass::dev::config::{self, RootConfig};
 
 use std::process::Command as ProcessCommand;
 
-use crate::facades::dialoguer::select_repository;
+use crate::facades::dialoguer::{select_category_and_repository, select_repository};
 
 #[derive(Parser, Debug)]
 pub struct CreateCommand {
@@ -58,31 +57,10 @@ impl CreateCommand {
     }
 
     fn select_category(user_config: &RootConfig) {
-        // TODO: Handle errors in this entire function
-        let categories: Vec<String> = grass::dev::list_all_repositories(user_config)
-            .iter()
-            .flat_map(|category| {
-                category
-                    .repositories
-                    .iter()
-                    .map(|repository| format!("{}/{}", repository.category, repository.repository))
-            })
-            .collect();
-
-        let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
-            .items(&categories)
-            .default(0)
-            .vim_mode(true)
-            .interact()
-            .unwrap();
-
-        let parts: Vec<&str> = categories[selection].splitn(2, '/').collect();
-
-        let (category, repository) = match parts.as_slice() {
-            [category, repository, ..] => (category, repository),
-            _ => return,
-        };
-        Self::create_session(user_config, category, repository);
+        let categories = &grass::dev::list_all_repositories(user_config);
+        // TODO: Remove unwrap
+        let repository = select_category_and_repository(categories).unwrap();
+        Self::create_session(user_config, &repository.category, &repository.repository);
     }
 
     pub fn handle(&self) {
