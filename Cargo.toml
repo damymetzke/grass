@@ -28,6 +28,7 @@ toml = "0.7.2"
 # dialoguer = { version = "0.10.3", features = ["fuzzy-select"]}
 git2 = "0.17.0"
 clap_complete = "4.2.1"
+thiserror = "1.0.40"
 
 [dependencies.clap]
 version = "4.1.8"

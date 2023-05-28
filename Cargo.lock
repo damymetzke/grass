@@ -302,6 +302,7 @@ dependencies = [
  "git2",
  "itertools",
  "serde",
+ "thiserror",
  "toml",
 ]
 

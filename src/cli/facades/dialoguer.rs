@@ -1,11 +1,28 @@
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
 use grass::dev::types::{SimpleCategoryDescription, SimpleRepositoryDescription};
+use thiserror::Error;
 
 pub trait Selectable {
     fn get_select_name(&self) -> &str;
 }
 
-pub fn select_selectable<T>(selectables: &[T]) -> Option<&T>
+#[derive(Error, Debug)]
+pub enum DialoguerError {
+    #[error("Dialoguer error")]
+    Dialoguer(dialoguer::Error),
+    #[error("User did not select an item")]
+    NothingSelected,
+}
+
+impl From<dialoguer::Error> for DialoguerError {
+    fn from(value: dialoguer::Error) -> Self {
+        DialoguerError::Dialoguer(value)
+    }
+}
+
+type Result<T> = std::result::Result<T, DialoguerError>;
+
+pub fn select_selectable<T>(selectables: &[T]) -> Result<&T>
 where
     T: Selectable,
 {
@@ -18,15 +35,16 @@ where
         .items(&options)
         .default(0)
         .vim_mode(true)
-        .interact_opt()
-        .unwrap_or(None)?;
+        .interact_opt()?;
 
-    selectables.get(selection)
+    selectables
+        .get(selection.ok_or(DialoguerError::NothingSelected)?)
+        .ok_or(DialoguerError::NothingSelected)
 }
 
 pub fn select_category_and_repository(
     categories: &[SimpleCategoryDescription],
-) -> Option<&SimpleRepositoryDescription> {
+) -> Result<&SimpleRepositoryDescription> {
     let sizes = categories
         .iter()
         .map(|category| category.repositories.len());
@@ -44,8 +62,8 @@ pub fn select_category_and_repository(
         .items(&options)
         .default(0)
         .vim_mode(true)
-        .interact_opt()
-        .unwrap_or(None)?;
+        .interact_opt()?
+        .ok_or(DialoguerError::NothingSelected)?;
 
     let mut j = selection;
     let mut i = 0;
@@ -61,6 +79,7 @@ pub fn select_category_and_repository(
     categories
         .get(i)
         .and_then(|category| category.repositories.get(j))
+        .ok_or(DialoguerError::NothingSelected)
 }
 
 impl Selectable for SimpleRepositoryDescription {

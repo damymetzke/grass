@@ -14,7 +14,7 @@ impl CloneCommand {
     pub fn handle(&self) {
         let user_config = config::load_user_config().unwrap_or_default();
         let category = self.category.clone().or_else(|| {
-            select_selectable(&grass::dev::list_categories(&user_config)).cloned()
+            select_selectable(&grass::dev::list_categories(&user_config)).cloned().ok()
         }).unwrap();
 
         grass::dev::clone_repository(&user_config, &self.remote, category);
