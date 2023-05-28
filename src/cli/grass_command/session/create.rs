@@ -4,6 +4,8 @@ use grass::dev::config::{self, RootConfig};
 
 use std::process::Command as ProcessCommand;
 
+use crate::facades::dialoguer::select_repository;
+
 #[derive(Parser, Debug)]
 pub struct CreateCommand {
     category: Option<String>,
@@ -50,24 +52,9 @@ impl CreateCommand {
         // TODO: Handle errors in this entire function
         let category = grass::dev::list_repos_by_category(user_config, category).unwrap();
 
-        let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
-            .items(
-                &category
-                    .repositories
-                    .iter()
-                    .map(|repository| &repository.repository)
-                    .collect::<Vec<_>>(),
-            )
-            .default(0)
-            .vim_mode(true)
-            .interact()
-            .unwrap();
+        let repository = select_repository(&category.repositories).unwrap();
 
-        Self::create_session(
-            user_config,
-            &category.category,
-            &category.repositories[selection].repository,
-        );
+        Self::create_session(user_config, &category.category, &repository.repository);
     }
 
     fn select_category(user_config: &RootConfig) {

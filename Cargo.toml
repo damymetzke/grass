@@ -17,7 +17,7 @@ required-features = ["cli"]
 
 [features]
 dev = []
-cli = ["dep:clap", "dep:colored"]
+cli = ["dep:clap", "dep:colored", "dep:dialoguer"]
 default = ["cli", "dev"]
 
 [dependencies]
@@ -42,3 +42,4 @@ optional = true
 git = "https://github.com/console-rs/dialoguer.git"
 rev = "c8cdaf3953c8e5e59734ecac14e67c6fc772f5ab"
 features = ["fuzzy-select"]
+optional = true

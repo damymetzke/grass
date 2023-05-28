@@ -1,3 +1,4 @@
+mod facades;
 mod grass_command;
 mod more_itertools;
 mod output;
