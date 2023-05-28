@@ -77,7 +77,8 @@ impl ChangesCommand {
                 all: false,
                 format,
             } => {
-                let category = grass::dev::list_repositories_with_change_status(&user_config, category);
+                let category =
+                    grass::dev::list_repositories_with_change_status(&user_config, category);
                 let category = if let Some(repositories) = category {
                     repositories
                         .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate))

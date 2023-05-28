@@ -1,7 +1,7 @@
 use std::{env, process::Command as ProcessCommand, str};
 
-use clap::{Parser, ValueEnum, CommandFactory};
-use clap_complete::{Generator, shells::Bash};
+use clap::{CommandFactory, Parser, ValueEnum};
+use clap_complete::{shells::Bash, Generator};
 use grass::dev::config;
 
 use super::GrassCommand;

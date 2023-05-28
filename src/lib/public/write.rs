@@ -31,11 +31,16 @@ pub enum CleanRepositoryError {
     Unknown,
 }
 
-pub fn clean_repository<T, U>(user_config: &RootConfig, category: T, repository: U) -> Result<(), CleanRepositoryError>
+pub fn clean_repository<T, U>(
+    user_config: &RootConfig,
+    category: T,
+    repository: U,
+) -> Result<(), CleanRepositoryError>
 where
     T: AsRef<str>,
     U: AsRef<str>,
 {
-    let repository_path = crate::dev::get_repository_path(user_config, category, repository).ok_or(CleanRepositoryError::Unknown)?;
+    let repository_path = crate::dev::get_repository_path(user_config, category, repository)
+        .ok_or(CleanRepositoryError::Unknown)?;
     Ok(git::clean_repository(repository_path)?)
 }

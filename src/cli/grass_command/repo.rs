@@ -20,7 +20,7 @@ impl RepoCommand {
     pub fn handle(&self) -> Result<()> {
         match &self.command {
             RepoSubcommand::Clean(command) => command.handle(),
-            RepoSubcommand::Clone(command) => command.handle()
+            RepoSubcommand::Clone(command) => command.handle(),
         }
     }
 }
