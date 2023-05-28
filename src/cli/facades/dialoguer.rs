@@ -1,12 +1,17 @@
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
 use grass::dev::types::{SimpleCategoryDescription, SimpleRepositoryDescription};
 
-pub fn select_repository(
-    repositories: &[SimpleRepositoryDescription],
-) -> Option<&SimpleRepositoryDescription> {
-    let options: Vec<_> = repositories
+pub trait Selectable {
+    fn get_select_name(&self) -> &str;
+}
+
+pub fn select_selectable<T>(selectables: &[T]) -> Option<&T>
+where
+    T: Selectable,
+{
+    let options: Vec<_> = selectables
         .iter()
-        .map(|repository| &repository.repository)
+        .map(|selectable| selectable.get_select_name())
         .collect();
 
     let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
@@ -16,7 +21,7 @@ pub fn select_repository(
         .interact_opt()
         .unwrap_or(None)?;
 
-    repositories.get(selection)
+    selectables.get(selection)
 }
 
 pub fn select_category_and_repository(
@@ -56,4 +61,22 @@ pub fn select_category_and_repository(
     categories
         .get(i)
         .and_then(|category| category.repositories.get(j))
+}
+
+impl Selectable for SimpleRepositoryDescription {
+    fn get_select_name(&self) -> &str {
+        self.repository.as_str()
+    }
+}
+
+impl Selectable for SimpleCategoryDescription {
+    fn get_select_name(&self) -> &str {
+        self.category.as_str()
+    }
+}
+
+impl Selectable for String {
+    fn get_select_name(&self) -> &str {
+        self.as_str()
+    }
 }

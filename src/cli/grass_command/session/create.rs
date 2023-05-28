@@ -3,7 +3,7 @@ use grass::dev::config::{self, RootConfig};
 
 use std::process::Command as ProcessCommand;
 
-use crate::facades::dialoguer::{select_category_and_repository, select_repository};
+use crate::facades::dialoguer::{select_category_and_repository, select_selectable};
 
 #[derive(Parser, Debug)]
 pub struct CreateCommand {
@@ -51,7 +51,7 @@ impl CreateCommand {
         // TODO: Handle errors in this entire function
         let category = grass::dev::list_repos_by_category(user_config, category).unwrap();
 
-        let repository = select_repository(&category.repositories).unwrap();
+        let repository = select_selectable(&category.repositories).unwrap();
 
         Self::create_session(user_config, &category.category, &repository.repository);
     }
