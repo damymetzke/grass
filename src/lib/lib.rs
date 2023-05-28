@@ -1,4 +1,5 @@
 mod config;
+mod facades;
 mod public;
 mod repository;
 mod util;
