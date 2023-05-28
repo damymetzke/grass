@@ -1,3 +1,4 @@
+use anyhow::Result;
 use clap::Parser;
 use grass::dev::config;
 
@@ -10,13 +11,14 @@ pub struct CloneCommand {
 }
 
 impl CloneCommand {
-    // TODO: Handle errors
-    pub fn handle(&self) {
+    pub fn handle(&self) -> Result<()> {
         let user_config = config::load_user_config().unwrap_or_default();
-        let category = self.category.clone().or_else(|| {
-            select_selectable(&grass::dev::list_categories(&user_config)).cloned().ok()
-        }).unwrap();
+        let category = self.category.clone().map_or_else(
+            || select_selectable(&grass::dev::list_categories(&user_config)).cloned(),
+            |value| Ok(value),
+        )?;
 
         grass::dev::clone_repository(&user_config, &self.remote, category);
+        Ok(())
     }
 }
