@@ -67,6 +67,12 @@ impl GrassConfig {
     }
 }
 
+#[derive(Error, Debug)]
+pub enum MergeError {
+    #[error("Cannot find home directory")]
+    MissingHomeDirectory,
+}
+
 impl RootConfig {
     pub fn try_default() -> Option<Self> {
         Some(Self {
@@ -75,11 +81,11 @@ impl RootConfig {
     }
 
     // TODO: Return a Result
-    pub fn merge(&mut self, next: &LoadRootConfig) -> &mut Self {
+    pub fn merge(&mut self, next: &LoadRootConfig) -> Result<&mut Self, MergeError> {
         let grass = if let Some(grass) = &next.grass {
             grass
         } else {
-            return self;
+            return Ok(self);
         };
 
         if let Some(base_dir) = &grass.base_dir {
@@ -87,6 +93,8 @@ impl RootConfig {
                 Some(suffix) => {
                     if let Some(home_dir) = dirs::home_dir() {
                         self.grass.base_dir = home_dir.join(suffix);
+                    } else {
+                        return Err(MergeError::MissingHomeDirectory);
                     };
                 }
                 None => self.grass.base_dir = PathBuf::from(base_dir),
@@ -115,7 +123,7 @@ impl RootConfig {
             }
         }
 
-        self
+        Ok(self)
     }
 }
 
@@ -178,7 +186,9 @@ pub fn load_user_config() -> Result<RootConfig, LoadUserError> {
                     file: PathBuf::from(file_name),
                     reason: error.to_string(),
                 })?;
-            config.merge(&load_config);
+            config
+                .merge(&load_config)
+                .map_err(|_| LoadUserError::MissingHomeDirectory)?;
         }
     }
 
@@ -233,7 +243,7 @@ mod tests {
     #[test]
     fn test_config_merge() {
         let mut config = RootConfig::try_default().unwrap();
-        config.merge(&get_load_config());
+        config.merge(&get_load_config()).expect("Could not merge");
 
         // TODO: This tests depends on the existance of a home directory
         // Figure out a way that it doesn't.
