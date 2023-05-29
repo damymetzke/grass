@@ -69,7 +69,8 @@ impl ChangesCommand {
     }
 
     pub fn handle(&self) {
-        let user_config = config::load_user_config().unwrap_or_default();
+        // TODO: Handle error
+        let user_config = config::load_user_config().unwrap();
 
         match self {
             Self {

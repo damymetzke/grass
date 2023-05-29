@@ -12,7 +12,7 @@ pub struct CloneCommand {
 
 impl CloneCommand {
     pub fn handle(&self) -> Result<()> {
-        let user_config = config::load_user_config().unwrap_or_default();
+        let user_config = config::load_user_config()?;
         let category = self.category.clone().map_or_else(
             || select_selectable(&grass::dev::list_categories(&user_config)).cloned(),
             Ok,

@@ -33,7 +33,7 @@ impl ShellInsertCommand {
     fn handle_bash() {
         Self::print_shell_complete(Bash);
 
-        let user_config = config::load_user_config().unwrap_or_default();
+        let user_config = config::load_user_config().unwrap();
         println!(r#"gr() {{ cd "$(grass script path $@)"; }}"#);
         // Check for TMUX variable
         if env::var("TMUX").is_ok() {

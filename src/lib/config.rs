@@ -1,10 +1,12 @@
 mod load;
 
+use anyhow::{anyhow, Result};
 use std::{
     cell::{Ref, RefCell},
     collections::hash_map::{Entry, HashMap},
     fs::{self, File},
     io::Read,
+    path::PathBuf,
     rc::Rc,
 };
 
@@ -20,25 +22,22 @@ pub struct GrassCategory {
 pub struct GrassConfig {
     pub category: HashMap<String, Rc<RefCell<GrassCategory>>>,
     pub aliases: HashMap<String, Rc<RefCell<GrassCategory>>>,
-    pub base_dir: String,
+    pub base_dir: PathBuf,
 }
 
-impl Default for GrassConfig {
-    fn default() -> Self {
-        GrassConfig {
-            category: HashMap::default(),
-            aliases: HashMap::default(),
-            base_dir: String::from("~/.repos"),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct RootConfig {
     pub grass: GrassConfig,
 }
 
 impl GrassConfig {
+    pub fn try_default() -> Option<Self> {
+        Some(Self {
+            category: HashMap::default(),
+            aliases: HashMap::default(),
+            base_dir: dirs::home_dir()?.join("repos"),
+        })
+    }
     pub fn get_from_category_or_alias<T>(&self, name: T) -> Option<Ref<GrassCategory>>
     where
         T: AsRef<str>,
@@ -69,6 +68,13 @@ impl GrassConfig {
 }
 
 impl RootConfig {
+    pub fn try_default() -> Option<Self> {
+        Some(Self {
+            grass: GrassConfig::try_default()?,
+        })
+    }
+
+    // TODO: Return a Result
     pub fn merge(&mut self, next: &LoadRootConfig) -> &mut Self {
         let grass = if let Some(grass) = &next.grass {
             grass
@@ -77,7 +83,14 @@ impl RootConfig {
         };
 
         if let Some(base_dir) = &grass.base_dir {
-            self.grass.base_dir = base_dir.clone();
+            match base_dir.strip_prefix("~/") {
+                Some(suffix) => {
+                    if let Some(home_dir) = dirs::home_dir() {
+                        self.grass.base_dir = home_dir.join(suffix);
+                    };
+                }
+                None => self.grass.base_dir = PathBuf::from(base_dir),
+            }
         };
 
         for (key, category) in &grass.category {
@@ -106,23 +119,21 @@ impl RootConfig {
     }
 }
 
-pub fn load_user_config() -> Result<RootConfig, Box<dyn std::error::Error>> {
+// TODO: Convert to a proper library error
+pub fn load_user_config() -> Result<RootConfig> {
     let mut file = File::open(
         dirs::config_dir()
-            .ok_or("Could not find home directory")?
+            .ok_or(anyhow!("Could not find home directory"))?
             .join("grass/config.toml"),
     )?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    let mut config = RootConfig::default();
-    let load_config: LoadRootConfig = toml::from_str(&contents)?;
-    config.merge(&load_config);
 
-    let mut config = RootConfig::default();
+    let mut config = RootConfig::try_default().ok_or(anyhow!("Error loading default config"))?;
 
     let config_dir = dirs::config_dir()
-        .ok_or("Could not find config directory")?
+        .ok_or(anyhow!("Could not find config directory"))?
         .join("grass");
     if let Ok(entries) = fs::read_dir(&config_dir) {
         for file_name in
@@ -162,7 +173,7 @@ pub fn load_example_config() -> RootConfig {
                 (String::from("general"), general),
                 (String::from("work"), work),
             ]),
-            base_dir: String::from("~/repos"),
+            base_dir: dirs::home_dir().unwrap().join("repos"),
         },
     }
 }
@@ -193,10 +204,15 @@ mod tests {
 
     #[test]
     fn test_config_merge() {
-        let mut config = RootConfig::default();
+        let mut config = RootConfig::try_default().unwrap();
         config.merge(&get_load_config());
 
-        assert_eq!(config.grass.base_dir, "~/my-repositories");
+        // TODO: This tests depends on the existance of a home directory
+        // Figure out a way that it doesn't.
+        assert_eq!(
+            config.grass.base_dir,
+            dirs::home_dir().unwrap().join("my-repositories")
+        );
         assert_eq!(
             config.grass.category.get("work").unwrap().borrow().name,
             "work"

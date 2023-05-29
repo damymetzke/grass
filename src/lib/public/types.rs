@@ -1,4 +1,4 @@
-use crate::{config::RootConfig, util};
+use crate::config::RootConfig;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ impl SimpleCategoryDescription {
         // TODO: Do error checking
         let category = category.into();
         Self {
-            category_directory: util::get_base_directory(config).unwrap().join(&category),
+            category_directory: config.grass.base_dir.join(&category),
             category,
             repositories: repositories.into_iter().collect(),
         }
@@ -67,7 +67,7 @@ where
         // TODO: Do error checking
         let category = category.into();
         Self {
-            category_directory: util::get_base_directory(config).unwrap().join(&category),
+            category_directory: config.grass.base_dir.join(&category),
             category,
             repository_iterator,
         }

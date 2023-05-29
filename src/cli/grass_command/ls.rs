@@ -76,7 +76,8 @@ impl LsCommand {
     }
 
     pub fn handle(&self) {
-        let user_config = config::load_user_config().unwrap_or_default();
+        // TODO: Handle errors
+        let user_config = config::load_user_config().unwrap();
 
         // TODO: Handle errors
         let output = match self {

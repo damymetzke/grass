@@ -2,7 +2,6 @@ mod config;
 mod facades;
 mod public;
 mod repository;
-mod util;
 
 #[cfg(feature = "dev")]
 pub mod dev {
@@ -21,8 +20,5 @@ pub mod dev {
     }
     pub mod repository {
         pub use crate::repository::*;
-    }
-    pub mod util {
-        pub use crate::util::*;
     }
 }

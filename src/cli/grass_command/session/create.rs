@@ -64,7 +64,7 @@ impl CreateCommand {
     }
 
     pub fn handle(&self) {
-        let user_config = config::load_user_config().unwrap_or_default();
+        let user_config = config::load_user_config().unwrap();
         match self {
             CreateCommand {
                 category: Some(category),

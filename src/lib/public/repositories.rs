@@ -8,7 +8,6 @@ use crate::{
         FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription,
     },
     repository::{get_repository_changes, RepositoryChangeStatus},
-    util::get_base_directory,
 };
 
 /// List repositories in a single category
@@ -39,7 +38,7 @@ where
     let category = user_config
         .grass
         .get_from_category_or_alias(&category_name)?;
-    let root_folder = get_base_directory(user_config)?.join(&category.name);
+    let root_folder = user_config.grass.base_dir.join(&category.name);
 
     let repositories = if let Ok(entries) = fs::read_dir(root_folder) {
         entries
@@ -84,7 +83,9 @@ where
 {
     let category = user_config.grass.get_from_category_or_alias(&category)?;
 
-    let result = get_base_directory(user_config)?
+    let result = user_config
+        .grass
+        .base_dir
         .join(&category.name)
         .join(repository.as_ref());
 
@@ -112,7 +113,9 @@ where
 {
     let category = user_config.grass.get_from_category_or_alias(&category)?;
 
-    let result = get_base_directory(user_config)?
+    let result = user_config
+        .grass
+        .base_dir
         .join(&category.name)
         .join(repository.as_ref());
 
