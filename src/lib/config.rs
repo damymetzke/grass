@@ -1,6 +1,5 @@
 mod load;
 
-use anyhow::{anyhow, Result};
 use std::{
     cell::{Ref, RefCell},
     collections::hash_map::{Entry, HashMap},
@@ -9,6 +8,7 @@ use std::{
     path::PathBuf,
     rc::Rc,
 };
+use thiserror::Error;
 
 use self::load::LoadRootConfig;
 
@@ -119,21 +119,37 @@ impl RootConfig {
     }
 }
 
+#[derive(Error, Debug)]
+pub enum LoadUserError {
+    #[error("Cannot find home directory")]
+    MissingHomeDirectory,
+    #[error("Cannot find configuration directory")]
+    MissingConfigurationDirectory,
+    #[error("Cannot read configuration file:\n{io_error}")]
+    CannotReadConfigurationFile { io_error: std::io::Error },
+    #[error("Cannot create default configuration")]
+    CannotCreateDefault,
+    #[error("The configuration file\n''\nwas improperly formatted:\n{reason}")]
+    ImproperlyFormatted { file: PathBuf, reason: String },
+}
+
 // TODO: Convert to a proper library error
-pub fn load_user_config() -> Result<RootConfig> {
+pub fn load_user_config() -> Result<RootConfig, LoadUserError> {
     let mut file = File::open(
         dirs::config_dir()
-            .ok_or(anyhow!("Could not find home directory"))?
+            .ok_or(LoadUserError::MissingHomeDirectory)?
             .join("grass/config.toml"),
-    )?;
+    )
+    .map_err(|error| LoadUserError::CannotReadConfigurationFile { io_error: error })?;
 
     let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    file.read_to_string(&mut contents)
+        .map_err(|error| LoadUserError::CannotReadConfigurationFile { io_error: error })?;
 
-    let mut config = RootConfig::try_default().ok_or(anyhow!("Error loading default config"))?;
+    let mut config = RootConfig::try_default().ok_or(LoadUserError::CannotCreateDefault)?;
 
     let config_dir = dirs::config_dir()
-        .ok_or(anyhow!("Could not find config directory"))?
+        .ok_or(LoadUserError::MissingConfigurationDirectory)?
         .join("grass");
     if let Ok(entries) = fs::read_dir(&config_dir) {
         for file_name in
@@ -145,11 +161,23 @@ pub fn load_user_config() -> Result<RootConfig> {
                 })
         {
             // TODO: better handle these errors, this should not stop the program.
-            let mut file = File::open(&config_dir.join(file_name))?;
+            let mut file = if let Ok(file) = File::open(&config_dir.join(&file_name)) {
+                file
+            } else {
+                continue;
+            };
 
             let mut contents = String::new();
-            file.read_to_string(&mut contents)?;
-            let load_config: LoadRootConfig = toml::from_str(&contents)?;
+
+            if file.read_to_string(&mut contents).is_err() {
+                continue;
+            };
+
+            let load_config: LoadRootConfig =
+                toml::from_str(&contents).map_err(|error| LoadUserError::ImproperlyFormatted {
+                    file: PathBuf::from(file_name),
+                    reason: error.to_string(),
+                })?;
             config.merge(&load_config);
         }
     }
