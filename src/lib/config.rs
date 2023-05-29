@@ -141,7 +141,6 @@ pub enum LoadUserError {
     ImproperlyFormatted { file: PathBuf, reason: String },
 }
 
-// TODO: Convert to a proper library error
 pub fn load_user_config() -> Result<RootConfig, LoadUserError> {
     let mut file = File::open(
         dirs::config_dir()
@@ -168,7 +167,6 @@ pub fn load_user_config() -> Result<RootConfig, LoadUserError> {
                     _ => None,
                 })
         {
-            // TODO: better handle these errors, this should not stop the program.
             let mut file = if let Ok(file) = File::open(&config_dir.join(&file_name)) {
                 file
             } else {
