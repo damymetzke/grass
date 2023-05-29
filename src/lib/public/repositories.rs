@@ -128,6 +128,7 @@ where
     Some(result)
 }
 
+// TODO: Add error handling
 pub fn list_repositories_with_change_status<T>(
     user_config: &RootConfig,
     category: T,
@@ -145,11 +146,12 @@ where
     Some(FilteredCategoryDescription::new(
         user_config,
         category.category.clone(),
-        category.into_iter().map(move |repository| {
-            (
-                repository.clone(),
-                get_repository_changes(category_path.join(&repository.repository)),
-            )
+        // TODO: Handle errors more gracefully
+        category.into_iter().filter_map(move |repository| {
+            match get_repository_changes(category_path.join(&repository.repository)) {
+                Ok(changes) => Some((repository, changes)),
+                Err(_) => None,
+            }
         }),
     ))
 }

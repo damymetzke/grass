@@ -1,4 +1,7 @@
-use std::{fmt::Display, path::Path};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 use git2::{Repository, Status};
 
@@ -8,33 +11,48 @@ pub enum RepositoryChangeStatus {
     UncommittedChanges(usize),
 }
 
-pub fn get_repository_changes<T>(path: T) -> RepositoryChangeStatus
+pub enum GetRepositoryChangersError {
+    CannotOpenRepository { path: PathBuf, reason: String },
+    CannotReadStatus { path: PathBuf, reason: String },
+}
+
+pub fn get_repository_changes<T>(
+    path: T,
+) -> Result<RepositoryChangeStatus, GetRepositoryChangersError>
 where
     T: AsRef<Path>,
 {
-    // TODO: Add error handling
-    // TODO: Be more specific on errors
-    let repository = Repository::open(path.as_ref()).ok();
-    let repository = if let Some(repository) = repository {
-        repository
-    } else {
-        return RepositoryChangeStatus::NoRepository;
+    let repository = Repository::open(path.as_ref());
+    let repository = match repository {
+        Ok(repository) => repository,
+        Err(error) => match error.code() {
+            git2::ErrorCode::NotFound => todo!(),
+            _ => {
+                return Err(GetRepositoryChangersError::CannotOpenRepository {
+                    path: path.as_ref().into(),
+                    reason: error.message().to_string(),
+                })
+            }
+        },
     };
 
-    let statuses = repository.statuses(None).ok();
-    let statuses = if let Some(statuses) = statuses {
-        statuses
-    } else {
-        return RepositoryChangeStatus::NoRepository;
+    let statuses = repository.statuses(None);
+    let statuses = match statuses {
+        Ok(statuses) => statuses,
+        Err(error) => {
+            return Err(GetRepositoryChangersError::CannotReadStatus {
+                path: path.as_ref().into(),
+                reason: error.message().to_string(),
+            })
+        }
     };
-
     match statuses
         .iter()
         .filter(|status| !matches!(status.status(), Status::IGNORED))
         .count()
     {
-        0 => RepositoryChangeStatus::UpToDate,
-        num_changes => RepositoryChangeStatus::UncommittedChanges(num_changes),
+        0 => Ok(RepositoryChangeStatus::UpToDate),
+        num_changes => Ok(RepositoryChangeStatus::UncommittedChanges(num_changes)),
     }
 }
 
