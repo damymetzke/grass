@@ -40,7 +40,7 @@ where
     T: AsRef<str>,
     U: AsRef<str>,
 {
-    let repository_path = crate::dev::get_repository_path(user_config, category, repository)
+    let repository_path = crate::dev::get_repository_path(&user_config.grass, category, repository)
         .ok_or(CleanRepositoryError::Unknown)?;
     Ok(git::clean_repository(repository_path)?)
 }

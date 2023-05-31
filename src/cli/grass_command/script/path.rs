@@ -26,7 +26,7 @@ impl PathCommand {
             PathCommand {
                 category,
                 repository: Some(repository),
-            } => grass::dev::get_repository_path(&user_config, category, repository),
+            } => grass::dev::get_repository_path(&user_config.grass, category, repository),
         };
 
         print!("{}", path.unwrap_or_default().to_str().unwrap_or_default());

@@ -46,7 +46,7 @@ impl ShellInsertCommand {
                     output.trim().split('@').collect::<Vec<_>>().as_slice()
                 {
                     if let Some(Some(path)) =
-                        grass::dev::get_repository_path(&user_config, category, repository)
+                        grass::dev::get_repository_path(&user_config.grass, category, repository)
                             .map(|path| path.to_str().map(String::from))
                     {
                         println!("cd {}", path);

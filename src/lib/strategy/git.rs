@@ -1,6 +1,10 @@
+mod local;
+
 use std::collections::HashMap;
 
 use thiserror::Error;
+
+pub use local::LocalGitStrategy;
 
 #[derive(Error, Debug)]
 pub enum GitStrategyError {
@@ -14,6 +18,8 @@ pub enum GitStrategyError {
     RemoteAuthenticationError { message: String, remote: String },
     #[error("The remote '{remote}' is unavailable:\n{message}")]
     RemoteUnavailable { message: String, remote: String },
+    #[error("There is a problem accessing the file system:\n{message}")]
+    FileSystemError { message: String, reasons: Vec<std::io::Error>},
     #[error("There is a problem:\n{message}")]
     UnknownError { message: String },
 }

@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf};
 use itertools::Itertools;
 
 use crate::{
-    config::RootConfig,
+    config::{RootConfig, GrassConfig},
     dev::types::{
         FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription,
     },
@@ -103,7 +103,7 @@ where
 
 // TODO: Return a result instead of an Option
 pub fn get_repository_path<T, U>(
-    user_config: &RootConfig,
+    user_config: &GrassConfig,
     category: T,
     repository: U,
 ) -> Option<PathBuf>
@@ -111,10 +111,9 @@ where
     T: AsRef<str>,
     U: AsRef<str>,
 {
-    let category = user_config.grass.get_from_category_or_alias(&category)?;
+    let category = user_config.get_from_category_or_alias(&category)?;
 
     let result = user_config
-        .grass
         .base_dir
         .join(&category.name)
         .join(repository.as_ref());
