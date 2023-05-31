@@ -2,6 +2,7 @@ mod config;
 mod facades;
 mod public;
 mod repository;
+mod strategy;
 
 #[cfg(feature = "dev")]
 pub mod dev {
@@ -15,10 +16,16 @@ pub mod dev {
         types,
         write::{clean_repository, clone_repository},
     };
+
     pub mod config {
         pub use crate::config::*;
     }
+
     pub mod repository {
         pub use crate::repository::*;
+    }
+
+    pub mod strategy {
+        pub use crate::strategy::*;
     }
 }
