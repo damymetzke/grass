@@ -6,6 +6,8 @@ use thiserror::Error;
 
 pub use local::LocalGitStrategy;
 
+use crate::public::api::RepositoryLocation;
+
 #[derive(Error, Debug)]
 pub enum GitStrategyError {
     #[error("Cannot find repository:\n{message}")]
@@ -26,11 +28,6 @@ pub enum GitStrategyError {
 
 pub type Result<T> = std::result::Result<T, GitStrategyError>;
 
-pub struct RepositoryLocation {
-    pub category: String,
-    pub repository: String,
-}
-
 pub enum RepositoryChangeStatus {
     UpToDate,
     NoRepository,
@@ -43,16 +40,16 @@ pub enum RepositoryChangeStatus {
 }
 
 pub trait GitStrategy {
-    fn clean<T>(self, repository: T) -> Result<()>
+    fn clean<T>(&self, repository: T) -> Result<()>
     where
         T: Into<RepositoryLocation>;
 
-    fn clone<T, U>(self, repository: T, remote: U) -> Result<()>
+    fn clone<T, U>(&self, repository: T, remote: U) -> Result<()>
     where
         T: Into<RepositoryLocation>,
         U: AsRef<str>;
 
-    fn get_changes<T>(self, repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
+    fn get_changes<T>(&self, repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
     where
         T: Into<RepositoryLocation>;
 }
@@ -64,19 +61,6 @@ impl RepositoryLocation {
         U: Into<String>,
     {
         RepositoryLocation {
-            category: category.into(),
-            repository: repository.into(),
-        }
-    }
-}
-
-impl<T, U> From<(T, U)> for RepositoryLocation
-where
-    T: Into<String>,
-    U: Into<String>,
-{
-    fn from((category, repository): (T, U)) -> Self {
-        Self {
             category: category.into(),
             repository: repository.into(),
         }

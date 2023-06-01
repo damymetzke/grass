@@ -17,7 +17,7 @@ impl<'a> LocalGitStrategy<'a> {
 }
 
 impl<'a> GitStrategy for LocalGitStrategy<'a> {
-    fn clean<T>(self, repository: T) -> Result<()>
+    fn clean<T>(&self, repository: T) -> Result<()>
     where
         T: Into<RepositoryLocation>,
     {
@@ -74,7 +74,7 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         }
     }
 
-    fn clone<T, U>(self, _repository: T, _remote: U) -> Result<()>
+    fn clone<T, U>(&self, _repository: T, _remote: U) -> Result<()>
     where
         T: Into<RepositoryLocation>,
         U: AsRef<str>,
@@ -82,7 +82,7 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         todo!()
     }
 
-    fn get_changes<T>(self, _repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
+    fn get_changes<T>(&self, _repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
     where
         T: Into<RepositoryLocation>,
     {

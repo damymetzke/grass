@@ -15,6 +15,7 @@ pub mod dev {
         },
         types,
         write::{clean_repository, clone_repository},
+        api::Api,
     };
 
     pub mod config {
