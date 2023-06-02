@@ -1,9 +1,6 @@
 use crate::{
     config,
-    dev::strategy::{
-        api::{ApiStrategy, LocalApiStrategy},
-        git::{GitStrategy, GitStrategyError},
-    },
+    dev::strategy::api::{ApiStrategy, LocalApiStrategy},
 };
 
 pub struct RepositoryLocation {
@@ -31,14 +28,17 @@ where
     }
 }
 
-impl<'a> Api<LocalApiStrategy<'a>> {
-}
+impl<'a> Api<LocalApiStrategy<'a>> {}
 
 impl<T> Api<T>
 where
     T: ApiStrategy,
 {
-    pub fn as_local<U>(closure: U)
+    /// Create an API intance using the 'local' strategy.
+    ///
+    /// The 'local' strategy applies to the local system.
+    /// This is considered the main focus of the crate.
+    pub fn with_local_strategy<U>(closure: U)
     where
         U: Fn(Api<LocalApiStrategy<'_>>),
     {
@@ -48,10 +48,11 @@ where
         closure(Api { strategy });
     }
 
-    pub fn clean_repository<U>(&self, repository: U) -> Result<(), GitStrategyError>
-    where
-        U: Into<RepositoryLocation>,
-    {
-        self.strategy.get_git_strategy().clean(repository)
+    /// Reference to the internal strategy object.
+    ///
+    /// Typically shouldn't be accessed directly.
+    /// The intended use of the API is to use the other API methods.
+    pub fn get_strategy(&self) -> &T {
+        &self.strategy
     }
 }
