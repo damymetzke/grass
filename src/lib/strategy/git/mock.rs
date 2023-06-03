@@ -30,6 +30,7 @@ use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, Result};
 /// - good_remote (no errors)
 /// - no_access (authentication error)
 /// - bad_response (invalid response)
+#[derive(Default)]
 pub struct MockGitStrategy;
 
 impl GitStrategy for MockGitStrategy {

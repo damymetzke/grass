@@ -1,8 +1,10 @@
 mod local;
+mod mock;
 
 use super::git::GitStrategy;
 
 pub use local::LocalApiStrategy;
+pub use mock::MockApiStrategy;
 
 pub trait ApiStrategy
 {

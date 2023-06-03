@@ -1,6 +1,6 @@
 use crate::{
     config,
-    dev::strategy::api::{ApiStrategy, LocalApiStrategy},
+    dev::strategy::api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
 };
 
 pub struct RepositoryLocation {
@@ -46,6 +46,18 @@ where
         let config = config::load_user_config().unwrap();
         let strategy = LocalApiStrategy::new(&config.grass);
         closure(Api { strategy });
+    }
+
+    /// Create an API instance using the 'mock' strategy
+    ///
+    /// The 'mock' strategy uses a list of pre-defined categories and repositories. 
+    /// Its primary purpose is for testing and for API examples.
+    pub fn with_mock_strategy<U>(closure: U)
+    where
+        U: Fn(Api<MockApiStrategy>),
+    {
+        let strategy = MockApiStrategy::default();
+        closure(Api { strategy })
     }
 
     /// Reference to the internal strategy object
