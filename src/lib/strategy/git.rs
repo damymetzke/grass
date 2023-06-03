@@ -1,10 +1,10 @@
 mod local;
-
-use std::collections::HashMap;
+mod mock;
 
 use thiserror::Error;
 
 pub use local::LocalGitStrategy;
+pub use mock::MockGitStrategy;
 
 use crate::public::api::RepositoryLocation;
 
@@ -14,6 +14,8 @@ pub enum GitStrategyError {
     RepositoryNotFound { message: String },
     #[error("There is a problem with the repository:\n{message}")]
     RepositoryError { message: String },
+    #[error("The repository already exists:\n{message}")]
+    RepositryExists {message: String},
     #[error("There is a problem fetching the remote '{remote}':\n{message}")]
     RemoteFetchError { message: String, remote: String },
     #[error("There is a problem authenticating for remote '{remote}':\n{message}")]
@@ -49,7 +51,7 @@ pub trait GitStrategy {
         T: Into<RepositoryLocation>,
         U: AsRef<str>;
 
-    fn get_changes<T>(&self, repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
+    fn get_changes<T>(&self, repository: T) -> Result<RepositoryChangeStatus>
     where
         T: Into<RepositoryLocation>;
 }

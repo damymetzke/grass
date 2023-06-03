@@ -34,7 +34,7 @@ impl<T> Api<T>
 where
     T: ApiStrategy,
 {
-    /// Create an API intance using the 'local' strategy.
+    /// Create an API intance using the 'local' strategy
     ///
     /// The 'local' strategy applies to the local system.
     /// This is considered the main focus of the crate.
@@ -48,7 +48,7 @@ where
         closure(Api { strategy });
     }
 
-    /// Reference to the internal strategy object.
+    /// Reference to the internal strategy object
     ///
     /// Typically shouldn't be accessed directly.
     /// The intended use of the API is to use the other API methods.

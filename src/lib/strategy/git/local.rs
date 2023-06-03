@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use git2::Repository;
 
 use crate::config::GrassConfig;
@@ -82,10 +80,10 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         todo!()
     }
 
-    fn get_changes<T>(&self, _repository: T) -> Result<HashMap<String, RepositoryChangeStatus>>
+    fn get_changes<T>(&self, _repository: T) -> Result<RepositoryChangeStatus>
     where
-        T: Into<RepositoryLocation>,
-    {
+        T: Into<RepositoryLocation> {
         todo!()
     }
+
 }
