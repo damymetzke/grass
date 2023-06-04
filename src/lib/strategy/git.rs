@@ -8,7 +8,7 @@ pub use mock::MockGitStrategy;
 
 use crate::public::api::RepositoryLocation;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq, Eq)]
 pub enum GitStrategyError {
     #[error("Cannot find repository:\n{message}")]
     RepositoryNotFound { message: String },
@@ -23,7 +23,7 @@ pub enum GitStrategyError {
     #[error("The remote '{remote}' is unavailable:\n{message}")]
     RemoteUnavailable { message: String, remote: String },
     #[error("There is a problem accessing the file system:\n{message}")]
-    FileSystemError { message: String, reasons: Vec<std::io::Error>},
+    FileSystemError { message: String, reasons: Vec<String>},
     #[error("There is a problem:\n{message}")]
     UnknownError { message: String },
 }

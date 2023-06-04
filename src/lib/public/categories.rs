@@ -9,7 +9,7 @@ use crate::config::RootConfig;
 /// # Examples
 ///
 /// ```
-/// # use grass::config;
+/// # use grass::dev::config;
 ///
 /// let user_config = config::load_example_config();
 ///

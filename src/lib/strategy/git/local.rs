@@ -61,6 +61,7 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
                 }
             })
             .filter_map(std::result::Result::err)
+            .map(|error| error.to_string())
             .collect();
 
         match results.len() {
@@ -82,8 +83,8 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
 
     fn get_changes<T>(&self, _repository: T) -> Result<RepositoryChangeStatus>
     where
-        T: Into<RepositoryLocation> {
+        T: Into<RepositoryLocation>,
+    {
         todo!()
     }
-
 }

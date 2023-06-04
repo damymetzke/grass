@@ -1,5 +1,7 @@
 use crate::dev::strategy::git::MockGitStrategy;
 
+use super::ApiStrategy;
+
 #[derive(Default)]
 pub struct MockApiStrategy {
     git_strategy: MockGitStrategy,
@@ -11,7 +13,7 @@ impl MockGitStrategy {
     }
 }
 
-impl super::ApiStrategy for MockApiStrategy {
+impl ApiStrategy for MockApiStrategy {
     type Git = MockGitStrategy;
 
     fn get_git_strategy(&self) -> &Self::Git {

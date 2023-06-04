@@ -17,7 +17,7 @@ use crate::{
 /// ```
 /// # use grass;
 /// #
-/// # let user_config = grass::config::load_example_config();
+/// # let user_config = grass::dev::config::load_example_config();
 ///
 /// // TODO: support dependency injection so this can be tested
 /// // let result_general = grass::list_repos_by_category(&user_config, "general").unwrap();
