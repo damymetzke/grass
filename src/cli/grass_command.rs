@@ -9,6 +9,7 @@ mod shell_insert;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
@@ -36,11 +37,14 @@ pub struct GrassCommand {
 }
 
 impl GrassCommand {
-    pub fn handle(&self) -> Result<()> {
+    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    where
+        T: ApiStrategy,
+    {
         match &self.command {
             GrassSubcommand::Check(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(),
-            GrassSubcommand::Repo(command) => command.handle()?,
+            GrassSubcommand::Repo(command) => command.handle(api)?,
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
             GrassSubcommand::Session(command) => command.handle(),

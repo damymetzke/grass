@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 #[derive(Parser, Debug)]
 pub struct CleanCommand {
@@ -8,13 +9,10 @@ pub struct CleanCommand {
 }
 
 impl CleanCommand {
-    pub fn handle(&self) -> Result<()> {
-        let user_config = grass::dev::config::load_user_config()?;
-
-        Ok(grass::dev::clean_repository(
-            &user_config,
-            &self.category,
-            &self.repository,
-        )?)
+    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    where
+        T: ApiStrategy,
+    {
+        Ok(api.clean_repository((&self.category, &self.repository))?)
     }
 }
