@@ -29,22 +29,9 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
             message: "Cannot not find repository".into(),
         })?;
 
-        let repository =
-            Repository::open(&repository_path).map_err(|error| match error.code() {
-                git2::ErrorCode::NotFound => GitStrategyError::RepositoryNotFound {
-                    message: error.to_string(),
-                },
-                _ => GitStrategyError::RepositoryError {
-                    message: error.to_string(),
-                },
-            })?;
+        let repository = Repository::open(&repository_path)?;
 
-        let statuses =
-            repository
-                .statuses(None)
-                .map_err(|error| GitStrategyError::RepositoryError {
-                    message: error.to_string(),
-                })?;
+        let statuses = repository.statuses(None)?;
 
         let results: Vec<_> = statuses
             .iter()
@@ -86,5 +73,45 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         T: Into<RepositoryLocation>,
     {
         todo!()
+    }
+}
+
+impl From<git2::Error> for GitStrategyError {
+    fn from(value: git2::Error) -> Self {
+        let message = value.message().to_string();
+        match value.code() {
+            git2::ErrorCode::NotFound => GitStrategyError::RepositoryNotFound { message },
+
+            git2::ErrorCode::Exists => GitStrategyError::RepositryExists { message },
+
+            git2::ErrorCode::Ambiguous
+            | git2::ErrorCode::BufSize
+            | git2::ErrorCode::User
+            | git2::ErrorCode::BareRepo
+            | git2::ErrorCode::UnbornBranch
+            | git2::ErrorCode::Unmerged
+            | git2::ErrorCode::NotFastForward
+            | git2::ErrorCode::InvalidSpec
+            | git2::ErrorCode::Conflict
+            | git2::ErrorCode::Locked
+            | git2::ErrorCode::Modified
+            | git2::ErrorCode::Applied
+            | git2::ErrorCode::Peel
+            | git2::ErrorCode::Eof
+            | git2::ErrorCode::Invalid
+            | git2::ErrorCode::Uncommitted
+            | git2::ErrorCode::Directory
+            | git2::ErrorCode::MergeConflict
+            | git2::ErrorCode::HashsumMismatch
+            | git2::ErrorCode::IndexDirty
+            | git2::ErrorCode::ApplyFail
+            | git2::ErrorCode::Owner => GitStrategyError::RepositoryError { message },
+
+            git2::ErrorCode::Auth | git2::ErrorCode::Certificate => {
+                GitStrategyError::RemoteAuthenticationError { message }
+            }
+
+            _ => GitStrategyError::UnknownError { message },
+        }
     }
 }
