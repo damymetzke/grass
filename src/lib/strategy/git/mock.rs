@@ -43,14 +43,17 @@ impl GitStrategy for MockGitStrategy {
         match repository {
             ("all_good" | "with_changes", _) => Ok(()),
             ("with_error", "first") => Err(GitStrategyError::RepositoryError {
-                message: "invalid repository".into(),
+                message: "Mocked error".into(),
+                reason: "invalid repository".into(),
             }),
             ("with_error", "second") => Err(GitStrategyError::FileSystemError {
-                message: "insufficient permission".into(),
+                message: "Mocked error".into(),
+                reason: "insufficient permission".into(),
                 reasons: vec![],
             }),
             _ => Err(GitStrategyError::RepositoryNotFound {
-                message: "cannot find repository".into(),
+                message: "Mocked error".into(),
+                reason: "cannot find repository".into(),
             }),
         }
     }
@@ -65,24 +68,29 @@ impl GitStrategy for MockGitStrategy {
         match repository {
             ("all_good" | "with_changes" | "with_error", "first" | "second")
             | ("all_good" | "with_changes", "third") => Err(GitStrategyError::RepositryExists {
-                message: "Can't fetch repository because it already exists locally".into(),
+                message: "Mocked error".into(),
+                reason: "Can't fetch repository because it already exists locally".into(),
             }),
             ("all_good" | "with_changes" | "wth_error", _) => Ok(()),
             _ => Err(GitStrategyError::RepositoryNotFound {
-                message: "Category does not exist".into(),
+                message: "Mocked error".into(),
+                reason: "Category does not exist".into(),
             }),
         }?;
 
         match remote.as_ref() {
             "good_remote" => Ok(()),
             "no_access" => Err(GitStrategyError::RemoteAuthenticationError {
-                message: "You are not authorized to access this remote".into(),
+                message: "Mocked error".into(),
+                reason: "You are not authorized to access this remote".into(),
             }),
             "bad_response" => Err(GitStrategyError::RemoteFetchError {
-                message: "The remote returned an invalid response".into(),
+                message: "Mocked error".into(),
+                reason: "The remote returned an invalid response".into(),
             }),
             _ => Err(GitStrategyError::RemoteFetchError {
-                message: "Could not access the remote".into(),
+                message: "Mocked error".into(),
+                reason: "Could not access the remote".into(),
             }),
         }
     }
@@ -104,19 +112,23 @@ impl GitStrategy for MockGitStrategy {
                 total: 9,
             }),
             ("with_error", "first") => Err(GitStrategyError::RepositoryError {
-                message: "invalid repository".into(),
+                message: "Mocked error".into(),
+                reason: "invalid repository".into(),
             }),
             ("with_error", "second") => Err(GitStrategyError::FileSystemError {
-                message: "insufficient permission".into(),
+                message: "Mocked error".into(),
+                reason: "insufficient permission".into(),
                 reasons: vec![],
             }),
             ("all_good" | "with_changes" | "with_error", _) => {
                 Err(GitStrategyError::RepositoryNotFound {
-                    message: "repository not found".into(),
+                    message: "Mocked error".into(),
+                    reason: "repository not found".into(),
                 })
             }
             _ => Err(GitStrategyError::RepositoryNotFound {
-                message: "category not found".into(),
+                message: "Mocked error".into(),
+                reason: "category not found".into(),
             }),
         }
     }

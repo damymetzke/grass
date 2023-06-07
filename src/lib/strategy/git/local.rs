@@ -1,4 +1,5 @@
 use git2::{build::RepoBuilder, Repository};
+use itertools::Itertools;
 
 use crate::config::GrassConfig;
 
@@ -26,7 +27,8 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
             repository.repository,
         )
         .ok_or_else(|| GitStrategyError::RepositoryNotFound {
-            message: "Cannot not find repository".into(),
+            message: "A problem was found while trying to find the repository path".into(),
+            reason: "Cannot not find repository".into(),
         })?;
 
         let repository = Repository::open(&repository_path)?;
@@ -54,7 +56,8 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         match results.len() {
             0 => Ok(()),
             _ => Err(GitStrategyError::FileSystemError {
-                message: "Cannot clean repository".into(),
+                message: "Something went wrong when trying to clean a repository".into(),
+                reason: results.iter().map(ToString::to_string).join("\n"),
                 reasons: results,
             }),
         }
@@ -72,7 +75,8 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
 
         let base_dir = crate::dev::get_category_path(self.config, category).ok_or_else(|| {
             GitStrategyError::RepositoryNotFound {
-                message: "Cannot find repository".into(),
+                message: "A problem was found while trying to find the category path".into(),
+                reason: "Cannot not find repository".into(),
             }
         })?;
 
@@ -93,11 +97,17 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
 
 impl From<git2::Error> for GitStrategyError {
     fn from(value: git2::Error) -> Self {
-        let message = value.message().to_string();
+        let reason = value.message().to_string();
         match value.code() {
-            git2::ErrorCode::NotFound => GitStrategyError::RepositoryNotFound { message },
+            git2::ErrorCode::NotFound => GitStrategyError::RepositoryNotFound {
+                message: "There was a problem running an unspecified git2 command".into(),
+                reason,
+            },
 
-            git2::ErrorCode::Exists => GitStrategyError::RepositryExists { message },
+            git2::ErrorCode::Exists => GitStrategyError::RepositryExists {
+                message: "There was a problem running an unspecified git2 command".into(),
+                reason,
+            },
 
             git2::ErrorCode::Ambiguous
             | git2::ErrorCode::BufSize
@@ -120,13 +130,22 @@ impl From<git2::Error> for GitStrategyError {
             | git2::ErrorCode::HashsumMismatch
             | git2::ErrorCode::IndexDirty
             | git2::ErrorCode::ApplyFail
-            | git2::ErrorCode::Owner => GitStrategyError::RepositoryError { message },
+            | git2::ErrorCode::Owner => GitStrategyError::RepositoryError {
+                message: "There was a problem running an unspecified git2 command".into(),
+                reason,
+            },
 
             git2::ErrorCode::Auth | git2::ErrorCode::Certificate => {
-                GitStrategyError::RemoteAuthenticationError { message }
+                GitStrategyError::RemoteAuthenticationError {
+                    message: "There was a problem running an unspecified git2 command".into(),
+                    reason,
+                }
             }
 
-            _ => GitStrategyError::UnknownError { message },
+            _ => GitStrategyError::UnknownError {
+                message: "There was a problem running an unspecified git2 command".into(),
+                reason,
+            },
         }
     }
 }
