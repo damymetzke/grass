@@ -22,7 +22,7 @@ impl PathCommand {
             PathCommand {
                 category,
                 repository: None,
-            } => grass::dev::get_category_path(&user_config, category),
+            } => grass::dev::get_category_path(&user_config.grass, category),
             PathCommand {
                 category,
                 repository: Some(repository),

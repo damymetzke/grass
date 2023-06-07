@@ -32,4 +32,28 @@ where
     {
         self.get_strategy().get_git_strategy().clean(repository)
     }
+
+    pub fn clone_repository<U, V>(&self, repository: U, remote: V) -> Result<(), GitStrategyError>
+    where
+        U: Into<RepositoryLocation>,
+        V: AsRef<str>,
+    {
+        self.get_strategy()
+            .get_git_strategy()
+            .clone(repository, remote)
+    }
+
+    pub fn clone_repository_default<U, V>(
+        &self,
+        category: U,
+        remote: V,
+    ) -> Result<(), GitStrategyError>
+    where
+        U: AsRef<str>,
+        V: AsRef<str>,
+    {
+        self.get_strategy()
+            .get_git_strategy()
+            .clone_default(category, remote)
+    }
 }

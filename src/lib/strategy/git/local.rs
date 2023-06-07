@@ -1,4 +1,4 @@
-use git2::Repository;
+use git2::{build::RepoBuilder, Repository};
 
 use crate::config::GrassConfig;
 
@@ -60,12 +60,27 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         }
     }
 
-    fn clone<T, U>(&self, _repository: T, _remote: U) -> Result<()>
+    fn clone<T, U>(&self, repository: T, remote: U) -> Result<()>
     where
         T: Into<RepositoryLocation>,
         U: AsRef<str>,
     {
-        todo!()
+        let RepositoryLocation {
+            category,
+            repository,
+        } = repository.into();
+
+        let base_dir = crate::dev::get_category_path(self.config, category).ok_or_else(|| {
+            GitStrategyError::RepositoryNotFound {
+                message: "Cannot find repository".into(),
+            }
+        })?;
+
+        let repo_path = base_dir.join(repository);
+
+        RepoBuilder::new().clone(remote.as_ref(), &repo_path)?;
+
+        Ok(())
     }
 
     fn get_changes<T>(&self, _repository: T) -> Result<RepositoryChangeStatus>

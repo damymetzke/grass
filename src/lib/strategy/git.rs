@@ -15,13 +15,16 @@ pub enum GitStrategyError {
     #[error("There is a problem with the repository:\n{message}")]
     RepositoryError { message: String },
     #[error("The repository already exists:\n{message}")]
-    RepositryExists {message: String},
+    RepositryExists { message: String },
     #[error("There is a problem fetching a remote:\n{message}")]
     RemoteFetchError { message: String },
     #[error("There is a problem authenticating for a remote:\n{message}")]
     RemoteAuthenticationError { message: String },
     #[error("There is a problem accessing the file system:\n{message}")]
-    FileSystemError { message: String, reasons: Vec<String>},
+    FileSystemError {
+        message: String,
+        reasons: Vec<String>,
+    },
     #[error("There is a problem:\n{message}")]
     UnknownError { message: String },
 }
@@ -48,6 +51,21 @@ pub trait GitStrategy {
     where
         T: Into<RepositoryLocation>,
         U: AsRef<str>;
+
+    fn clone_default<T, U>(&self, category: T, remote: U) -> Result<()>
+    where
+        T: AsRef<str>,
+        U: AsRef<str>,
+    {
+        let repository = &remote
+            .as_ref()
+            .split('/')
+            .last()
+            .unwrap_or("repository")
+            .trim_end_matches(".git");
+
+        self.clone((category.as_ref(), *repository), &remote)
+    }
 
     fn get_changes<T>(&self, repository: T) -> Result<RepositoryChangeStatus>
     where

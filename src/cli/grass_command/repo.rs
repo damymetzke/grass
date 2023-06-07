@@ -24,7 +24,7 @@ impl RepoCommand {
     {
         match &self.command {
             RepoSubcommand::Clean(command) => command.handle(api),
-            RepoSubcommand::Clone(command) => command.handle(),
+            RepoSubcommand::Clone(command) => command.handle(api),
         }
     }
 }

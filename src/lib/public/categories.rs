@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use itertools::Itertools;
 
-use crate::config::RootConfig;
+use crate::config::{RootConfig, GrassConfig};
 
 /// List categories
 ///
@@ -27,11 +27,11 @@ pub fn list_categories(user_config: &RootConfig) -> Vec<String> {
 }
 
 // TODO: Return Result instead of Option
-pub fn get_category_path<T>(user_config: &RootConfig, category: T) -> Option<PathBuf>
+pub fn get_category_path<T>(user_config: &GrassConfig, category: T) -> Option<PathBuf>
 where
     T: AsRef<str>,
 {
-    let category = user_config.grass.get_from_category_or_alias(&category)?;
+    let category = user_config.get_from_category_or_alias(&category)?;
 
-    Some(user_config.grass.base_dir.join(&category.name))
+    Some(user_config.base_dir.join(&category.name))
 }

@@ -8,7 +8,7 @@ where
     T: AsRef<str>,
     U: AsRef<str>,
 {
-    let base_dir = crate::dev::get_category_path(user_config, category)?;
+    let base_dir = crate::dev::get_category_path(&user_config.grass, category)?;
     let repository_name = remote
         .as_ref()
         .split('/')
