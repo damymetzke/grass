@@ -76,15 +76,12 @@ impl GitStrategy for MockGitStrategy {
         match remote.as_ref() {
             "good_remote" => Ok(()),
             "no_access" => Err(GitStrategyError::RemoteAuthenticationError {
-                remote: "no_access".into(),
                 message: "You are not authorized to access this remote".into(),
             }),
             "bad_response" => Err(GitStrategyError::RemoteFetchError {
-                remote: "bad_response".into(),
                 message: "The remote returned an invalid response".into(),
             }),
-            _ => Err(GitStrategyError::RemoteUnavailable {
-                remote: remote.as_ref().into(),
+            _ => Err(GitStrategyError::RemoteFetchError {
                 message: "Could not access the remote".into(),
             }),
         }

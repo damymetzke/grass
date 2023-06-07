@@ -16,12 +16,10 @@ pub enum GitStrategyError {
     RepositoryError { message: String },
     #[error("The repository already exists:\n{message}")]
     RepositryExists {message: String},
-    #[error("There is a problem fetching the remote '{remote}':\n{message}")]
-    RemoteFetchError { message: String, remote: String },
-    #[error("There is a problem authenticating for remote '{remote}':\n{message}")]
-    RemoteAuthenticationError { message: String, remote: String },
-    #[error("The remote '{remote}' is unavailable:\n{message}")]
-    RemoteUnavailable { message: String, remote: String },
+    #[error("There is a problem fetching a remote:\n{message}")]
+    RemoteFetchError { message: String },
+    #[error("There is a problem authenticating for a remote:\n{message}")]
+    RemoteAuthenticationError { message: String },
     #[error("There is a problem accessing the file system:\n{message}")]
     FileSystemError { message: String, reasons: Vec<String>},
     #[error("There is a problem:\n{message}")]
