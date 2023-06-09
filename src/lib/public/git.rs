@@ -30,6 +30,26 @@ where
     api.get_strategy().get_git_strategy().clean(repository)
 }
 
+/// Clone a git repository, from a remote.
+///
+/// The remote must be a valid git remote.
+/// Currently only publically available remotes are supported.
+///
+/// # Example
+///
+/// ```rust
+/// # use grass::dev::Api;
+/// # Api::with_mock_strategy(|api|{
+/// let api: Api<_> = api;
+/// // This will clone from the remote 'good remote'.
+/// // This will be cloned to the category 'all_good', with the repository name 'new_repository'.
+/// grass::dev::clone_repository(&api, ("all_good", "new_repository"), "good_remote").unwrap();
+/// # });
+/// ```
+///
+///
+/// # Future
+/// - TODO: Add a way to authenticate remotes
 pub fn clone_repository<T, U, V>(api: &Api<T>, repository: U, remote: V) -> Result<(), GitStrategyError>
 where
     T: ApiStrategy,
