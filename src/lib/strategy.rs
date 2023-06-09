@@ -1,2 +1,2 @@
-pub mod git;
 pub mod api;
+pub mod git;

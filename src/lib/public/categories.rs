@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use itertools::Itertools;
 
-use crate::config::{RootConfig, GrassConfig};
+use crate::config::{GrassConfig, RootConfig};
 
 /// List categories
 ///

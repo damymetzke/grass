@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf};
 use itertools::Itertools;
 
 use crate::{
-    config::{RootConfig, GrassConfig},
+    config::{GrassConfig, RootConfig},
     dev::types::{
         FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription,
     },

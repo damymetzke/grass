@@ -33,7 +33,7 @@ impl<'a> Api<LocalApiStrategy<'a>> {}
 impl Api<MockApiStrategy> {
     /// Create an API instance using the 'mock' strategy
     ///
-    /// The 'mock' strategy uses a list of pre-defined categories and repositories. 
+    /// The 'mock' strategy uses a list of pre-defined categories and repositories.
     /// Its primary purpose is for testing and for API examples.
     pub fn with_mock_strategy<U>(closure: U)
     where
@@ -64,7 +64,6 @@ impl<T> Api<T>
 where
     T: ApiStrategy,
 {
-
     /// Reference to the internal strategy object
     ///
     /// Typically shouldn't be accessed directly.

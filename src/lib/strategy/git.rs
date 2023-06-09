@@ -99,8 +99,16 @@ impl GitStrategyError {
             RepositoryError { reason, .. } => RepositoryError { message, reason },
             RepositryExists { reason, .. } => RepositryExists { message, reason },
             RemoteFetchError { reason, .. } => RemoteFetchError { message, reason },
-            RemoteAuthenticationError { reason, .. } => RemoteAuthenticationError { message, reason },
-            FileSystemError { reason, reasons, .. } => FileSystemError { message, reason, reasons },
+            RemoteAuthenticationError { reason, .. } => {
+                RemoteAuthenticationError { message, reason }
+            }
+            FileSystemError {
+                reason, reasons, ..
+            } => FileSystemError {
+                message,
+                reason,
+                reasons,
+            },
             UnknownError { reason, .. } => UnknownError { message, reason },
         }
     }
