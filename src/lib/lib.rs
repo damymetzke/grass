@@ -1,3 +1,4 @@
+#![allow(rustdoc::bare_urls)]
 mod config;
 mod public;
 mod repository;
