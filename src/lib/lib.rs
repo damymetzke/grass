@@ -6,7 +6,6 @@ mod strategy;
 #[cfg(feature = "dev")]
 pub mod dev {
     pub use crate::public::{
-        api::Api,
         categories::{get_category_path, list_categories},
         repositories::{
             get_repository, get_repository_path, list_all_repositories,
@@ -14,6 +13,11 @@ pub mod dev {
             list_repositories_with_change_status,
         },
         types,
+    };
+
+    pub use crate::public::{
+        api::Api,
+        git::{clean_repository, clone_repository, clone_repository_default},
     };
 
     pub mod config {

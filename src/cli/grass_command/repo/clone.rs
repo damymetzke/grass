@@ -21,7 +21,7 @@ impl CloneCommand {
             Ok,
         )?;
 
-        api.clone_repository_default(category, &self.remote)?;
+        grass::dev::clone_repository_default(api, category, &self.remote)?;
         Ok(())
     }
 }
