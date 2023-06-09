@@ -21,7 +21,7 @@ impl CloneCommand {
             Ok,
         )?;
 
-        api.clone_repository_default(&self.remote, category)?;
+        api.clone_repository_default(category, &self.remote)?;
         Ok(())
     }
 }
