@@ -53,21 +53,6 @@ pub trait GitStrategy {
         T: Into<RepositoryLocation>,
         U: AsRef<str>;
 
-    fn clone_default<T, U>(&self, category: T, remote: U) -> Result<()>
-    where
-        T: AsRef<str>,
-        U: AsRef<str>,
-    {
-        let repository = &remote
-            .as_ref()
-            .split('/')
-            .last()
-            .unwrap_or("repository")
-            .trim_end_matches(".git");
-
-        self.clone((category.as_ref(), *repository), &remote)
-    }
-
     fn get_changes<T>(&self, repository: T) -> Result<RepositoryChangeStatus>
     where
         T: Into<RepositoryLocation>;

@@ -86,7 +86,14 @@ where
     U: AsRef<str>,
     V: AsRef<str>,
 {
-    api.get_strategy()
-        .get_git_strategy()
-        .clone_default(category, remote)
+    let repository = &remote
+        .as_ref()
+        .to_string();
+    let repository = repository
+        .split('/')
+        .last()
+        .unwrap_or("repository")
+        .trim_end_matches(".git");
+
+    clone_repository(api, (category.as_ref(), repository), remote)
 }
