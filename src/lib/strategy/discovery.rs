@@ -1,11 +1,17 @@
+mod mock;
+
 use thiserror::Error;
 
 use crate::public::api::RepositoryLocation;
 
+pub use mock::MockDiscoveryStrategy;
+
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum DiscoveryStrategyError {
-    #[error("There is a problem:\n{message}\nReason: {reason}")]
-    UnknownError { message: String, reason: String },
+    #[error("Cannot find repository:\nContext: {context}\nReason: {reason}")]
+    CategoryNotFound{ context: String, reason: String },
+    #[error("There is a problem:\nContext: {context}\nReason: {reason}")]
+    UnknownError { context: String, reason: String },
 }
 
 pub type Result<T> = std::result::Result<T, DiscoveryStrategyError>;
@@ -32,5 +38,5 @@ pub trait DiscoveryStrategy {
 
     fn list_categories<T>() -> Result<T>
     where
-        T: FromIterator<RepositoryLocation>;
+        T: FromIterator<String>;
 }
