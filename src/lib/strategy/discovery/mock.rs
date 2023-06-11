@@ -6,7 +6,7 @@ use super::{DiscoveryExistsResult, DiscoveryStrategy, DiscoveryStrategyError, Re
 pub struct MockDiscoveryStrategy;
 
 impl DiscoveryStrategy for MockDiscoveryStrategy {
-    fn check_repository_exists<T>(repository: T) -> Result<DiscoveryExistsResult>
+    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExistsResult>
     where
         T: Into<crate::public::api::RepositoryLocation>,
     {
@@ -23,7 +23,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         }
     }
 
-    fn check_category_exists<T>(category: T) -> Result<DiscoveryExistsResult>
+    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExistsResult>
     where
         T: AsRef<str>,
     {
@@ -33,7 +33,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         }
     }
 
-    fn list_repositories_in_category<T, U>(category: T) -> Result<U>
+    fn list_repositories_in_category<T, U>(&self, category: T) -> Result<U>
     where
         T: AsRef<str>,
         U: FromIterator<crate::public::api::RepositoryLocation>,
@@ -62,7 +62,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         Ok(result)
     }
 
-    fn list_categories<T>() -> Result<T>
+    fn list_categories<T>(&self) -> Result<T>
     where
         T: FromIterator<String>,
     {
