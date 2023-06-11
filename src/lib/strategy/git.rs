@@ -32,15 +32,11 @@ pub enum GitStrategyError {
 
 pub type Result<T> = std::result::Result<T, GitStrategyError>;
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum RepositoryChangeStatus {
     UpToDate,
     NoRepository,
-    FilesChanged {
-        added: usize,
-        deleted: usize,
-        changed: usize,
-        total: usize,
-    },
+    FilesChanged { num_changes: usize },
 }
 
 pub trait GitStrategy {

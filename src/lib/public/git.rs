@@ -1,7 +1,7 @@
 use crate::dev::{
     strategy::{
         api::ApiStrategy,
-        git::{GitStrategy, GitStrategyError},
+        git::{GitStrategy, GitStrategyError, RepositoryChangeStatus},
     },
     Api,
 };
@@ -50,7 +50,11 @@ where
 ///
 /// # Future
 /// - TODO: Add a way to authenticate remotes
-pub fn clone_repository<T, U, V>(api: &Api<T>, repository: U, remote: V) -> Result<(), GitStrategyError>
+pub fn clone_repository<T, U, V>(
+    api: &Api<T>,
+    repository: U,
+    remote: V,
+) -> Result<(), GitStrategyError>
 where
     T: ApiStrategy,
     U: Into<RepositoryLocation>,
@@ -80,15 +84,17 @@ where
 /// grass::dev::clone_repository_default(&api, "all_good", "good_remote").unwrap();
 /// # });
 /// ```
-pub fn clone_repository_default<T, U, V>(api: &Api<T>, category: U, remote: V) -> Result<(), GitStrategyError>
+pub fn clone_repository_default<T, U, V>(
+    api: &Api<T>,
+    category: U,
+    remote: V,
+) -> Result<(), GitStrategyError>
 where
     T: ApiStrategy,
     U: AsRef<str>,
     V: AsRef<str>,
 {
-    let repository = &remote
-        .as_ref()
-        .to_string();
+    let repository = &remote.as_ref().to_string();
     let repository = repository
         .split('/')
         .last()
@@ -96,4 +102,45 @@ where
         .trim_end_matches(".git");
 
     clone_repository(api, (category.as_ref(), repository), remote)
+}
+
+/// Get the change status of a specific repository
+///
+/// # Example
+///
+/// ```rust
+/// # use grass::dev::Api;
+/// # use grass::dev::strategy::git::RepositoryChangeStatus;
+/// # Api::with_mock_strategy(|api|{
+/// let api: Api<_> = api;
+///
+/// let no_changes =
+///     grass::dev::get_repository_change_status(&api, ("with_changes", "first"))
+///         .unwrap();
+/// let no_repository =
+///     grass::dev::get_repository_change_status(&api, ("with_changes", "second"))
+///         .unwrap();
+/// let with_changes =
+///     grass::dev::get_repository_change_status(&api, ("with_changes", "third"))
+///         .unwrap();
+///
+/// assert_eq!(no_changes, RepositoryChangeStatus::UpToDate);
+/// assert_eq!(no_repository, RepositoryChangeStatus::NoRepository);
+/// assert_eq!(
+///     with_changes,
+///     RepositoryChangeStatus::FilesChanged { num_changes: 9 }
+/// );
+/// # });
+/// ```
+pub fn get_repository_change_status<T, U>(
+    api: &Api<T>,
+    repository: U,
+) -> Result<RepositoryChangeStatus, GitStrategyError>
+where
+    T: ApiStrategy,
+    U: Into<RepositoryLocation>,
+{
+    api.get_strategy()
+        .get_git_strategy()
+        .get_changes(repository)
 }

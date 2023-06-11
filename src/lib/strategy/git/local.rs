@@ -1,4 +1,4 @@
-use git2::{build::RepoBuilder, Repository};
+use git2::{build::RepoBuilder, ErrorCode, Repository, Status};
 use itertools::Itertools;
 
 use crate::config::GrassConfig;
@@ -87,11 +87,53 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         Ok(())
     }
 
-    fn get_changes<T>(&self, _repository: T) -> Result<RepositoryChangeStatus>
+    fn get_changes<T>(&self, repository: T) -> Result<RepositoryChangeStatus>
     where
         T: Into<RepositoryLocation>,
     {
-        todo!()
+        let repository: RepositoryLocation = repository.into();
+        let repository_path = crate::dev::get_repository_path(
+            self.config,
+            repository.category,
+            repository.repository,
+        )
+        .ok_or_else(|| GitStrategyError::RepositoryNotFound {
+            message: "A problem was found while trying to find the repository path".into(),
+            reason: "Cannot not find repository".into(),
+        })?;
+
+        let repository = match Repository::open(repository_path) {
+            Ok(repository) => Ok(repository),
+            Err(error) => {
+                if error.code() == ErrorCode::NotFound {
+                    return Ok(RepositoryChangeStatus::UpToDate);
+                }
+
+                Err(error)
+            }
+        };
+
+        let repository = repository.map_err(|error| {
+            GitStrategyError::from(error).with_message("There was a problem opening the repository")
+        })?;
+
+        let statuses = repository.statuses(None).map_err(|error| {
+            GitStrategyError::from(error)
+                .with_message("There was a problem retrieving the repository status")
+        })?;
+
+        let changes: Vec<_> = statuses
+            .iter()
+            .filter(|status| status.status().contains(Status::IGNORED))
+            .collect();
+
+        if changes.is_empty() {
+            return Ok(RepositoryChangeStatus::UpToDate);
+        }
+
+        Ok(RepositoryChangeStatus::FilesChanged {
+            num_changes: changes.len(),
+        })
     }
 }
 

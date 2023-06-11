@@ -18,7 +18,7 @@ use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, Result};
 /// - with_changes
 ///   - first (no changes)
 ///   - second (no repository)
-///   - third (uncommitted changes; 2 added, 3 deleted, 4 changed, 9 total)
+///   - third (9 uncommitted changes)
 /// - with_error
 ///   - first (invalid repository)
 ///   - second (unsufficient file permissions)
@@ -105,12 +105,9 @@ impl GitStrategy for MockGitStrategy {
             ("all_good", "first" | "second" | "third") => Ok(RepositoryChangeStatus::UpToDate),
             ("with_changes", "first") => Ok(RepositoryChangeStatus::UpToDate),
             ("with_changes", "second") => Ok(RepositoryChangeStatus::NoRepository),
-            ("with_changes", "third") => Ok(RepositoryChangeStatus::FilesChanged {
-                added: 2,
-                deleted: 3,
-                changed: 4,
-                total: 9,
-            }),
+            ("with_changes", "third") => {
+                Ok(RepositoryChangeStatus::FilesChanged { num_changes: 9 })
+            }
             ("with_error", "first") => Err(GitStrategyError::RepositoryError {
                 message: "Mocked error".into(),
                 reason: "invalid repository".into(),

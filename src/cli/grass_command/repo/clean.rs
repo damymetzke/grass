@@ -13,6 +13,9 @@ impl CleanCommand {
     where
         T: ApiStrategy,
     {
-        Ok(grass::dev::clean_repository(api, (&self.category, &self.repository))?)
+        Ok(grass::dev::clean_repository(
+            api,
+            (&self.category, &self.repository),
+        )?)
     }
 }
