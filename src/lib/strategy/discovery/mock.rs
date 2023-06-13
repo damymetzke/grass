@@ -1,6 +1,8 @@
 use crate::public::api::RepositoryLocation;
 
-use super::{DiscoveryExistsResult, DiscoveryStrategy, DiscoveryStrategyError, Result};
+use super::{
+    BoxedIterator, DiscoveryExistsResult, DiscoveryStrategy, DiscoveryStrategyError, Result,
+};
 
 #[derive(Default)]
 pub struct MockDiscoveryStrategy;
@@ -33,24 +35,35 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         }
     }
 
-    fn list_repositories_in_category<T, U>(&self, category: T) -> Result<U>
+    fn list_repositories_in_category<T>(
+        &self,
+        category: T,
+    ) -> Result<BoxedIterator<Result<RepositoryLocation>>>
     where
         T: AsRef<str>,
-        U: FromIterator<crate::public::api::RepositoryLocation>,
     {
-        let result: U = match category.as_ref() {
-            "all_good" | "with_changes" => [
-                (category.as_ref(), "first"),
-                (category.as_ref(), "second"),
-                (category.as_ref(), "third"),
+        let to_ok = |location| Ok(location);
+        let result = match category.as_ref() {
+            "all_good" => [
+                ("all_good", "first"),
+                ("all_good", "second"),
+                ("all_good", "third"),
             ]
             .iter()
             .map(RepositoryLocation::from)
-            .collect(),
-            "with_errors" => [(category.as_ref(), "first"), (category.as_ref(), "second")]
+            .map(to_ok),
+            "with_changes" => [
+                ("with_changes", "first"),
+                ("with_changes", "second"),
+                ("with_changes", "third"),
+            ]
+            .iter()
+            .map(RepositoryLocation::from)
+            .map(to_ok),
+            "with_errors" => [("with_errors", "first"), ("with_errors", "second")]
                 .iter()
                 .map(RepositoryLocation::from)
-                .collect(),
+                .map(to_ok),
             _ => {
                 return Err(DiscoveryStrategyError::CategoryNotFound {
                     context: "When mocking".into(),
@@ -59,7 +72,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
             }
         };
 
-        Ok(result)
+        Ok(Box::from(result))
     }
 
     fn list_categories<T>(&self) -> Result<T>

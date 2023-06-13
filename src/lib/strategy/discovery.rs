@@ -12,6 +12,8 @@ pub use mock::MockDiscoveryStrategy;
 pub enum DiscoveryStrategyError {
     #[error("Cannot find repository:\nContext: {context}\nReason: {reason}")]
     CategoryNotFound { context: String, reason: String },
+    #[error("There is a problem accessing the file system:\nContext: {context}\nReason: {reason}")]
+    FilesystemError { context: String, reason: String },
     #[error("There is a problem:\nContext: {context}\nReason: {reason}")]
     UnknownError { context: String, reason: String },
 }
@@ -24,6 +26,8 @@ pub enum DiscoveryExistsResult {
     CategoryNotFound,
 }
 
+pub type BoxedIterator<'a, T> = Box<dyn Iterator<Item = T> + 'a>;
+
 pub trait DiscoveryStrategy {
     fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExistsResult>
     where
@@ -33,10 +37,12 @@ pub trait DiscoveryStrategy {
     where
         T: AsRef<str>;
 
-    fn list_repositories_in_category<T, U>(&self, category: T) -> Result<U>
+    fn list_repositories_in_category<T>(
+        &self,
+        category: T,
+    ) -> Result<BoxedIterator<Result<RepositoryLocation>>>
     where
-        T: AsRef<str>,
-        U: FromIterator<RepositoryLocation>;
+        T: AsRef<str>;
 
     fn list_categories<T>(&self) -> Result<T>
     where
