@@ -5,7 +5,7 @@ use crate::{
     public::api::RepositoryLocation,
 };
 
-use super::{BoxedIterator, DiscoveryExistsResult, DiscoveryStrategy, Result};
+use super::{BoxedIterator, DiscoveryExists, DiscoveryStrategy, Result};
 
 pub struct LocalDiscoveryStrategy<'a> {
     config: &'a GrassConfig,
@@ -18,7 +18,7 @@ impl<'a> LocalDiscoveryStrategy<'a> {
 }
 
 impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
-    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExistsResult>
+    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExists>
     where
         T: Into<RepositoryLocation>,
     {
@@ -29,24 +29,24 @@ impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
 
         let category_dir = match self.config.get_from_category_or_alias(category) {
             Some(category) => self.config.base_dir.join(&category.name),
-            None => return Ok(DiscoveryExistsResult::CategoryNotFound),
+            None => return Ok(DiscoveryExists::CategoryNotFound),
         };
 
         let repository_dir = category_dir.join(repository);
 
         match repository_dir.is_dir() {
-            true => Ok(DiscoveryExistsResult::Exists),
-            false => Ok(DiscoveryExistsResult::RepositoryNotFound),
+            true => Ok(DiscoveryExists::Exists),
+            false => Ok(DiscoveryExists::RepositoryNotFound),
         }
     }
 
-    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExistsResult>
+    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExists>
     where
         T: AsRef<str>,
     {
         match self.config.get_from_category_or_alias(category) {
-            Some(_) => Ok(DiscoveryExistsResult::Exists),
-            None => Ok(DiscoveryExistsResult::CategoryNotFound),
+            Some(_) => Ok(DiscoveryExists::Exists),
+            None => Ok(DiscoveryExists::CategoryNotFound),
         }
     }
 

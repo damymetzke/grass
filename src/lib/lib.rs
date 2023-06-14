@@ -17,7 +17,7 @@ pub mod dev {
     };
 
     pub use crate::public::{
-        api::Api,
+        api::{Api, RepositoryLocation},
         git::{
             clean_repository, clone_repository, clone_repository_default,
             get_repository_change_status,

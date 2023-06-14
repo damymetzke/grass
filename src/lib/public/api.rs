@@ -3,6 +3,7 @@ use crate::{
     dev::strategy::api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
 };
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RepositoryLocation {
     pub category: String,
     pub repository: String,

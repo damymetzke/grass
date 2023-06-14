@@ -1,14 +1,14 @@
 use crate::public::api::RepositoryLocation;
 
 use super::{
-    BoxedIterator, DiscoveryExistsResult, DiscoveryStrategy, DiscoveryStrategyError, Result,
+    BoxedIterator, DiscoveryExists, DiscoveryStrategy, DiscoveryStrategyError, Result,
 };
 
 #[derive(Default)]
 pub struct MockDiscoveryStrategy;
 
 impl DiscoveryStrategy for MockDiscoveryStrategy {
-    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExistsResult>
+    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExists>
     where
         T: Into<crate::public::api::RepositoryLocation>,
     {
@@ -17,21 +17,21 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
 
         match repository {
             ("all_good" | "with_changes" | "with_error", "first" | "second")
-            | ("all_good" | "with_changes", "third") => Ok(DiscoveryExistsResult::Exists),
+            | ("all_good" | "with_changes", "third") => Ok(DiscoveryExists::Exists),
             ("all_good" | "with_changes" | "with_error", _) => {
-                Ok(DiscoveryExistsResult::RepositoryNotFound)
+                Ok(DiscoveryExists::RepositoryNotFound)
             }
-            _ => Ok(DiscoveryExistsResult::CategoryNotFound),
+            _ => Ok(DiscoveryExists::CategoryNotFound),
         }
     }
 
-    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExistsResult>
+    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExists>
     where
         T: AsRef<str>,
     {
         match category.as_ref() {
-            "all_good" | "with_changes" | "with_error" => Ok(DiscoveryExistsResult::Exists),
-            _ => Ok(DiscoveryExistsResult::CategoryNotFound),
+            "all_good" | "with_changes" | "with_error" => Ok(DiscoveryExists::Exists),
+            _ => Ok(DiscoveryExists::CategoryNotFound),
         }
     }
 
