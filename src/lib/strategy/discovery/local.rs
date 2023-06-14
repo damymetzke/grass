@@ -152,6 +152,6 @@ impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
     where
         T: FromIterator<String>,
     {
-        todo!()
+        Ok(self.config.category.keys().cloned().collect())
     }
 }

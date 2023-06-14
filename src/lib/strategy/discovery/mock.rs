@@ -42,7 +42,6 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
     where
         T: AsRef<str>,
     {
-        let to_ok = |location| Ok(location);
         let result = match category.as_ref() {
             "all_good" => [
                 ("all_good", "first"),
@@ -51,7 +50,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
             ]
             .iter()
             .map(RepositoryLocation::from)
-            .map(to_ok),
+            .map(Ok),
             "with_changes" => [
                 ("with_changes", "first"),
                 ("with_changes", "second"),
@@ -59,11 +58,11 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
             ]
             .iter()
             .map(RepositoryLocation::from)
-            .map(to_ok),
+            .map(Ok),
             "with_errors" => [("with_errors", "first"), ("with_errors", "second")]
                 .iter()
                 .map(RepositoryLocation::from)
-                .map(to_ok),
+                .map(Ok),
             _ => {
                 return Err(DiscoveryStrategyError::CategoryNotFound {
                     context: "When mocking".into(),
