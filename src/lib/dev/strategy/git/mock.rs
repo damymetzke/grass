@@ -1,4 +1,4 @@
-use crate::public::api::RepositoryLocation;
+use crate::dev::public::api::RepositoryLocation;
 
 use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, Result};
 

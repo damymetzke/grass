@@ -1,8 +1,6 @@
-use crate::public::api::RepositoryLocation;
+use crate::dev::public::api::RepositoryLocation;
 
-use super::{
-    BoxedIterator, DiscoveryExists, DiscoveryStrategy, DiscoveryStrategyError, Result,
-};
+use super::{BoxedIterator, DiscoveryExists, DiscoveryStrategy, DiscoveryStrategyError, Result};
 
 #[derive(Default)]
 pub struct MockDiscoveryStrategy;
@@ -10,7 +8,7 @@ pub struct MockDiscoveryStrategy;
 impl DiscoveryStrategy for MockDiscoveryStrategy {
     fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExists>
     where
-        T: Into<crate::public::api::RepositoryLocation>,
+        T: Into<RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
         let repository = (repository.category.as_str(), repository.repository.as_str());

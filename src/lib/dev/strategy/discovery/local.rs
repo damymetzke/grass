@@ -1,8 +1,8 @@
 use std::fs;
 
-use crate::{
-    config::GrassConfig, dev::strategy::discovery::DiscoveryStrategyError,
-    public::api::RepositoryLocation,
+use crate::dev::{
+    config::GrassConfig, public::api::RepositoryLocation,
+    strategy::discovery::DiscoveryStrategyError,
 };
 
 use super::{BoxedIterator, DiscoveryExists, DiscoveryStrategy, Result};

@@ -2,12 +2,10 @@ use std::{fs, path::PathBuf};
 
 use itertools::Itertools;
 
-use crate::{
+use crate::dev::{
     config::{GrassConfig, RootConfig},
-    dev::types::{
-        FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription,
-    },
     repository::{get_repository_changes, RepositoryChangeStatus},
+    types::{FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription},
 };
 
 /// List repositories in a single category

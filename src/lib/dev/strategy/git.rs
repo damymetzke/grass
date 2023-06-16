@@ -6,7 +6,7 @@ use thiserror::Error;
 pub use local::LocalGitStrategy;
 pub use mock::MockGitStrategy;
 
-use crate::public::api::RepositoryLocation;
+use crate::dev::public::api::RepositoryLocation;
 
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum GitStrategyError {

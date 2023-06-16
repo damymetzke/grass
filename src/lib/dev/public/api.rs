@@ -1,6 +1,6 @@
-use crate::{
+use crate::dev::{
     config,
-    dev::strategy::api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
+    strategy::api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
 };
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

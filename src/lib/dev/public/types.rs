@@ -1,4 +1,4 @@
-use crate::config::RootConfig;
+use crate::dev::config::RootConfig;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]

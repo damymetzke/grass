@@ -1,7 +1,7 @@
 use git2::{build::RepoBuilder, ErrorCode, Repository, Status};
 use itertools::Itertools;
 
-use crate::config::GrassConfig;
+use crate::dev::config::GrassConfig;
 
 use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, RepositoryLocation, Result};
 

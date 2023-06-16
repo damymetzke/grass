@@ -1,4 +1,4 @@
-use crate::{config::GrassConfig, dev::strategy::git::LocalGitStrategy};
+use crate::dev::{config::GrassConfig, strategy::git::LocalGitStrategy};
 
 use super::ApiStrategy;
 

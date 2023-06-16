@@ -3,7 +3,7 @@ mod mock;
 
 use thiserror::Error;
 
-use crate::public::api::RepositoryLocation;
+use crate::dev::public::api::RepositoryLocation;
 
 pub use local::LocalDiscoveryStrategy;
 pub use mock::MockDiscoveryStrategy;
