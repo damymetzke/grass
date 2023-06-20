@@ -35,9 +35,13 @@ pub enum GrassSubcommand {
 #[command(author, version, about, long_about)]
 /// GRAss: GLobal Repository Assistent
 ///
-/// GRAss is a utility which aims to assit you into managing repositories.
-/// For more information see:
-/// <https://github.com/damymetzke/grass>
+/// A utility which aims to assist you into managing repositories.
+/// The repository can be found at <https://github.com/damymetzke/grass>.
+///
+/// You can add aliases by puttin scripts with the prefix 'grass-' on your path.
+/// For example, the script 'grass-foo'.
+/// This will allow you to call this script using `grass foo`.
+/// Additional arguments will be passed to the script.
 pub struct GrassCommand {
     #[command(subcommand)]
     command: GrassSubcommand,
