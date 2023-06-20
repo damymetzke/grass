@@ -55,7 +55,7 @@ enum HandleExternalResult {
 impl GrassCommand {
     fn handle_external(
         value: &Vec<String>,
-        commands: &Vec<ExternalCommand>,
+        commands: &[ExternalCommand],
     ) -> HandleExternalResult {
         let (subcommand, args) = match value.as_slice() {
             [subcommand, args @ ..] => (subcommand, args),
@@ -76,7 +76,7 @@ impl GrassCommand {
         HandleExternalResult::CommandFound
     }
 
-    pub fn handle<T>(&self, api: &Api<T>, external_commands: &Vec<ExternalCommand>) -> Result<()>
+    pub fn handle<T>(&self, api: &Api<T>, external_commands: &[ExternalCommand]) -> Result<()>
     where
         T: ApiStrategy,
     {
@@ -92,23 +92,20 @@ impl GrassCommand {
             GrassSubcommand::Debug(command) => command.handle(),
             GrassSubcommand::External(parts) => {
                 let result = Self::handle_external(parts, external_commands);
-                match result {
-                    HandleExternalResult::CommandNotFound(cmd) => {
-                        eprintln!(
-                            "{} unrecognized subcommand '{}'",
-                            "error:".red().bold(),
-                            cmd.yellow()
-                        );
-                        eprintln!();
-                        eprintln!(
-                            "{} {} <COMMAND>",
-                            "Usage:".bold().underline(),
-                            "grass".bold()
-                        );
-                        eprintln!();
-                        eprintln!("For more information, try '{}'.", "--help".bold());
-                    }
-                    _ => (),
+                if let HandleExternalResult::CommandNotFound(cmd) = result {
+                    eprintln!(
+                        "{} unrecognized subcommand '{}'",
+                        "error:".red().bold(),
+                        cmd.yellow()
+                    );
+                    eprintln!();
+                    eprintln!(
+                        "{} {} <COMMAND>",
+                        "Usage:".bold().underline(),
+                        "grass".bold()
+                    );
+                    eprintln!();
+                    eprintln!("For more information, try '{}'.", "--help".bold());
                 }
             }
         };
