@@ -7,9 +7,13 @@ mod script;
 mod session;
 mod shell_insert;
 
+use std::process::Command;
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use grass::dev::{strategy::api::ApiStrategy, Api};
+
+use crate::external_command::ExternalCommand;
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
@@ -22,6 +26,8 @@ pub enum GrassSubcommand {
     Cs(session::create::CreateCommand),
     #[cfg(debug_assertions)]
     Debug(debug::DebugCommand),
+    #[clap(external_subcommand)]
+    External(Vec<String>),
 }
 
 #[derive(Parser, Debug)]
@@ -36,8 +42,36 @@ pub struct GrassCommand {
     command: GrassSubcommand,
 }
 
+enum HandleExternalResult {
+    CommandFound,
+    CommandNotFound,
+}
+
 impl GrassCommand {
-    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    fn handle_external(
+        value: &Vec<String>,
+        commands: &Vec<ExternalCommand>,
+    ) -> HandleExternalResult {
+        let (subcommand, args) = match value.as_slice() {
+            [subcommand, args @ ..] => (subcommand, args),
+            _ => return HandleExternalResult::CommandNotFound,
+        };
+
+        let command = commands
+            .iter()
+            .find(|command| command.command == subcommand.as_str());
+
+        let command = match command {
+            Some(command) => command,
+            None => return HandleExternalResult::CommandNotFound,
+        };
+
+        Command::new(&command.path).args(args).status().ok();
+
+        HandleExternalResult::CommandFound
+    }
+
+    pub fn handle<T>(&self, api: &Api<T>, external_commands: &Vec<ExternalCommand>) -> Result<()>
     where
         T: ApiStrategy,
     {
@@ -51,6 +85,12 @@ impl GrassCommand {
             GrassSubcommand::Cs(command) => command.handle(),
             #[cfg(debug_assertions)]
             GrassSubcommand::Debug(command) => command.handle(),
+            GrassSubcommand::External(parts) => {
+                let result = Self::handle_external(parts, external_commands);
+                if matches!(result, HandleExternalResult::CommandNotFound) {
+                    eprintln!("The subcommand is not recognized");
+                };
+            }
         };
         Ok(())
     }

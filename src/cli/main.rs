@@ -1,3 +1,4 @@
+mod external_command;
 mod facades;
 mod grass_command;
 mod more_itertools;
@@ -11,7 +12,7 @@ fn main() {
     let grass_command = GrassCommand::parse();
 
     Api::with_local_strategy(|api| {
-        match grass_command.handle(&api) {
+        match grass_command.handle(&api, &external_command::get_external_commands()) {
             Ok(_) => (),
             Err(error) => println!("Something went wrong!\n{}", error),
         };
