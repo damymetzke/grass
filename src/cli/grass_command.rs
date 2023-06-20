@@ -11,6 +11,7 @@ use std::process::Command;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 use grass::dev::{strategy::api::ApiStrategy, Api};
 
 use crate::external_command::ExternalCommand;
@@ -44,7 +45,7 @@ pub struct GrassCommand {
 
 enum HandleExternalResult {
     CommandFound,
-    CommandNotFound,
+    CommandNotFound(String),
 }
 
 impl GrassCommand {
@@ -54,7 +55,7 @@ impl GrassCommand {
     ) -> HandleExternalResult {
         let (subcommand, args) = match value.as_slice() {
             [subcommand, args @ ..] => (subcommand, args),
-            _ => return HandleExternalResult::CommandNotFound,
+            _ => return HandleExternalResult::CommandNotFound(String::new()),
         };
 
         let command = commands
@@ -63,7 +64,7 @@ impl GrassCommand {
 
         let command = match command {
             Some(command) => command,
-            None => return HandleExternalResult::CommandNotFound,
+            None => return HandleExternalResult::CommandNotFound(subcommand.clone()),
         };
 
         Command::new(&command.path).args(args).status().ok();
@@ -87,9 +88,24 @@ impl GrassCommand {
             GrassSubcommand::Debug(command) => command.handle(),
             GrassSubcommand::External(parts) => {
                 let result = Self::handle_external(parts, external_commands);
-                if matches!(result, HandleExternalResult::CommandNotFound) {
-                    eprintln!("The subcommand is not recognized");
-                };
+                match result {
+                    HandleExternalResult::CommandNotFound(cmd) => {
+                        eprintln!(
+                            "{} unrecognized subcommand '{}'",
+                            "error:".red().bold(),
+                            cmd.yellow()
+                        );
+                        eprintln!();
+                        eprintln!(
+                            "{} {} <COMMAND>",
+                            "Usage:".bold().underline(),
+                            "grass".bold()
+                        );
+                        eprintln!();
+                        eprintln!("For more information, try '{}'.", "--help".bold());
+                    }
+                    _ => (),
+                }
             }
         };
         Ok(())

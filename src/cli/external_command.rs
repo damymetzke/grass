@@ -1,4 +1,4 @@
-use std::{path::PathBuf, env, fs, os::unix::prelude::PermissionsExt};
+use std::{env, fs, os::unix::prelude::PermissionsExt, path::PathBuf};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ExternalCommand {
