@@ -4,8 +4,24 @@ use thiserror::Error;
 
 use crate::dev::{
     config,
-    strategy::{api::LocalApiStrategy, discovery::LocalDiscoveryStrategy, git::LocalGitStrategy},
+    strategy::{
+        api::{ApiStrategy, LocalApiStrategy},
+        discovery::LocalDiscoveryStrategy,
+        git::LocalGitStrategy,
+    },
 };
+
+pub struct Api<T: ApiStrategy>(T);
+
+pub trait AccessApi<T: ApiStrategy> {
+    fn get_strategy(&self) -> &T;
+}
+
+impl<T: ApiStrategy> AccessApi<T> for Api<T> {
+    fn get_strategy(&self) -> &T {
+        &self.0
+    }
+}
 
 #[derive(Error)]
 pub enum LocalStrategyError<T>
@@ -27,7 +43,7 @@ pub fn use_local_strategy_with_default_config<T, U, V>(
     closure: T,
 ) -> Result<U, LocalStrategyError<V>>
 where
-    T: Fn(LocalApiStrategy) -> Result<U, LocalStrategyError<V>>,
+    T: Fn(Api<LocalApiStrategy>) -> Result<U, LocalStrategyError<V>>,
     V: StdError,
 {
     let config = config::load_user_config()
@@ -41,5 +57,5 @@ where
 
     let api_strategy = LocalApiStrategy::new(&git_strategy, &discovery_strategy);
 
-    closure(api_strategy)
+    closure(Api(api_strategy))
 }
