@@ -1,6 +1,10 @@
 use crate::dev::{
     config,
-    strategy::api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
+    strategy::{
+        api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
+        discovery::LocalDiscoveryStrategy,
+        git::LocalGitStrategy,
+    },
 };
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -68,8 +72,12 @@ impl Api<LocalApiStrategy<'_>> {
         U: Fn(Api<LocalApiStrategy<'_>>),
     {
         // TODO: Set up error handling
-        let config = config::load_user_config().unwrap();
-        let strategy = LocalApiStrategy::new(&config.grass);
+        let config = config::load_user_config().unwrap().grass;
+
+        let git_strategy = LocalGitStrategy::new(&config);
+        let discovery_strategy = LocalDiscoveryStrategy::new(&config);
+
+        let strategy = LocalApiStrategy::new(&git_strategy, &discovery_strategy);
         closure(Api { strategy });
     }
 }
