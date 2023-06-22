@@ -5,16 +5,17 @@ mod more_itertools;
 mod output;
 
 use clap::Parser;
-use grass::dev::Api;
+use grass::dev::use_local_strategy_with_default_config;
 use grass_command::GrassCommand;
 
 fn main() {
     let grass_command = GrassCommand::parse();
 
-    Api::with_local_strategy(|api| {
-        match grass_command.handle(&api, &external_command::get_external_commands()) {
-            Ok(_) => (),
+    match use_local_strategy_with_default_config(|api| {
+        Ok(grass_command.handle(&api, &external_command::get_external_commands()))
+    }) {
             Err(error) => println!("Something went wrong!\n{}", error),
+            Ok(Err(error)) => println!("Something went wrong!\n{}", error),
+            _ => (),
         };
-    })
 }

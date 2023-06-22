@@ -1,11 +1,9 @@
-use std::error::Error as StdError;
-
 use thiserror::Error;
 
 use crate::dev::{
     config,
     strategy::{
-        api::{ApiStrategy, LocalApiStrategy},
+        api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
         discovery::LocalDiscoveryStrategy,
         git::LocalGitStrategy,
     },
@@ -23,15 +21,12 @@ impl<T: ApiStrategy> AccessApi<T> for Api<T> {
     }
 }
 
-#[derive(Error)]
-pub enum LocalStrategyError<T>
-where
-    T: StdError,
+
+#[derive(Error, Debug)]
+pub enum LocalStrategyError
 {
     #[error("Could not load user configuration\nReason: {reason}")]
     LoadConfigError { reason: String },
-    #[error(transparent)]
-    UserError(#[from] T),
 }
 
 /// Builds the API strategy using the default local config
@@ -39,12 +34,11 @@ where
 /// The base configuration directory is located using [dirs::config_dir].
 /// All files under the `{config}/grass/` that end with `.toml` are then considered.
 /// They are considered in alphabetical order, with later values overriding earlier ones.
-pub fn use_local_strategy_with_default_config<T, U, V>(
+pub fn use_local_strategy_with_default_config<T, U>(
     closure: T,
-) -> Result<U, LocalStrategyError<V>>
+) -> Result<U, LocalStrategyError>
 where
-    T: Fn(Api<LocalApiStrategy>) -> Result<U, LocalStrategyError<V>>,
-    V: StdError,
+    T: Fn(Api<LocalApiStrategy>) -> Result<U, LocalStrategyError>,
 {
     let config = config::load_user_config()
         .map_err(|error| LocalStrategyError::LoadConfigError {
@@ -58,4 +52,11 @@ where
     let api_strategy = LocalApiStrategy::new(&git_strategy, &discovery_strategy);
 
     closure(Api(api_strategy))
+}
+
+/// Builds the API strategy using the mocking strategy
+///
+/// This can be used during testing.
+pub fn use_mock_strategy() -> Api<MockApiStrategy> {
+    Api(MockApiStrategy::default())
 }
