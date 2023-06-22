@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use grass::dev::{strategy::api::ApiStrategy, ApiV2 as Api};
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 #[derive(Parser, Debug)]
 pub struct CleanCommand {

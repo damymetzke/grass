@@ -12,7 +12,7 @@ use std::process::Command;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use grass::dev::{strategy::api::ApiStrategy, ApiV2 as Api};
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 use crate::external_command::ExternalCommand;
 

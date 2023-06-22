@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use grass::dev::{config, strategy::api::ApiStrategy, ApiV2 as Api};
+use grass::dev::{config, strategy::api::ApiStrategy, Api};
 
 use crate::facades::dialoguer::select_selectable;
 

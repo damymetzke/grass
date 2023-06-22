@@ -18,5 +18,5 @@ pub use public::{
     git::{
         clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
     },
-    strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api as ApiV2},
+    strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
 };

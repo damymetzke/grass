@@ -3,7 +3,7 @@ mod clone;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use grass::dev::{strategy::api::ApiStrategy, ApiV2 as Api};
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 #[derive(Debug, Subcommand)]
 pub enum RepoSubcommand {
