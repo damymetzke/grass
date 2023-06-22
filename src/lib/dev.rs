@@ -4,7 +4,6 @@ pub mod repository;
 pub mod strategy;
 
 pub use public::{
-    api::{Api, RepositoryLocation},
     categories::{get_category_path, list_categories},
     repositories::{
         get_repository, get_repository_path, list_all_repositories,
@@ -15,6 +14,7 @@ pub use public::{
 };
 
 pub use public::{
+    api::RepositoryLocation,
     git::{
         clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
     },
