@@ -27,6 +27,10 @@ pub trait PathStrategy {
     /// Grass makes no guarentees that all repositories will be contained in the same directory.
     /// You cannot assume that other repositories in the same category are contained in the same
     /// directory.
+    ///
+    /// # Example
+    ///
+    /// TODO: Add when mock strategy has been created
     fn get_containing_directory<T>(&self, repository: T) -> Result<PathBuf>
     where
         T: Into<RepositoryLocation>;
@@ -34,6 +38,10 @@ pub trait PathStrategy {
     /// Get the directory for a repository
     ///
     /// This will fail if the repository, or the path, doesn't exist.
+    ///
+    /// # Example
+    ///
+    /// TODO: Add when mock strategy has been created
     fn get_directory<T>(&self, repository: T) -> Result<PathBuf>
     where
         T: Into<RepositoryLocation>;
