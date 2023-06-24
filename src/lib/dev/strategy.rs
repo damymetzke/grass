@@ -38,6 +38,7 @@
 //! | :--------------------------------------------------- | :----------------------------------------------- |
 //! | [crate::dev::strategy::discovery::DiscoveryStrategy] | List and find repositories, independent of paths |
 //! | [crate::dev::strategy::git::GitStrategy]             | Read and write operations using Git              |
+//! | [crate::dev::strategy::path::PathStrategy]           | Resolve repositories to file system paths        |
 //!
 //! [^1]: [crate::dev::strategy::api::ApiStrategy]
 
