@@ -1,3 +1,4 @@
+mod local;
 mod mock;
 
 use std::path::PathBuf;
@@ -6,6 +7,7 @@ use thiserror::Error;
 
 use crate::dev::RepositoryLocation;
 
+pub use local::LocalPathStrategy;
 pub use mock::MockPathStrategy;
 
 #[derive(Error, Debug, PartialEq, Eq)]
