@@ -34,7 +34,29 @@ pub trait PathStrategy {
     ///
     /// # Example
     ///
-    /// TODO: Add when mock strategy has been created
+    /// ```rust
+    /// use grass::dev::strategy::path::{MockPathStrategy, PathStrategy, PathStrategyError};
+    /// use std::path::PathBuf;
+    /// let strategy = MockPathStrategy;
+    /// fn test_strategy<T: PathStrategy>(strategy: &T) {
+    ///     assert_eq!(
+    ///         strategy.get_containing_directory(("all_good", "first")),
+    ///         Ok(PathBuf::from("/home/example/repositories/all_good"))
+    ///     );
+    ///
+    ///     assert_eq!(
+    ///         strategy.get_containing_directory(("with_changes", "does_not_exist")),
+    ///         Ok(PathBuf::from("/home/example/repositories/with_changes"))
+    ///     );
+    ///
+    ///     assert!(matches!(
+    ///         strategy.get_containing_directory(("does_not_exist", "third")),
+    ///         Err(PathStrategyError::RepositoryNotFound { .. })
+    ///     ));
+    /// }
+    ///
+    /// test_strategy(&strategy);
+    /// ```
     fn get_containing_directory<T>(&self, repository: T) -> Result<PathBuf>
     where
         T: Into<RepositoryLocation>;
@@ -45,7 +67,28 @@ pub trait PathStrategy {
     ///
     /// # Example
     ///
-    /// TODO: Add when mock strategy has been created
+    /// ```rust
+    /// use grass::dev::strategy::path::{MockPathStrategy, PathStrategy, PathStrategyError};
+    /// use std::path::PathBuf;
+    /// let strategy = MockPathStrategy;
+    /// fn test_strategy<T: PathStrategy>(strategy: &T) {
+    ///     assert_eq!(
+    ///         strategy.get_directory(("all_good", "first")),
+    ///         Ok(PathBuf::from("/home/example/repositories/all_good/first"))
+    ///     );
+    ///
+    ///     assert!(matches!(
+    ///         strategy.get_directory(("all_good", "does_not_exist")),
+    ///         Err(PathStrategyError::RepositoryNotFound { .. })
+    ///     ));
+    ///
+    ///     assert!(matches!(
+    ///         strategy.get_directory(("does_not_exist", "third")),
+    ///         Err(PathStrategyError::RepositoryNotFound { .. })
+    ///     ));
+    /// }
+    /// test_strategy(&strategy);
+    /// ```
     fn get_directory<T>(&self, repository: T) -> Result<PathBuf>
     where
         T: Into<RepositoryLocation>;

@@ -17,7 +17,7 @@ impl PathStrategy for MockPathStrategy {
         let repository: RepositoryLocation = repository.into();
         let repository = (repository.category.as_str(), repository.repository.as_str());
         match repository {
-            ("all_good", _) => Ok(PathBuf::from("/home/example/repositories")),
+            ("all_good", _) => Ok(PathBuf::from("/home/example/repositories/all_good")),
             ("with_changes", _) => Ok(PathBuf::from("/home/example/repositories/with_changes")),
             ("with_error", _) => Ok(PathBuf::from("/home/example/repositories/with_error")),
             _ => Err(PathStrategyError::RepositoryNotFound {
