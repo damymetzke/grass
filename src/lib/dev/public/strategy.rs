@@ -6,6 +6,7 @@ use crate::dev::{
         api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
         discovery::LocalDiscoveryStrategy,
         git::LocalGitStrategy,
+        path::LocalPathStrategy,
     },
 };
 
@@ -21,10 +22,8 @@ impl<T: ApiStrategy> AccessApi<T> for Api<T> {
     }
 }
 
-
 #[derive(Error, Debug)]
-pub enum LocalStrategyError
-{
+pub enum LocalStrategyError {
     #[error("Could not load user configuration\nReason: {reason}")]
     LoadConfigError { reason: String },
 }
@@ -34,9 +33,7 @@ pub enum LocalStrategyError
 /// The base configuration directory is located using [dirs::config_dir].
 /// All files under the `{config}/grass/` that end with `.toml` are then considered.
 /// They are considered in alphabetical order, with later values overriding earlier ones.
-pub fn use_local_strategy_with_default_config<T, U>(
-    closure: T,
-) -> Result<U, LocalStrategyError>
+pub fn use_local_strategy_with_default_config<T, U>(closure: T) -> Result<U, LocalStrategyError>
 where
     T: Fn(Api<LocalApiStrategy>) -> Result<U, LocalStrategyError>,
 {
@@ -48,8 +45,9 @@ where
 
     let git_strategy = LocalGitStrategy::new(&config);
     let discovery_strategy = LocalDiscoveryStrategy::new(&config);
+    let path_strategy = LocalPathStrategy::new(&config);
 
-    let api_strategy = LocalApiStrategy::new(&git_strategy, &discovery_strategy);
+    let api_strategy = LocalApiStrategy::new(&discovery_strategy, & git_strategy, &path_strategy);
 
     closure(Api(api_strategy))
 }

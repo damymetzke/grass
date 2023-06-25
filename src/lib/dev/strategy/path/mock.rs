@@ -7,6 +7,7 @@ use super::{PathStrategy, PathStrategyError};
 /// A mocked implementation of the path strategy
 ///
 /// TODO: Get a central documentation for mocked data
+#[derive(Debug, Default)]
 pub struct MockPathStrategy;
 
 impl PathStrategy for MockPathStrategy {
