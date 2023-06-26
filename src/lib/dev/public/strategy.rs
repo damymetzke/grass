@@ -47,7 +47,7 @@ where
     let discovery_strategy = LocalDiscoveryStrategy::new(&config);
     let path_strategy = LocalPathStrategy::new(&config);
 
-    let api_strategy = LocalApiStrategy::new(&discovery_strategy, & git_strategy, &path_strategy);
+    let api_strategy = LocalApiStrategy::new(&discovery_strategy, &git_strategy, &path_strategy);
 
     closure(Api(api_strategy))
 }
