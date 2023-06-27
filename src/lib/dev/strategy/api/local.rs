@@ -6,14 +6,14 @@ use super::ApiStrategy;
 
 pub struct LocalApiStrategy<'a> {
     discovery_strategy: &'a LocalDiscoveryStrategy<'a>,
-    git_strategy: &'a LocalGitStrategy<'a>,
+    git_strategy: &'a LocalGitStrategy<'a, LocalPathStrategy<'a>>,
     path_strategy: &'a LocalPathStrategy<'a>,
 }
 
 impl<'a> LocalApiStrategy<'a> {
     pub fn new(
         discovery_strategy: &'a LocalDiscoveryStrategy<'a>,
-        git_strategy: &'a LocalGitStrategy<'a>,
+        git_strategy: &'a LocalGitStrategy<'a, LocalPathStrategy<'a>>,
         path_strategy: &'a LocalPathStrategy<'a>,
     ) -> Self {
         Self {
@@ -26,7 +26,7 @@ impl<'a> LocalApiStrategy<'a> {
 
 impl<'a> ApiStrategy for LocalApiStrategy<'a> {
     type Discovery = LocalDiscoveryStrategy<'a>;
-    type Git = LocalGitStrategy<'a>;
+    type Git = LocalGitStrategy<'a, LocalPathStrategy<'a>>;
     type Path = LocalPathStrategy<'a>;
 
     fn get_discovery_strategy(&self) -> &Self::Discovery {

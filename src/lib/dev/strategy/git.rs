@@ -8,6 +8,8 @@ pub use mock::MockGitStrategy;
 
 use crate::dev::public::api::RepositoryLocation;
 
+// TODO: Change to `context` and `reason` fields.
+// TODO: Implement conversion from PathStrategyError.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum GitStrategyError {
     #[error("Cannot find repository:\n{message}\nReason: {reason}")]

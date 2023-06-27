@@ -1,35 +1,49 @@
 use git2::{build::RepoBuilder, ErrorCode, Repository, Status};
 use itertools::Itertools;
 
-use crate::dev::config::GrassConfig;
+use crate::dev::strategy::path::{PathStrategy, PathStrategyError};
 
 use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, RepositoryLocation, Result};
 
-pub struct LocalGitStrategy<'a> {
-    config: &'a GrassConfig,
+pub struct LocalGitStrategy<'a, T: PathStrategy> {
+    path_strategy: &'a T,
 }
 
-impl<'a> LocalGitStrategy<'a> {
-    pub fn new(config: &'a GrassConfig) -> Self {
-        Self { config }
+impl<'a, T: PathStrategy> LocalGitStrategy<'a, T> {
+    pub fn new(path_strategy: &'a T) -> Self {
+        Self {
+            path_strategy,
+        }
     }
 }
 
-impl<'a> GitStrategy for LocalGitStrategy<'a> {
-    fn clean<T>(&self, repository: T) -> Result<()>
+impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
+    fn clean<U>(&self, repository: U) -> Result<()>
     where
-        T: Into<RepositoryLocation>,
+        U: Into<RepositoryLocation>,
     {
-        let repository: RepositoryLocation = repository.into();
-        let repository_path = crate::dev::get_repository_path(
-            self.config,
-            repository.category,
-            repository.repository,
-        )
-        .ok_or_else(|| GitStrategyError::RepositoryNotFound {
-            message: "A problem was found while trying to find the repository path".into(),
-            reason: "Cannot not find repository".into(),
-        })?;
+        let repository_path = self
+            .path_strategy
+            .get_directory(repository)
+            .map_err(|error| match error {
+                PathStrategyError::RepositoryNotFound { context, reason } => {
+                    GitStrategyError::RepositoryNotFound {
+                        message: context,
+                        reason,
+                    }
+                }
+                PathStrategyError::FileDoesNotExist { context, reason } => {
+                    GitStrategyError::FileSystemError {
+                        message: context,
+                        reason,
+                        reasons: Vec::new(),
+                    }
+                }
+                PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
+                    message: context,
+                    reason,
+                },
+            })?;
 
         let repository = Repository::open(&repository_path)?;
 
@@ -63,44 +77,67 @@ impl<'a> GitStrategy for LocalGitStrategy<'a> {
         }
     }
 
-    fn clone<T, U>(&self, repository: T, remote: U) -> Result<()>
+    fn clone<U, V>(&self, repository: U, remote: V) -> Result<()>
     where
-        T: Into<RepositoryLocation>,
-        U: AsRef<str>,
+        U: Into<RepositoryLocation>,
+        V: AsRef<str>,
     {
-        let RepositoryLocation {
-            category,
-            repository,
-        } = repository.into();
-
-        let base_dir = crate::dev::get_category_path(self.config, category).ok_or_else(|| {
-            GitStrategyError::RepositoryNotFound {
-                message: "A problem was found while trying to find the category path".into(),
-                reason: "Cannot not find repository".into(),
-            }
-        })?;
-
-        let repo_path = base_dir.join(repository);
+        let repo_path =
+            self.path_strategy
+                .get_directory(repository)
+                .map_err(|error| match error {
+                    PathStrategyError::RepositoryNotFound { context, reason } => {
+                        GitStrategyError::RepositoryNotFound {
+                            message: context,
+                            reason,
+                        }
+                    }
+                    PathStrategyError::FileDoesNotExist { context, reason } => {
+                        GitStrategyError::FileSystemError {
+                            message: context,
+                            reason,
+                            reasons: Vec::new(),
+                        }
+                    }
+                    PathStrategyError::Unknown { context, reason } => {
+                        GitStrategyError::UnknownError {
+                            message: context,
+                            reason,
+                        }
+                    }
+                })?;
 
         RepoBuilder::new().clone(remote.as_ref(), &repo_path)?;
 
         Ok(())
     }
 
-    fn get_changes<T>(&self, repository: T) -> Result<RepositoryChangeStatus>
+    fn get_changes<U>(&self, repository: U) -> Result<RepositoryChangeStatus>
     where
-        T: Into<RepositoryLocation>,
+        U: Into<RepositoryLocation>,
     {
-        let repository: RepositoryLocation = repository.into();
-        let repository_path = crate::dev::get_repository_path(
-            self.config,
-            repository.category,
-            repository.repository,
-        )
-        .ok_or_else(|| GitStrategyError::RepositoryNotFound {
-            message: "A problem was found while trying to find the repository path".into(),
-            reason: "Cannot not find repository".into(),
-        })?;
+        let repository_path = self
+            .path_strategy
+            .get_directory(repository)
+            .map_err(|error| match error {
+                PathStrategyError::RepositoryNotFound { context, reason } => {
+                    GitStrategyError::RepositoryNotFound {
+                        message: context,
+                        reason,
+                    }
+                }
+                PathStrategyError::FileDoesNotExist { context, reason } => {
+                    GitStrategyError::FileSystemError {
+                        message: context,
+                        reason,
+                        reasons: Vec::new(),
+                    }
+                }
+                PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
+                    message: context,
+                    reason,
+                },
+            })?;
 
         let repository = match Repository::open(repository_path) {
             Ok(repository) => Ok(repository),

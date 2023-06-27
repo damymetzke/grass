@@ -65,7 +65,7 @@ pub trait PathStrategy {
 
     /// Get the directory for a repository
     ///
-    /// This will fail if the repository, or the path, doesn't exist.
+    /// This will also work if the path doesn't exist
     ///
     /// # Example
     ///
