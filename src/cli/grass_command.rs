@@ -53,10 +53,7 @@ enum HandleExternalResult {
 }
 
 impl GrassCommand {
-    fn handle_external(
-        value: &Vec<String>,
-        commands: &[ExternalCommand],
-    ) -> HandleExternalResult {
+    fn handle_external(value: &Vec<String>, commands: &[ExternalCommand]) -> HandleExternalResult {
         let (subcommand, args) = match value.as_slice() {
             [subcommand, args @ ..] => (subcommand, args),
             _ => return HandleExternalResult::CommandNotFound(String::new()),

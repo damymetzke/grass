@@ -14,8 +14,8 @@ fn main() {
     match use_local_strategy_with_default_config(|api| {
         Ok(grass_command.handle(&api, &external_command::get_external_commands()))
     }) {
-            Err(error) => println!("Something went wrong!\n{}", error),
-            Ok(Err(error)) => println!("Something went wrong!\n{}", error),
-            _ => (),
-        };
+        Err(error) => println!("Something went wrong!\n{}", error),
+        Ok(Err(error)) => println!("Something went wrong!\n{}", error),
+        _ => (),
+    };
 }

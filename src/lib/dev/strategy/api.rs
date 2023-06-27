@@ -1,7 +1,7 @@
 mod local;
 mod mock;
 
-use super::{git::GitStrategy, discovery::DiscoveryStrategy, path::PathStrategy};
+use super::{discovery::DiscoveryStrategy, git::GitStrategy, path::PathStrategy};
 
 pub use local::LocalApiStrategy;
 pub use mock::MockApiStrategy;

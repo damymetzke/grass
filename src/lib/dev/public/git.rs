@@ -1,9 +1,9 @@
 use crate::dev::{
+    public::strategy::Api,
     strategy::{
         api::ApiStrategy,
         git::{GitStrategy, GitStrategyError, RepositoryChangeStatus},
     },
-    public::strategy::Api,
 };
 
 use super::{api::RepositoryLocation, strategy::AccessApi};
