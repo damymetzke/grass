@@ -11,9 +11,7 @@ pub struct LocalGitStrategy<'a, T: PathStrategy> {
 
 impl<'a, T: PathStrategy> LocalGitStrategy<'a, T> {
     pub fn new(path_strategy: &'a T) -> Self {
-        Self {
-            path_strategy,
-        }
+        Self { path_strategy }
     }
 }
 
@@ -22,28 +20,7 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
     where
         U: Into<RepositoryLocation>,
     {
-        let repository_path = self
-            .path_strategy
-            .get_directory(repository)
-            .map_err(|error| match error {
-                PathStrategyError::RepositoryNotFound { context, reason } => {
-                    GitStrategyError::RepositoryNotFound {
-                        message: context,
-                        reason,
-                    }
-                }
-                PathStrategyError::FileDoesNotExist { context, reason } => {
-                    GitStrategyError::FileSystemError {
-                        message: context,
-                        reason,
-                        reasons: Vec::new(),
-                    }
-                }
-                PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
-                    message: context,
-                    reason,
-                },
-            })?;
+        let repository_path = self.path_strategy.get_directory(repository)?;
 
         let repository = Repository::open(&repository_path)?;
 
@@ -82,30 +59,7 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
         U: Into<RepositoryLocation>,
         V: AsRef<str>,
     {
-        let repo_path =
-            self.path_strategy
-                .get_directory(repository)
-                .map_err(|error| match error {
-                    PathStrategyError::RepositoryNotFound { context, reason } => {
-                        GitStrategyError::RepositoryNotFound {
-                            message: context,
-                            reason,
-                        }
-                    }
-                    PathStrategyError::FileDoesNotExist { context, reason } => {
-                        GitStrategyError::FileSystemError {
-                            message: context,
-                            reason,
-                            reasons: Vec::new(),
-                        }
-                    }
-                    PathStrategyError::Unknown { context, reason } => {
-                        GitStrategyError::UnknownError {
-                            message: context,
-                            reason,
-                        }
-                    }
-                })?;
+        let repo_path = self.path_strategy.get_directory(repository)?;
 
         RepoBuilder::new().clone(remote.as_ref(), &repo_path)?;
 
@@ -116,28 +70,7 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
     where
         U: Into<RepositoryLocation>,
     {
-        let repository_path = self
-            .path_strategy
-            .get_directory(repository)
-            .map_err(|error| match error {
-                PathStrategyError::RepositoryNotFound { context, reason } => {
-                    GitStrategyError::RepositoryNotFound {
-                        message: context,
-                        reason,
-                    }
-                }
-                PathStrategyError::FileDoesNotExist { context, reason } => {
-                    GitStrategyError::FileSystemError {
-                        message: context,
-                        reason,
-                        reasons: Vec::new(),
-                    }
-                }
-                PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
-                    message: context,
-                    reason,
-                },
-            })?;
+        let repository_path = self.path_strategy.get_directory(repository)?;
 
         let repository = match Repository::open(repository_path) {
             Ok(repository) => Ok(repository),
@@ -171,6 +104,30 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
         Ok(RepositoryChangeStatus::FilesChanged {
             num_changes: changes.len(),
         })
+    }
+}
+
+impl From<PathStrategyError> for GitStrategyError {
+    fn from(value: PathStrategyError) -> Self {
+        match value {
+            PathStrategyError::RepositoryNotFound { context, reason } => {
+                GitStrategyError::RepositoryNotFound {
+                    message: context,
+                    reason,
+                }
+            }
+            PathStrategyError::FileDoesNotExist { context, reason } => {
+                GitStrategyError::FileSystemError {
+                    message: context,
+                    reason,
+                    reasons: Vec::new(),
+                }
+            }
+            PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
+                message: context,
+                reason,
+            },
+        }
     }
 }
 
