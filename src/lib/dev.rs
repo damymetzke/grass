@@ -4,18 +4,19 @@ pub mod repository;
 pub mod strategy;
 
 pub use public::{
-    categories::{get_category_path, list_categories},
+    categories::get_category_path,
     repositories::{
         get_repository, get_repository_path, list_all_repositories,
-        list_all_repositories_with_change_status,
-        list_repositories_with_change_status,
+        list_all_repositories_with_change_status, list_repositories_with_change_status,
     },
     types,
 };
 
 pub use public::{
     api::RepositoryLocation,
-    discovery::{list_repositories_in_category, list_repositories_in_category_with_errors},
+    discovery::{
+        list_categories, list_repositories_in_category, list_repositories_in_category_with_errors,
+    },
     git::{
         clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
     },

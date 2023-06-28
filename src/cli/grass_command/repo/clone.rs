@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use grass::dev::{config, strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::ApiStrategy, Api};
 
 use crate::facades::dialoguer::select_selectable;
 
@@ -15,9 +15,11 @@ impl CloneCommand {
     where
         T: ApiStrategy,
     {
-        let user_config = config::load_user_config()?;
         let category = self.category.clone().map_or_else(
-            || select_selectable(&grass::dev::list_categories(&user_config)).cloned(),
+            || {
+                select_selectable(grass::dev::list_categories::<_, Vec<_>>(api)?.as_slice())
+                    .cloned()
+            },
             Ok,
         )?;
 

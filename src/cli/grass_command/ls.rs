@@ -95,7 +95,7 @@ impl LsCommand {
                 all: false,
                 format,
             } => Self::generate_output_category_name_only(
-                grass::dev::list_categories(&user_config).iter(),
+                grass::dev::list_categories::<_, Vec<_>>(api)?.iter(),
                 &format.clone().unwrap_or_default(),
             ),
             LsCommand {

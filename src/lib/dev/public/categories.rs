@@ -1,30 +1,6 @@
 use std::path::PathBuf;
 
-use itertools::Itertools;
-
-use crate::dev::config::{GrassConfig, RootConfig};
-
-/// List categories
-///
-/// # Examples
-///
-/// ```
-/// # use grass::dev::config;
-///
-/// let user_config = config::load_example_config();
-///
-/// // TODO: support dependency injection so this can be tested
-/// // assert_eq!(vec!{"general", "work"}, grass::list_categories(&user_config));
-/// ```
-pub fn list_categories(user_config: &RootConfig) -> Vec<String> {
-    user_config
-        .grass
-        .category
-        .keys()
-        .map(String::from)
-        .sorted()
-        .collect()
-}
+use crate::dev::config::GrassConfig;
 
 // TODO: Return Result instead of Option
 pub fn get_category_path<T>(user_config: &GrassConfig, category: T) -> Option<PathBuf>

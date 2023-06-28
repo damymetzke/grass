@@ -1,3 +1,4 @@
+use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
 use grass::dev::types::{SimpleCategoryDescription, SimpleRepositoryDescription};
 use thiserror::Error;
@@ -20,7 +21,7 @@ impl From<dialoguer::Error> for DialoguerError {
     }
 }
 
-type Result<T> = std::result::Result<T, DialoguerError>;
+type OldResult<T> = std::result::Result<T, DialoguerError>;
 
 pub fn select_selectable<T>(selectables: &[T]) -> Result<&T>
 where
@@ -37,14 +38,14 @@ where
         .vim_mode(true)
         .interact_opt()?;
 
-    selectables
+    Ok(selectables
         .get(selection.ok_or(DialoguerError::NothingSelected)?)
-        .ok_or(DialoguerError::NothingSelected)
+        .ok_or(DialoguerError::NothingSelected)?)
 }
 
 pub fn select_category_and_repository(
     categories: &[SimpleCategoryDescription],
-) -> Result<&SimpleRepositoryDescription> {
+) -> OldResult<&SimpleRepositoryDescription> {
     let sizes = categories
         .iter()
         .map(|category| category.repositories.len());

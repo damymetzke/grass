@@ -42,6 +42,14 @@ where
     Ok(api
         .get_strategy()
         .get_discovery_strategy()
-        .list_repositories_in_category(category)?.collect())
+        .list_repositories_in_category(category)?
+        .collect())
+}
 
+pub fn list_categories<T: ApiStrategy, U: FromIterator<String>>(
+    api: &Api<T>,
+) -> Result<U, DiscoveryStrategyError> {
+    api.get_strategy()
+        .get_discovery_strategy()
+        .list_categories()
 }
