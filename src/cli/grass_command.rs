@@ -79,12 +79,12 @@ impl GrassCommand {
     {
         match &self.command {
             GrassSubcommand::Check(command) => command.handle(),
-            GrassSubcommand::Ls(command) => command.handle(),
+            GrassSubcommand::Ls(command) => command.handle(api)?,
             GrassSubcommand::Repo(command) => command.handle(api)?,
             GrassSubcommand::Script(command) => command.handle(),
             GrassSubcommand::ShellInsert(command) => command.handle(),
-            GrassSubcommand::Session(command) => command.handle(),
-            GrassSubcommand::Cs(command) => command.handle(),
+            GrassSubcommand::Session(command) => command.handle(api)?,
+            GrassSubcommand::Cs(command) => command.handle(api)?,
             #[cfg(debug_assertions)]
             GrassSubcommand::Debug(command) => command.handle(),
             GrassSubcommand::External(parts) => {

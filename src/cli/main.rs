@@ -1,3 +1,4 @@
+mod error;
 mod external_command;
 mod facades;
 mod grass_command;

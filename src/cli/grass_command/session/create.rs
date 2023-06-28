@@ -1,5 +1,10 @@
+use anyhow::Result;
 use clap::Parser;
-use grass::dev::config::{self, RootConfig};
+use grass::dev::{
+    config::{self, RootConfig},
+    strategy::api::ApiStrategy,
+    Api,
+};
 
 use std::process::Command as ProcessCommand;
 
@@ -47,13 +52,21 @@ impl CreateCommand {
         };
     }
 
-    fn select_repository(user_config: &RootConfig, category: &String) {
-        // TODO: Handle errors in this entire function
-        let category = grass::dev::list_repos_by_category(user_config, category).unwrap();
+    fn select_repository<T: ApiStrategy>(
+        api: &Api<T>,
+        user_config: &RootConfig,
+        category: &String,
+    ) -> Result<()> {
+        let repositories: Vec<_> = grass::dev::list_repositories_in_category(api, category)?;
+        let repositories: Vec<_> = repositories
+            .into_iter()
+            .map(|repository| repository.repository)
+            .collect();
 
-        let repository = select_selectable(&category.repositories).unwrap();
+        let repository = select_selectable(&repositories).unwrap();
 
-        Self::create_session(user_config, &category.category, &repository.repository);
+        Self::create_session(user_config, category, repository);
+        Ok(())
     }
 
     fn select_category(user_config: &RootConfig) {
@@ -63,7 +76,7 @@ impl CreateCommand {
         Self::create_session(user_config, &repository.category, &repository.repository);
     }
 
-    pub fn handle(&self) {
+    pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
         let user_config = config::load_user_config().unwrap();
         match self {
             CreateCommand {
@@ -73,8 +86,9 @@ impl CreateCommand {
             CreateCommand {
                 category: Some(category),
                 repository: None,
-            } => Self::select_repository(&user_config, category),
+            } => Self::select_repository(api, &user_config, category)?,
             _ => Self::select_category(&user_config),
-        }
+        };
+        Ok(())
     }
 }

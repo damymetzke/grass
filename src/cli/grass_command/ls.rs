@@ -1,8 +1,11 @@
+use anyhow::Result;
 use clap::{Parser, ValueEnum};
-use grass::dev::{config, types::SimpleCategoryDescription};
+use grass::dev::{
+    config, strategy::api::ApiStrategy, types::SimpleCategoryDescription, Api, RepositoryLocation,
+};
 use itertools::Itertools;
 
-use crate::output::generate_fancy_vertical_list;
+use crate::{error::CliError, output::generate_fancy_vertical_list};
 
 #[derive(ValueEnum, Debug, Clone, Default)]
 enum Format {
@@ -30,19 +33,16 @@ pub struct LsCommand {
 
 impl LsCommand {
     fn generate_output_repositories_for_category(
-        category: &SimpleCategoryDescription,
+        category: String,
+        repositories: Vec<RepositoryLocation>,
         format: &Format,
     ) -> String {
         match format {
             Format::Fancy => generate_fancy_vertical_list(
-                format!("Repos for category '{}'", category.category),
-                category
-                    .repositories
-                    .iter()
-                    .map(|repository| &repository.repository),
+                format!("Repos for category '{}'", category),
+                repositories.iter().map(|repository| &repository.repository),
             ),
-            Format::Simple => category
-                .repositories
+            Format::Simple => repositories
                 .iter()
                 .map(|repository| format!("{}/{}", &repository.category, &repository.repository))
                 .join(" "),
@@ -57,7 +57,16 @@ impl LsCommand {
         categories
             .into_iter()
             .map(|category| {
-                Self::generate_output_repositories_for_category(category.borrow(), format)
+                let category: &SimpleCategoryDescription = category.borrow();
+                Self::generate_output_repositories_for_category(
+                    category.category.clone(),
+                    category
+                        .repositories
+                        .iter()
+                        .map(|repository| (&repository.category, &repository.repository).into())
+                        .collect(),
+                    format,
+                )
             })
             .join(match format {
                 Format::Fancy => "\n\n",
@@ -75,7 +84,7 @@ impl LsCommand {
         }
     }
 
-    pub fn handle(&self) {
+    pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
         // TODO: Handle errors
         let user_config = config::load_user_config().unwrap();
 
@@ -94,7 +103,8 @@ impl LsCommand {
                 all: false,
                 format,
             } => Self::generate_output_repositories_for_category(
-                &grass::dev::list_repos_by_category(&user_config, category).unwrap(),
+                category.clone(),
+                grass::dev::list_repositories_in_category(api, category)?,
                 &format.clone().unwrap_or_default(),
             ),
             LsCommand {
@@ -108,10 +118,11 @@ impl LsCommand {
             _ => {
                 // TODO: Generate more specific output
                 eprintln!("There was a problem with the command");
-                return;
+                return Err(CliError::new("Invalid flags provided.", ["grass", "ls"]).into());
             }
         };
 
         println!("{}", output);
+        Ok(())
     }
 }
