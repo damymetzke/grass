@@ -5,14 +5,14 @@ use crate::dev::strategy::{
 use super::ApiStrategy;
 
 pub struct LocalApiStrategy<'a> {
-    discovery_strategy: &'a LocalDiscoveryStrategy<'a>,
+    discovery_strategy: &'a LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>,
     git_strategy: &'a LocalGitStrategy<'a, LocalPathStrategy<'a>>,
     path_strategy: &'a LocalPathStrategy<'a>,
 }
 
 impl<'a> LocalApiStrategy<'a> {
     pub fn new(
-        discovery_strategy: &'a LocalDiscoveryStrategy<'a>,
+        discovery_strategy: &'a LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>,
         git_strategy: &'a LocalGitStrategy<'a, LocalPathStrategy<'a>>,
         path_strategy: &'a LocalPathStrategy<'a>,
     ) -> Self {
@@ -25,7 +25,7 @@ impl<'a> LocalApiStrategy<'a> {
 }
 
 impl<'a> ApiStrategy for LocalApiStrategy<'a> {
-    type Discovery = LocalDiscoveryStrategy<'a>;
+    type Discovery = LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>;
     type Git = LocalGitStrategy<'a, LocalPathStrategy<'a>>;
     type Path = LocalPathStrategy<'a>;
 

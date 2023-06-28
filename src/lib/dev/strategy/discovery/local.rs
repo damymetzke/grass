@@ -1,38 +1,45 @@
 use std::fs;
 
 use crate::dev::{
-    config::GrassConfig, public::api::RepositoryLocation,
-    strategy::discovery::DiscoveryStrategyError,
+    config::GrassConfig,
+    public::api::RepositoryLocation,
+    strategy::{
+        discovery::DiscoveryStrategyError,
+        path::{PathStrategy, PathStrategyError},
+    },
 };
 
 use super::{BoxedIterator, DiscoveryExists, DiscoveryStrategy, Result};
 
-pub struct LocalDiscoveryStrategy<'a> {
+pub struct LocalDiscoveryStrategy<'a, T>
+where
+    T: PathStrategy,
+{
     config: &'a GrassConfig,
+    path_strategy: &'a T,
 }
 
-impl<'a> LocalDiscoveryStrategy<'a> {
-    pub fn new(config: &'a GrassConfig) -> Self {
-        LocalDiscoveryStrategy { config }
+impl<'a, T> LocalDiscoveryStrategy<'a, T>
+where
+    T: PathStrategy,
+{
+    pub fn new(config: &'a GrassConfig, path_strategy: &'a T) -> Self {
+        LocalDiscoveryStrategy {
+            config,
+            path_strategy,
+        }
     }
 }
 
-impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
-    fn check_repository_exists<T>(&self, repository: T) -> Result<DiscoveryExists>
+impl<'a, T> DiscoveryStrategy for LocalDiscoveryStrategy<'a, T>
+where
+    T: PathStrategy,
+{
+    fn check_repository_exists<U>(&self, repository: U) -> Result<DiscoveryExists>
     where
-        T: Into<RepositoryLocation>,
+        U: Into<RepositoryLocation>,
     {
-        let RepositoryLocation {
-            category,
-            repository,
-        } = repository.into();
-
-        let category_dir = match self.config.get_from_category_or_alias(category) {
-            Some(category) => self.config.base_dir.join(&category.name),
-            None => return Ok(DiscoveryExists::CategoryNotFound),
-        };
-
-        let repository_dir = category_dir.join(repository);
+        let repository_dir = self.path_strategy.get_directory(repository)?;
 
         match repository_dir.is_dir() {
             true => Ok(DiscoveryExists::Exists),
@@ -40,9 +47,9 @@ impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
         }
     }
 
-    fn check_category_exists<T>(&self, category: T) -> Result<DiscoveryExists>
+    fn check_category_exists<U>(&self, category: U) -> Result<DiscoveryExists>
     where
-        T: AsRef<str>,
+        U: AsRef<str>,
     {
         match self.config.get_from_category_or_alias(category) {
             Some(_) => Ok(DiscoveryExists::Exists),
@@ -50,12 +57,12 @@ impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
         }
     }
 
-    fn list_repositories_in_category<T>(
+    fn list_repositories_in_category<U>(
         &self,
-        category: T,
+        category: U,
     ) -> Result<BoxedIterator<Result<RepositoryLocation>>>
     where
-        T: AsRef<str>,
+        U: AsRef<str>,
     {
         let category = self.config.get_from_category_or_alias(category).ok_or(
             DiscoveryStrategyError::CategoryNotFound {
@@ -148,10 +155,26 @@ impl<'a> DiscoveryStrategy for LocalDiscoveryStrategy<'a> {
         })))
     }
 
-    fn list_categories<T>(&self) -> Result<T>
+    fn list_categories<U>(&self) -> Result<U>
     where
-        T: FromIterator<String>,
+        U: FromIterator<String>,
     {
         Ok(self.config.category.keys().cloned().collect())
+    }
+}
+
+impl From<PathStrategyError> for DiscoveryStrategyError {
+    fn from(value: PathStrategyError) -> Self {
+        match value {
+            PathStrategyError::RepositoryNotFound { context, reason } => {
+                DiscoveryStrategyError::CategoryNotFound { context, reason }
+            }
+            PathStrategyError::FileDoesNotExist { context, reason } => {
+                DiscoveryStrategyError::FilesystemError { context, reason }
+            }
+            PathStrategyError::Unknown { context, reason } => {
+                DiscoveryStrategyError::UnknownError { context, reason }
+            }
+        }
     }
 }
