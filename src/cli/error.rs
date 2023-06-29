@@ -6,9 +6,7 @@ pub struct CliError {
 }
 
 impl CliError {
-    pub fn new<T: Into<String>>(
-        message: T,
-    ) -> Self {
+    pub fn new<T: Into<String>>(message: T) -> Self {
         CliError {
             message: message.into(),
         }
@@ -19,10 +17,6 @@ impl Error for CliError {}
 
 impl Display for CliError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "CLI Error:\n  {}",
-            self.message,
-        )
+        write!(f, "CLI Error:\n  {}", self.message,)
     }
 }
