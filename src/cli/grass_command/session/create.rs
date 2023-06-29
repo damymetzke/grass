@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::Parser;
 use grass::dev::{
     config::{self, RootConfig},
@@ -69,11 +69,13 @@ impl CreateCommand {
         Ok(())
     }
 
-    fn select_category(user_config: &RootConfig) {
-        let categories = &grass::dev::list_all_repositories(user_config);
-        // TODO: Remove unwrap
-        let repository = select_category_and_repository(categories).unwrap();
+    fn select_category<T: ApiStrategy>(user_config: &RootConfig, api: &Api<T>) -> Result<()> {
+        let categories: Vec<_> = grass::dev::list_all_repositories(api)?;
+
+        let repository = select_category_and_repository(categories.as_slice())
+            .context("When running the command 'grass session create'")?;
         Self::create_session(user_config, &repository.category, &repository.repository);
+        Ok(())
     }
 
     pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
@@ -87,7 +89,7 @@ impl CreateCommand {
                 category: Some(category),
                 repository: None,
             } => Self::select_repository(api, &user_config, category)?,
-            _ => Self::select_category(&user_config),
+            _ => Self::select_category(&user_config, api)?,
         };
         Ok(())
     }

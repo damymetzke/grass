@@ -46,6 +46,19 @@ where
         .collect())
 }
 
+pub fn list_all_repositories<T, U>(api: &Api<T>) -> Result<U, DiscoveryStrategyError>
+where
+    T: ApiStrategy,
+    U: FromIterator<RepositoryLocation>,
+{
+    let categories: Vec<_> = list_categories(api)?;
+    Ok(categories
+        .iter()
+        .filter_map(|category| list_repositories_in_category::<_, _, Vec<_>>(api, category).ok())
+        .flatten()
+        .collect())
+}
+
 pub fn list_categories<T: ApiStrategy, U: FromIterator<String>>(
     api: &Api<T>,
 ) -> Result<U, DiscoveryStrategyError> {

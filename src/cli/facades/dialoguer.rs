@@ -1,7 +1,12 @@
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
-use grass::dev::types::{SimpleCategoryDescription, SimpleRepositoryDescription};
+use grass::dev::{
+    types::{SimpleCategoryDescription, SimpleRepositoryDescription},
+    RepositoryLocation,
+};
 use thiserror::Error;
+
+use crate::error::CliError;
 
 pub trait Selectable {
     fn get_select_name(&self) -> &str;
@@ -20,8 +25,6 @@ impl From<dialoguer::Error> for DialoguerError {
         DialoguerError::Dialoguer(value)
     }
 }
-
-type OldResult<T> = std::result::Result<T, DialoguerError>;
 
 pub fn select_selectable<T>(selectables: &[T]) -> Result<&T>
 where
@@ -44,19 +47,16 @@ where
 }
 
 pub fn select_category_and_repository(
-    categories: &[SimpleCategoryDescription],
-) -> OldResult<&SimpleRepositoryDescription> {
-    let sizes = categories
-        .iter()
-        .map(|category| category.repositories.len());
+    categories: &[RepositoryLocation],
+) -> Result<&RepositoryLocation> {
     let options: Vec<_> = categories
         .iter()
-        .flat_map(|category| {
-            category
-                .repositories
-                .iter()
-                .map(|repository| format!("{}/{}", repository.category, repository.repository))
-        })
+        .map(
+            |RepositoryLocation {
+                 category,
+                 repository,
+             }| format!("{}/{}", category, repository),
+        )
         .collect();
 
     let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
@@ -66,21 +66,9 @@ pub fn select_category_and_repository(
         .interact_opt()?
         .ok_or(DialoguerError::NothingSelected)?;
 
-    let mut j = selection;
-    let mut i = 0;
-
-    for size in sizes {
-        if j < size {
-            break;
-        }
-        j -= size;
-        i += 1;
-    }
-
-    categories
-        .get(i)
-        .and_then(|category| category.repositories.get(j))
-        .ok_or(DialoguerError::NothingSelected)
+    Ok(categories
+        .get(selection)
+        .ok_or(CliError::new("No option selected"))?)
 }
 
 impl Selectable for SimpleRepositoryDescription {
