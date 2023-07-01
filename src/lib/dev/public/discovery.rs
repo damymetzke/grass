@@ -1,6 +1,6 @@
 use crate::dev::{
     strategy::{
-        api::ApiStrategy,
+        api::HasDiscoveryStrategy,
         discovery::{DiscoveryStrategy, DiscoveryStrategyError},
     },
     Api, RepositoryLocation,
@@ -13,7 +13,7 @@ pub fn list_repositories_in_category<T, U, V>(
     category: U,
 ) -> Result<V, DiscoveryStrategyError>
 where
-    T: ApiStrategy,
+    T: HasDiscoveryStrategy,
     U: AsRef<str>,
     V: FromIterator<RepositoryLocation>,
 {
@@ -35,7 +35,7 @@ pub fn list_repositories_in_category_with_errors<T, U, V>(
     category: U,
 ) -> Result<V, DiscoveryStrategyError>
 where
-    T: ApiStrategy,
+    T: HasDiscoveryStrategy,
     U: AsRef<str>,
     V: FromIterator<Result<RepositoryLocation, DiscoveryStrategyError>>,
 {
@@ -48,7 +48,7 @@ where
 
 pub fn list_all_repositories<T, U>(api: &Api<T>) -> Result<U, DiscoveryStrategyError>
 where
-    T: ApiStrategy,
+    T: HasDiscoveryStrategy,
     U: FromIterator<RepositoryLocation>,
 {
     let categories: Vec<_> = list_categories(api)?;
@@ -59,7 +59,7 @@ where
         .collect())
 }
 
-pub fn list_categories<T: ApiStrategy, U: FromIterator<String>>(
+pub fn list_categories<T: HasDiscoveryStrategy, U: FromIterator<String>>(
     api: &Api<T>,
 ) -> Result<U, DiscoveryStrategyError> {
     api.get_strategy()

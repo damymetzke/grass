@@ -3,20 +3,20 @@ use thiserror::Error;
 use crate::dev::{
     config,
     strategy::{
-        api::{ApiStrategy, LocalApiStrategy, MockApiStrategy},
+        api::{LocalApiStrategy, MockApiStrategy},
         discovery::LocalDiscoveryStrategy,
         git::LocalGitStrategy,
         path::LocalPathStrategy,
     },
 };
 
-pub struct Api<T: ApiStrategy>(T);
+pub struct Api<T>(T);
 
-pub trait AccessApi<T: ApiStrategy> {
+pub trait AccessApi<T> {
     fn get_strategy(&self) -> &T;
 }
 
-impl<T: ApiStrategy> AccessApi<T> for Api<T> {
+impl<T> AccessApi<T> for Api<T> {
     fn get_strategy(&self) -> &T {
         &self.0
     }
