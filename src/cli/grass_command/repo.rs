@@ -3,7 +3,7 @@ mod clone;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use grass::dev::{strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Debug, Subcommand)]
 pub enum RepoSubcommand {
@@ -20,7 +20,7 @@ pub struct RepoCommand {
 impl RepoCommand {
     pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
     where
-        T: ApiStrategy,
+        T: SupportsAll,
     {
         match &self.command {
             RepoSubcommand::Clean(command) => command.handle(api),

@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use grass::dev::{
     config::{self, RootConfig},
-    strategy::api::ApiStrategy,
+    strategy::api::SupportsAll,
     Api,
 };
 
@@ -52,7 +52,7 @@ impl CreateCommand {
         };
     }
 
-    fn select_repository<T: ApiStrategy>(
+    fn select_repository<T: SupportsAll>(
         api: &Api<T>,
         user_config: &RootConfig,
         category: &String,
@@ -69,7 +69,7 @@ impl CreateCommand {
         Ok(())
     }
 
-    fn select_category<T: ApiStrategy>(user_config: &RootConfig, api: &Api<T>) -> Result<()> {
+    fn select_category<T: SupportsAll>(user_config: &RootConfig, api: &Api<T>) -> Result<()> {
         let categories: Vec<_> = grass::dev::list_all_repositories(api)?;
 
         let repository = select_category_and_repository(categories.as_slice())
@@ -78,7 +78,7 @@ impl CreateCommand {
         Ok(())
     }
 
-    pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
         let user_config = config::load_user_config().unwrap();
         match self {
             CreateCommand {

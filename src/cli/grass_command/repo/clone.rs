@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use grass::dev::{strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 use crate::facades::dialoguer::select_selectable;
 
@@ -13,7 +13,7 @@ pub struct CloneCommand {
 impl CloneCommand {
     pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
     where
-        T: ApiStrategy,
+        T: SupportsAll,
     {
         let category = self.category.clone().map_or_else(
             || {

@@ -2,7 +2,7 @@ use crate::dev::strategy::{
     discovery::MockDiscoveryStrategy, git::MockGitStrategy, path::MockPathStrategy,
 };
 
-use super::{ApiStrategy, HasDiscoveryStrategy, HasGitStrategy, HasPathStrategy};
+use super::{SupportsAll, SupportsDiscovery, SupportsGit, SupportsPath};
 
 #[derive(Default)]
 pub struct MockApiStrategy {
@@ -17,9 +17,9 @@ impl MockGitStrategy {
     }
 }
 
-impl ApiStrategy for MockApiStrategy {}
+impl SupportsAll for MockApiStrategy {}
 
-impl HasDiscoveryStrategy for MockApiStrategy {
+impl SupportsDiscovery for MockApiStrategy {
     type Discovery = MockDiscoveryStrategy;
 
     fn get_discovery_strategy(&self) -> &Self::Discovery {
@@ -27,7 +27,7 @@ impl HasDiscoveryStrategy for MockApiStrategy {
     }
 }
 
-impl HasGitStrategy for MockApiStrategy {
+impl SupportsGit for MockApiStrategy {
     type Git = MockGitStrategy;
 
     fn get_git_strategy(&self) -> &Self::Git {
@@ -35,7 +35,7 @@ impl HasGitStrategy for MockApiStrategy {
     }
 }
 
-impl HasPathStrategy for MockApiStrategy {
+impl SupportsPath for MockApiStrategy {
     type Path = MockPathStrategy;
 
     fn get_path_strategy(&self) -> &Self::Path {

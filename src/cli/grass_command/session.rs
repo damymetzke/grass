@@ -2,7 +2,7 @@ pub mod create;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use grass::dev::{strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Debug, Subcommand)]
 pub enum SessionSubcommand {
@@ -16,7 +16,7 @@ pub struct SessionCommand {
 }
 
 impl SessionCommand {
-    pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
         match &self.command {
             SessionSubcommand::Create(command) => command.handle(api)?,
         };

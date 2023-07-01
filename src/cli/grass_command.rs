@@ -12,7 +12,7 @@ use std::process::Command;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use grass::dev::{strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 use crate::external_command::ExternalCommand;
 
@@ -75,7 +75,7 @@ impl GrassCommand {
 
     pub fn handle<T>(&self, api: &Api<T>, external_commands: &[ExternalCommand]) -> Result<()>
     where
-        T: ApiStrategy,
+        T: SupportsAll,
     {
         match &self.command {
             GrassSubcommand::Check(command) => command.handle(),

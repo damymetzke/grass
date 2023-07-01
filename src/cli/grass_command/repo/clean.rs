@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use grass::dev::{strategy::api::ApiStrategy, Api};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Parser, Debug)]
 pub struct CleanCommand {
@@ -11,7 +11,7 @@ pub struct CleanCommand {
 impl CleanCommand {
     pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
     where
-        T: ApiStrategy,
+        T: SupportsAll,
     {
         Ok(grass::dev::clean_repository(
             api,

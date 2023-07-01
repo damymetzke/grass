@@ -2,7 +2,7 @@ use crate::dev::strategy::{
     discovery::LocalDiscoveryStrategy, git::LocalGitStrategy, path::LocalPathStrategy,
 };
 
-use super::{ApiStrategy, HasDiscoveryStrategy, HasGitStrategy, HasPathStrategy};
+use super::{SupportsAll, SupportsDiscovery, SupportsGit, SupportsPath};
 
 pub struct LocalApiStrategy<'a> {
     discovery_strategy: &'a LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>,
@@ -24,9 +24,9 @@ impl<'a> LocalApiStrategy<'a> {
     }
 }
 
-impl<'a> ApiStrategy for LocalApiStrategy<'a> {}
+impl<'a> SupportsAll for LocalApiStrategy<'a> {}
 
-impl<'a> HasDiscoveryStrategy for LocalApiStrategy<'a> {
+impl<'a> SupportsDiscovery for LocalApiStrategy<'a> {
     type Discovery = LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>;
 
     fn get_discovery_strategy(&self) -> &Self::Discovery {
@@ -34,7 +34,7 @@ impl<'a> HasDiscoveryStrategy for LocalApiStrategy<'a> {
     }
 }
 
-impl<'a> HasGitStrategy for LocalApiStrategy<'a> {
+impl<'a> SupportsGit for LocalApiStrategy<'a> {
     type Git = LocalGitStrategy<'a, LocalPathStrategy<'a>>;
 
     fn get_git_strategy(&self) -> &Self::Git {
@@ -42,7 +42,7 @@ impl<'a> HasGitStrategy for LocalApiStrategy<'a> {
     }
 }
 
-impl<'a> HasPathStrategy for LocalApiStrategy<'a> {
+impl<'a> SupportsPath for LocalApiStrategy<'a> {
     type Path = LocalPathStrategy<'a>;
 
     fn get_path_strategy(&self) -> &Self::Path {

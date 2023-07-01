@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
-use grass::dev::{strategy::api::ApiStrategy, Api, RepositoryLocation};
+use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 use itertools::Itertools;
 
 use crate::{error::CliError, output::generate_fancy_vertical_list};
@@ -107,7 +107,7 @@ impl LsCommand {
         }
     }
 
-    pub fn handle<T: ApiStrategy>(&self, api: &Api<T>) -> Result<()> {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
         let output = match self {
             LsCommand {
                 category: None,

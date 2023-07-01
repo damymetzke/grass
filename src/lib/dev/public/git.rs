@@ -1,7 +1,7 @@
 use crate::dev::{
     public::strategy::Api,
     strategy::{
-        api::HasGitStrategy,
+        api::SupportsGit,
         git::{GitStrategy, GitStrategyError, RepositoryChangeStatus},
     },
 };
@@ -23,7 +23,7 @@ use super::{api::RepositoryLocation, strategy::AccessApi};
 /// ```
 pub fn clean_repository<T, U>(api: &Api<T>, repository: U) -> Result<(), GitStrategyError>
 where
-    T: HasGitStrategy,
+    T: SupportsGit,
     U: Into<RepositoryLocation>,
 {
     api.get_strategy().get_git_strategy().clean(repository)
@@ -54,7 +54,7 @@ pub fn clone_repository<T, U, V>(
     remote: V,
 ) -> Result<(), GitStrategyError>
 where
-    T: HasGitStrategy,
+    T: SupportsGit,
     U: Into<RepositoryLocation>,
     V: AsRef<str>,
 {
@@ -87,7 +87,7 @@ pub fn clone_repository_default<T, U, V>(
     remote: V,
 ) -> Result<(), GitStrategyError>
 where
-    T: HasGitStrategy,
+    T: SupportsGit,
     U: AsRef<str>,
     V: AsRef<str>,
 {
@@ -133,7 +133,7 @@ pub fn get_repository_change_status<T, U>(
     repository: U,
 ) -> Result<RepositoryChangeStatus, GitStrategyError>
 where
-    T: HasGitStrategy,
+    T: SupportsGit,
     U: Into<RepositoryLocation>,
 {
     api.get_strategy()
