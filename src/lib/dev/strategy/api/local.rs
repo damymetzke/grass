@@ -2,7 +2,7 @@ use crate::dev::strategy::{
     discovery::LocalDiscoveryStrategy, git::LocalGitStrategy, path::LocalPathStrategy,
 };
 
-use super::{SupportsAll, SupportsDiscovery, SupportsGit, SupportsPath};
+use super::{SupportsDiscovery, SupportsGit, SupportsPath};
 
 pub struct LocalApiStrategy<'a> {
     discovery_strategy: &'a LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>,
@@ -23,8 +23,6 @@ impl<'a> LocalApiStrategy<'a> {
         }
     }
 }
-
-impl<'a> SupportsAll for LocalApiStrategy<'a> {}
 
 impl<'a> SupportsDiscovery for LocalApiStrategy<'a> {
     type Discovery = LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>;

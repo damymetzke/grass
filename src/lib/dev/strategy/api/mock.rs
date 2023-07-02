@@ -2,7 +2,7 @@ use crate::dev::strategy::{
     discovery::MockDiscoveryStrategy, git::MockGitStrategy, path::MockPathStrategy,
 };
 
-use super::{SupportsAll, SupportsDiscovery, SupportsGit, SupportsPath};
+use super::{SupportsDiscovery, SupportsGit, SupportsPath};
 
 #[derive(Default)]
 pub struct MockApiStrategy {
@@ -16,8 +16,6 @@ impl MockGitStrategy {
         Self::default()
     }
 }
-
-impl SupportsAll for MockApiStrategy {}
 
 impl SupportsDiscovery for MockApiStrategy {
     type Discovery = MockDiscoveryStrategy;

@@ -25,3 +25,5 @@ pub trait SupportsPath {
 
     fn get_path_strategy(&self) -> &Self::Path;
 }
+
+impl<T: SupportsDiscovery + SupportsGit + SupportsPath> SupportsAll for T {}
