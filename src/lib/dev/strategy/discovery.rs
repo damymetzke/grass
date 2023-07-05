@@ -48,12 +48,16 @@ pub type BoxedIterator<'a, T> = Box<dyn Iterator<Item = T> + 'a>;
 /// By design, this concept is abstract.
 /// The goal of the discovery strategy, is to provide a way to discover which options there are.
 ///
-/// In the case of [LocalDiscoveryStrategy][^1], 2 things are considered:
+/// In the case of [LocalDiscoveryStrategy][^local], 2 things are considered:
 ///
 /// - The provided configuration.
 /// - Folders in the file system.
 ///
-/// [^1]: [crate::dev::strategy::discovery::LocalDiscoveryStrategy]
+/// # See
+///
+/// [crate::dev::strategy::discovery::SupportsDiscovery]
+///
+/// [^local]: [crate::dev::strategy::discovery::LocalDiscoveryStrategy]
 pub trait DiscoveryStrategy {
     ///
     /// # Return
