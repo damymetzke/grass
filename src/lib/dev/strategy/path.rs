@@ -95,3 +95,9 @@ pub trait PathStrategy {
     where
         T: Into<RepositoryLocation>;
 }
+
+pub trait SupportsPath {
+    type Path: PathStrategy;
+
+    fn get_path_strategy(&self) -> &Self::Path;
+}

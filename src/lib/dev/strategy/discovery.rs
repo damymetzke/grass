@@ -216,3 +216,10 @@ pub trait DiscoveryStrategy {
     where
         T: FromIterator<String>;
 }
+
+pub trait SupportsDiscovery {
+    type Discovery: DiscoveryStrategy;
+
+    fn get_discovery_strategy(&self) -> &Self::Discovery;
+}
+

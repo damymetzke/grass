@@ -55,6 +55,13 @@ pub trait GitStrategy {
         T: Into<RepositoryLocation>;
 }
 
+pub trait SupportsGit {
+    type Git: GitStrategy;
+
+    fn get_git_strategy(&self) -> &Self::Git;
+}
+
+
 impl RepositoryLocation {
     pub fn new<T, U>(category: T, repository: U) -> Self
     where

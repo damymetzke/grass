@@ -1,8 +1,5 @@
 use crate::dev::{
-    strategy::{
-        api::SupportsDiscovery,
-        discovery::{DiscoveryStrategy, DiscoveryStrategyError},
-    },
+    strategy::discovery::{DiscoveryStrategy, DiscoveryStrategyError, SupportsDiscovery},
     Api, RepositoryLocation,
 };
 
