@@ -10,10 +10,29 @@ use crate::dev::{
     },
 };
 
+#[derive(Debug)]
 pub struct Api<T>(T);
 
 pub trait AccessApi<T> {
     fn get_strategy(&self) -> &T;
+}
+
+impl<T> Api<T> {
+    pub fn new(value: T) -> Self {
+        Self(value)
+    }
+}
+
+impl<T> From<T> for Api<T> {
+    fn from(value: T) -> Self {
+        Self(value)
+    }
+}
+
+impl<T: Clone> From<&T> for Api<T> {
+    fn from(value: &T) -> Self {
+        Self(value.clone())
+    }
 }
 
 impl<T> AccessApi<T> for Api<T> {
@@ -49,7 +68,7 @@ where
 
     let api_strategy = LocalApiStrategy::new(&discovery_strategy, &git_strategy, &path_strategy);
 
-    closure(Api(api_strategy))
+    closure(api_strategy.into())
 }
 
 /// Builds the API strategy using the mocking strategy
