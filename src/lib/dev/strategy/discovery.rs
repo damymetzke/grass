@@ -44,7 +44,7 @@ pub type BoxedIterator<'a, T> = Box<dyn Iterator<Item = T> + 'a>;
 
 /// Strategy for finding repositories and categories
 ///
-/// The exact behavior of this strategy can vary wildly.
+/// The exact behavior of this strategy can vary.
 /// By design, this concept is abstract.
 /// The goal of the discovery strategy, is to provide a way to discover which options there are.
 ///
