@@ -10,7 +10,7 @@
 //!
 //! You *may* change the specific behavior of the crate,
 //! by extending any of the strategies.
-//! See below for an overview on how to create an `Api`[^api] 
+//! See below for an overview on how to create an `Api`[^api]
 //!
 //! # Overview
 //!
@@ -30,6 +30,7 @@
 //!
 //! | strategy                                             | description                                      |
 //! | :--------------------------------------------------- | :----------------------------------------------- |
+//! | [crate::dev::strategy::alias::AliasStrategy]         | List and resolve aliases                         |
 //! | [crate::dev::strategy::discovery::DiscoveryStrategy] | List and find repositories, independent of paths |
 //! | [crate::dev::strategy::git::GitStrategy]             | Read and write operations using Git              |
 //! | [crate::dev::strategy::path::PathStrategy]           | Resolve repositories to file system paths        |
@@ -40,6 +41,7 @@
 //!
 //! [^supports_all]: [crate::dev::strategy::api::SupportsAll]
 
+pub mod alias;
 pub mod api;
 pub mod discovery;
 pub mod git;

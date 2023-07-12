@@ -68,13 +68,15 @@ impl LsCommand {
                 next_category,
             ) = match location {
                 (Some(location), None) => (location, String::new()),
-                (Some(location), Some(RepositoryLocation { category, .. })) => (location, category),
+                (Some(location), Some(RepositoryLocation { category, .. })) => {
+                    (location, AsRef::<String>::as_ref(&category).clone())
+                }
                 // TODO: This should never happen, log this in the future I guess
                 (None, _) => break,
             };
 
-            if matches!(format, Format::Fancy) && category != previous_category {
-                previous_category = category.clone();
+            if matches!(format, Format::Fancy) && category.as_ref() != previous_category {
+                previous_category = AsRef::<String>::as_ref(&category).clone();
                 result += format!("┌ Repositories for category '{}'\n│\n", category).as_str();
             };
 
@@ -82,7 +84,7 @@ impl LsCommand {
                 Format::Fancy => {
                     if next_category.is_empty() {
                         format!("└─ {}", repository)
-                    } else if category != next_category {
+                    } else if category.as_ref() != next_category {
                         format!("└─ {}\n\n", repository)
                     } else {
                         format!("├─ {}\n", repository)

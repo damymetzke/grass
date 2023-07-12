@@ -39,7 +39,7 @@ impl GitStrategy for MockGitStrategy {
         T: Into<RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
         match repository {
             ("all_good" | "with_changes", _) => Ok(()),
             ("with_error", "first") => Err(GitStrategyError::RepositoryError {
@@ -64,7 +64,7 @@ impl GitStrategy for MockGitStrategy {
         U: AsRef<str>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
         match repository {
             ("all_good" | "with_changes" | "with_error", "first" | "second")
             | ("all_good" | "with_changes", "third") => Err(GitStrategyError::RepositryExists {
@@ -100,7 +100,7 @@ impl GitStrategy for MockGitStrategy {
         T: Into<RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
         match repository {
             ("all_good", "first" | "second" | "third") => Ok(RepositoryChangeStatus::UpToDate),
             ("with_changes", "first") => Ok(RepositoryChangeStatus::UpToDate),

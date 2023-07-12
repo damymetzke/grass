@@ -11,7 +11,7 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         T: Into<RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
 
         match repository {
             ("all_good" | "with_changes" | "with_error", "first" | "second")

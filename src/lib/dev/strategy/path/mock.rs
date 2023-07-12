@@ -16,7 +16,7 @@ impl PathStrategy for MockPathStrategy {
         T: Into<crate::dev::RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
         match repository {
             ("all_good", _) => Ok(PathBuf::from("/home/example/repositories/all_good")),
             ("with_changes", _) => Ok(PathBuf::from("/home/example/repositories/with_changes")),
@@ -33,7 +33,7 @@ impl PathStrategy for MockPathStrategy {
         T: Into<crate::dev::RepositoryLocation>,
     {
         let repository: RepositoryLocation = repository.into();
-        let repository = (repository.category.as_str(), repository.repository.as_str());
+        let repository = (repository.category.as_ref(), repository.repository.as_str());
         match repository {
             ("all_good", "first") => Ok(PathBuf::from("/home/example/repositories/all_good/first")),
             ("all_good", "second") => {

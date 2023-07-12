@@ -203,19 +203,6 @@ pub trait SupportsGit {
     fn get_git_strategy(&self) -> &Self::Git;
 }
 
-impl RepositoryLocation {
-    pub fn new<T, U>(category: T, repository: U) -> Self
-    where
-        T: Into<String>,
-        U: Into<String>,
-    {
-        RepositoryLocation {
-            category: category.into(),
-            repository: repository.into(),
-        }
-    }
-}
-
 impl GitStrategyError {
     pub fn with_message<T>(self, message: T) -> Self
     where

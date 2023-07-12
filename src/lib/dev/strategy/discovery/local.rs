@@ -149,7 +149,7 @@ where
             .into();
 
             Some(Ok(RepositoryLocation {
-                category: category.name.clone(),
+                category: category.name.clone().into(),
                 repository,
             }))
         })))
