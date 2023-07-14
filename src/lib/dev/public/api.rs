@@ -31,14 +31,14 @@ impl From<&str> for Category {
 
 impl From<Alias> for Category {
     fn from(value: Alias) -> Self {
-        Category(value.category)
+        value.category
     }
 }
 
 impl From<ResolveAliasResult> for Category {
     fn from(value: ResolveAliasResult) -> Self {
         match value {
-            ResolveAliasResult::Alias(Alias { category, .. }) => Category(category),
+            ResolveAliasResult::Alias(Alias { category, .. }) => category,
             ResolveAliasResult::NoAlias(category) => Category(category),
         }
     }
