@@ -2,6 +2,15 @@ use std::fmt::Display;
 
 use crate::dev::strategy::alias::{Alias, ResolveAliasResult};
 
+/// A string which represents a category.
+///
+/// This is a unique type, because not all conversion to a String make sense.
+/// For example, take `Alias`[^alias].
+/// If this were converted to a [std::str],
+/// then something like "{alias} -> {category}" would make more sense.
+/// But when used as a category, just the category should be used.
+///
+/// [^alias]: [crate::dev::strategy::alias::Alias]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct Category(pub String);
 

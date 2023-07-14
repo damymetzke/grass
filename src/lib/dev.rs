@@ -13,7 +13,7 @@ pub use public::{
 };
 
 pub use public::{
-    api::RepositoryLocation,
+    api::{RepositoryLocation, Category},
     discovery::{
         list_all_repositories, list_categories, list_repositories_in_category,
         list_repositories_in_category_with_errors,
