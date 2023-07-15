@@ -1,6 +1,8 @@
 mod mock;
+mod nop;
 
 pub use mock::MockAliasStrategy;
+pub use nop::NopAliasStrategy;
 
 use crate::dev::public::api::Category;
 
