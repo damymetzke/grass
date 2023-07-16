@@ -226,4 +226,3 @@ pub trait SupportsDiscovery {
 
     fn get_discovery_strategy(&self) -> &Self::Discovery;
 }
-
