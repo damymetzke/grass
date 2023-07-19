@@ -141,6 +141,12 @@ pub trait AliasStrategy {
         T: AsRef<str>;
 }
 
+pub trait SupportsAlias {
+    type Alias: AliasStrategy;
+
+    fn get_alias_strategy(&self) -> &Self::Alias;
+}
+
 impl<T: Into<String>, U: Into<Category>> From<(T, U)> for Alias {
     fn from(value: (T, U)) -> Self {
         let (alias, category) = value;

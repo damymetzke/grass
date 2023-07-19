@@ -1,11 +1,15 @@
 use crate::dev::strategy::{
-    discovery::MockDiscoveryStrategy, git::MockGitStrategy, path::MockPathStrategy,
+    alias::{MockAliasStrategy, SupportsAlias},
+    discovery::MockDiscoveryStrategy,
+    git::MockGitStrategy,
+    path::MockPathStrategy,
 };
 
 use super::{SupportsDiscovery, SupportsGit, SupportsPath};
 
 #[derive(Default)]
 pub struct MockApiStrategy {
+    alias_strategy: MockAliasStrategy,
     discovery_strategy: MockDiscoveryStrategy,
     git_strategy: MockGitStrategy,
     path_strategy: MockPathStrategy,
@@ -14,6 +18,14 @@ pub struct MockApiStrategy {
 impl MockGitStrategy {
     pub fn new() -> Self {
         Self::default()
+    }
+}
+
+impl SupportsAlias for MockApiStrategy {
+    type Alias = MockAliasStrategy;
+
+    fn get_alias_strategy(&self) -> &Self::Alias {
+        &self.alias_strategy
     }
 }
 

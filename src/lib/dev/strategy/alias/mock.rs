@@ -7,6 +7,7 @@ use super::{Alias, AliasStrategy, AliasStrategyError, ResolveAliasResult};
 /// - [ ] Write a new mocking structure and reference it here.
 ///
 /// [^strategy]: [crate::dev::strategy::alias::AliasStrategy]
+#[derive(Debug, Default)]
 pub struct MockAliasStrategy;
 
 impl AliasStrategy for MockAliasStrategy {
