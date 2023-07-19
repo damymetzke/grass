@@ -76,3 +76,9 @@ impl<'a> AliasStrategy for LocalAliasStrategy<'a> {
         Ok(result)
     }
 }
+
+impl<'a> LocalAliasStrategy<'a> {
+    pub fn new(config: &'a GrassConfig) -> Self {
+        LocalAliasStrategy { config }
+    }
+}

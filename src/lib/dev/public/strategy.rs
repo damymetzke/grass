@@ -3,6 +3,7 @@ use thiserror::Error;
 use crate::dev::{
     config,
     strategy::{
+        alias::LocalAliasStrategy,
         api::{LocalApiStrategy, MockApiStrategy},
         discovery::LocalDiscoveryStrategy,
         git::LocalGitStrategy,
@@ -62,11 +63,17 @@ where
         })?
         .grass;
 
+    let alias_strategy = LocalAliasStrategy::new(&config);
     let path_strategy = LocalPathStrategy::new(&config);
     let discovery_strategy = LocalDiscoveryStrategy::new(&config, &path_strategy);
     let git_strategy = LocalGitStrategy::new(&path_strategy);
 
-    let api_strategy = LocalApiStrategy::new(&discovery_strategy, &git_strategy, &path_strategy);
+    let api_strategy = LocalApiStrategy::new(
+        &alias_strategy,
+        &discovery_strategy,
+        &git_strategy,
+        &path_strategy,
+    );
 
     closure(api_strategy.into())
 }
