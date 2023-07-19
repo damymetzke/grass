@@ -1,11 +1,13 @@
 mod local;
 mod mock;
 
-use super::{discovery::SupportsDiscovery, git::SupportsGit, path::SupportsPath};
+use super::{
+    alias::SupportsAlias, discovery::SupportsDiscovery, git::SupportsGit, path::SupportsPath,
+};
 
 pub use local::LocalApiStrategy;
 pub use mock::MockApiStrategy;
 
-pub trait SupportsAll: SupportsDiscovery + SupportsGit + SupportsPath {}
+pub trait SupportsAll: SupportsAlias + SupportsDiscovery + SupportsGit + SupportsPath {}
 
-impl<T: SupportsDiscovery + SupportsGit + SupportsPath> SupportsAll for T {}
+impl<T: SupportsAlias + SupportsDiscovery + SupportsGit + SupportsPath> SupportsAll for T {}
