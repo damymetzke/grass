@@ -51,7 +51,7 @@ where
     where
         U: AsRef<str>,
     {
-        match self.config.get_from_category_or_alias(category) {
+        match self.config.get_by_category(category) {
             Some(_) => Ok(DiscoveryExists::Exists),
             None => Ok(DiscoveryExists::CategoryNotFound),
         }
@@ -64,7 +64,7 @@ where
     where
         U: AsRef<str>,
     {
-        let category = self.config.get_from_category_or_alias(category).ok_or(
+        let category = self.config.get_by_category(category).ok_or(
             DiscoveryStrategyError::CategoryNotFound {
                 context: "When trying to ge tthe category from the configuration".into(),
                 reason: "Category doesn't exist".into(),

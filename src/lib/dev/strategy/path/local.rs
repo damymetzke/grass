@@ -21,7 +21,7 @@ impl<'a> PathStrategy for LocalPathStrategy<'a> {
     {
         let RepositoryLocation { category, .. } = repository.into();
 
-        let result = match self.config.get_from_category_or_alias(category) {
+        let result = match self.config.get_by_category(category) {
             Some(category) => self.config.base_dir.join(&category.name),
             None => {
                 return Err(PathStrategyError::RepositoryNotFound {
