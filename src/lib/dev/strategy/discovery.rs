@@ -8,6 +8,8 @@ use crate::dev::public::api::RepositoryLocation;
 pub use local::LocalDiscoveryStrategy;
 pub use mock::MockDiscoveryStrategy;
 
+use super::alias::AliasStrategyError;
+
 /// Error returned by methods of [DiscoveryStrategy]
 ///
 /// Each variant has 2 fields:
@@ -225,4 +227,17 @@ pub trait SupportsDiscovery {
     type Discovery: DiscoveryStrategy;
 
     fn get_discovery_strategy(&self) -> &Self::Discovery;
+}
+
+impl From<AliasStrategyError> for DiscoveryStrategyError {
+    fn from(value: AliasStrategyError) -> Self {
+        match value {
+            AliasStrategyError::UnkownError { context, reason } => {
+                DiscoveryStrategyError::UnknownError { context, reason }
+            }
+            AliasStrategyError::CategoryNotFound { context, reason } => {
+                DiscoveryStrategyError::CategoryNotFound { context, reason }
+            }
+        }
+    }
 }
