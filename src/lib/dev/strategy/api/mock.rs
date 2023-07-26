@@ -15,7 +15,7 @@ pub struct MockApiStrategy {
     path_strategy: MockPathStrategy,
 }
 
-impl MockGitStrategy {
+impl MockApiStrategy {
     pub fn new() -> Self {
         Self::default()
     }
