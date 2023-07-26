@@ -7,6 +7,8 @@ pub use mock::MockGitStrategy;
 
 use crate::dev::public::api::RepositoryLocation;
 
+use super::alias::AliasStrategyError;
+
 /// Error returned from methods in `GitStrategy`[^strategy].
 ///
 /// # Todo:
@@ -227,6 +229,23 @@ impl GitStrategyError {
                 reasons,
             },
             UnknownError { reason, .. } => UnknownError { message, reason },
+        }
+    }
+}
+
+impl From<AliasStrategyError> for GitStrategyError {
+    fn from(value: AliasStrategyError) -> Self {
+        match value {
+            AliasStrategyError::UnkownError { context, reason } => GitStrategyError::UnknownError {
+                message: context,
+                reason,
+            },
+            AliasStrategyError::CategoryNotFound { context, reason } => {
+                GitStrategyError::RepositoryNotFound {
+                    message: context,
+                    reason,
+                }
+            }
         }
     }
 }

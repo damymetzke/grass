@@ -6,7 +6,7 @@ pub use local::LocalAliasStrategy;
 pub use mock::MockAliasStrategy;
 pub use nop::NopAliasStrategy;
 
-use crate::dev::public::api::Category;
+use crate::dev::{public::api::Category, RepositoryLocation};
 
 /// Error returned by methods of `AliasStrategy`[^strategy].
 ///
@@ -139,6 +139,28 @@ pub trait AliasStrategy {
     fn resolve_alias<T>(&self, alias: T) -> Result<ResolveAliasResult>
     where
         T: AsRef<str>;
+
+    /// Resolve the alias in a RepositoryLocation
+    ///
+    /// Wraps `resolve_alias`[^resolve].
+    /// This will resolve the `category` part of the location.
+    /// The repository will not be changed.
+    ///
+    /// [^resolve]: [crate::dev::strategy::alias::AliasStrategy::resolve_alias]
+    fn resolve_location_alias<T>(&self, location: T) -> Result<RepositoryLocation>
+    where
+        T: Into<RepositoryLocation>,
+    {
+        let RepositoryLocation {
+            category,
+            repository,
+        } = location.into();
+
+        Ok(RepositoryLocation {
+            category: self.resolve_alias(category)?.into(),
+            repository,
+        })
+    }
 }
 
 pub trait SupportsAlias {

@@ -1,6 +1,9 @@
 use crate::dev::{
     public::strategy::Api,
-    strategy::git::{GitStrategy, GitStrategyError, RepositoryChangeStatus, SupportsGit},
+    strategy::{
+        alias::{AliasStrategy, SupportsAlias},
+        git::{GitStrategy, GitStrategyError, RepositoryChangeStatus, SupportsGit},
+    },
 };
 
 use super::{api::RepositoryLocation, strategy::AccessApi};
@@ -20,10 +23,14 @@ use super::{api::RepositoryLocation, strategy::AccessApi};
 /// ```
 pub fn clean_repository<T, U>(api: &Api<T>, repository: U) -> Result<(), GitStrategyError>
 where
-    T: SupportsGit,
+    T: SupportsGit + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    api.get_strategy().get_git_strategy().clean(repository)
+    api.get_strategy().get_git_strategy().clean(
+        api.get_strategy()
+            .get_alias_strategy()
+            .resolve_location_alias(repository)?,
+    )
 }
 
 /// Clone a git repository from a remote.
@@ -51,13 +58,16 @@ pub fn clone_repository<T, U, V>(
     remote: V,
 ) -> Result<(), GitStrategyError>
 where
-    T: SupportsGit,
+    T: SupportsGit + SupportsAlias,
     U: Into<RepositoryLocation>,
     V: AsRef<str>,
 {
-    api.get_strategy()
-        .get_git_strategy()
-        .clone(repository, remote)
+    let api = api.get_strategy();
+    api.get_git_strategy().clone(
+        api.get_alias_strategy()
+            .resolve_location_alias(repository)?,
+        remote,
+    )
 }
 
 /// Clone a git repository from a remote, with an default generated name.
@@ -84,7 +94,7 @@ pub fn clone_repository_default<T, U, V>(
     remote: V,
 ) -> Result<(), GitStrategyError>
 where
-    T: SupportsGit,
+    T: SupportsGit + SupportsAlias,
     U: AsRef<str>,
     V: AsRef<str>,
 {
@@ -130,10 +140,13 @@ pub fn get_repository_change_status<T, U>(
     repository: U,
 ) -> Result<RepositoryChangeStatus, GitStrategyError>
 where
-    T: SupportsGit,
+    T: SupportsGit + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    api.get_strategy()
-        .get_git_strategy()
-        .get_changes(repository)
+    let api = api.get_strategy();
+
+    api.get_git_strategy().get_changes(
+        api.get_alias_strategy()
+            .resolve_location_alias(repository)?,
+    )
 }
