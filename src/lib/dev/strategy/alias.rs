@@ -5,6 +5,7 @@ mod nop;
 pub use local::LocalAliasStrategy;
 pub use mock::MockAliasStrategy;
 pub use nop::NopAliasStrategy;
+use thiserror::Error;
 
 use crate::dev::{public::api::Category, RepositoryLocation};
 
@@ -18,9 +19,11 @@ use crate::dev::{public::api::Category, RepositoryLocation};
 /// - `reason`: What went wrong, often provided by third party crates.
 ///
 /// [^strategy]: [crate::dev::strategy::alias::AliasStrategy]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Error, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AliasStrategyError {
+    #[error("There is a problem:\nContext: {context}\nReason: {reason}")]
     UnkownError { context: String, reason: String },
+    #[error("Cannot find category:\nContext: {context}\nReason: {reason}")]
     CategoryNotFound { context: String, reason: String },
 }
 
