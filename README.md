@@ -1,7 +1,19 @@
-# Global Repository Assistant
+# Grouped Repository Assistant
 
 GRAss is a repository assistant written in rust.
 In short it is a CLI utility, which aims to assist in the managing of repositories.
+It does this by grouping the repositories in abstract groups, called categories.
+Each repository can be uniquely defined by a category and repository pair.
+So for example, you could have a category for personal, and work repositories.
+Then you could have the following repositories:
+
+```
+personal rust_example
+personal dotfiles
+work java_monorepo
+work example_dot_com_frontend
+```
+
 Examples of what it can do:
 
 - Manage categories of repositories.
