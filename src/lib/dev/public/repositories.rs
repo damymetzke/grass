@@ -91,6 +91,7 @@ where
 }
 
 // TODO: Return a result instead of an Option
+#[deprecated(note = "I will replace this with what is now `dev::get_repository_path_next`")]
 pub fn get_repository_path<T, U>(
     user_config: &GrassConfig,
     category: T,

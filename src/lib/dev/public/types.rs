@@ -2,12 +2,14 @@ use crate::dev::config::RootConfig;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
+#[deprecated(note = "Part of the old system, don't use anymore")]
 pub struct SimpleRepositoryDescription {
     pub category: String,
     pub repository: String,
 }
 
 #[derive(Debug, Clone)]
+#[deprecated(note = "Part of the old system, don't use anymore")]
 pub struct SimpleCategoryDescription {
     pub category_directory: PathBuf,
     pub category: String,
@@ -15,6 +17,7 @@ pub struct SimpleCategoryDescription {
 }
 
 #[derive(Debug, Clone)]
+#[deprecated(note = "Part of the old system, don't use anymore")]
 pub struct FilteredCategoryDescription<T, U>
 where
     T: Iterator<Item = (SimpleRepositoryDescription, U)>,
