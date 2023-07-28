@@ -1,6 +1,11 @@
 use crate::dev::{
-    strategy::{discovery::{DiscoveryStrategy, DiscoveryStrategyError, SupportsDiscovery}, alias::{SupportsAlias, AliasStrategy}},
-    Api, RepositoryLocation, Category,
+    strategy::{
+        alias::{AliasStrategy, SupportsAlias},
+        discovery::{
+            DiscoveryExists, DiscoveryStrategy, DiscoveryStrategyError, SupportsDiscovery,
+        },
+    },
+    Api, Category, RepositoryLocation,
 };
 
 use super::strategy::AccessApi;
@@ -14,8 +19,11 @@ where
     U: AsRef<str>,
     V: FromIterator<RepositoryLocation>,
 {
-
-    let category: Category = api.get_strategy().get_alias_strategy().resolve_alias(category)?.into();
+    let category: Category = api
+        .get_strategy()
+        .get_alias_strategy()
+        .resolve_alias(category)?
+        .into();
     let iterator = api
         .get_strategy()
         .get_discovery_strategy()
@@ -38,7 +46,11 @@ where
     U: AsRef<str>,
     V: FromIterator<Result<RepositoryLocation, DiscoveryStrategyError>>,
 {
-    let category: Category = api.get_strategy().get_alias_strategy().resolve_alias(category)?.into();
+    let category: Category = api
+        .get_strategy()
+        .get_alias_strategy()
+        .resolve_alias(category)?
+        .into();
 
     Ok(api
         .get_strategy()
@@ -71,4 +83,51 @@ pub fn list_categories<T: SupportsDiscovery, U: FromIterator<String>>(
     api.get_strategy()
         .get_discovery_strategy()
         .list_categories()
+}
+
+/// Returns whether or not a repository exists
+///
+/// # Todo:
+///
+/// - [ ] Return a generic crate wide error
+///       (<https://github.com/damymetzke/grass/issues/2>)
+///
+/// # Example
+///
+/// ```rust
+/// # use grass::dev::{
+/// #     self,
+/// #     strategy::{
+/// #         alias::SupportsAlias,
+/// #         api::MockApiStrategy,
+/// #         discovery::{DiscoveryExists, SupportsDiscovery},
+/// #     },
+/// #     Api,
+/// # };
+/// # let api = Api::from(MockApiStrategy::default());
+/// #
+/// fn test_public<T: SupportsDiscovery + SupportsAlias>(api: &Api<T>) {
+///     assert_eq!(
+///         dev::verify_repository_exists(api, ("all_good", "first")).unwrap(),
+///         DiscoveryExists::Exists
+///     )
+/// }
+///
+/// test_public(&api)
+/// ```
+pub fn verify_repository_exists<T, U>(
+    api: &Api<T>,
+    repository: U,
+) -> Result<DiscoveryExists, DiscoveryStrategyError>
+where
+    T: SupportsDiscovery + SupportsAlias,
+    U: Into<RepositoryLocation>,
+{
+    let api = api.get_strategy();
+    let result = api.get_discovery_strategy().check_repository_exists(
+        api.get_alias_strategy()
+            .resolve_location_alias(repository)?,
+    )?;
+
+    Ok(result)
 }

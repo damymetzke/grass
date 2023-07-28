@@ -16,7 +16,7 @@ pub use public::{
     api::{Category, RepositoryLocation},
     discovery::{
         list_all_repositories, list_categories, list_repositories_in_category,
-        list_repositories_in_category_with_errors,
+        list_repositories_in_category_with_errors, verify_repository_exists,
     },
     git::{
         clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
