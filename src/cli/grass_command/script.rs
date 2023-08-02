@@ -1,6 +1,8 @@
 mod path;
 
+use anyhow::Result;
 use clap::{Parser, Subcommand};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Debug, Subcommand)]
 enum ScriptSubcommand {
@@ -19,9 +21,12 @@ pub struct ScriptCommand {
 }
 
 impl ScriptCommand {
-    pub fn handle(&self) {
+    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    where
+        T: SupportsAll,
+    {
         match &self.command {
-            ScriptSubcommand::Path(path_command) => path_command.handle(),
+            ScriptSubcommand::Path(path_command) => path_command.handle(api),
         }
     }
 }

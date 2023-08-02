@@ -1,5 +1,6 @@
+use anyhow::Result;
 use clap::Parser;
-use grass::dev::config;
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Parser, Debug)]
 /// Print the path of a category root, or a repository
@@ -9,26 +10,17 @@ pub struct PathCommand {
     /// The category to display, can be an alias
     category: String,
     /// The repository to display
-    ///
-    /// When omitted will print the repository directory instead.
-    repository: Option<String>,
+    repository: String,
 }
 
 impl PathCommand {
-    pub fn handle(&self) {
-        // TODO: Handle errors
-        let user_config = config::load_user_config().unwrap();
-        let path = match self {
-            PathCommand {
-                category,
-                repository: None,
-            } => grass::dev::get_category_path(&user_config.grass, category),
-            PathCommand {
-                category,
-                repository: Some(repository),
-            } => grass::dev::get_repository_path(&user_config.grass, category, repository),
-        };
+    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    where
+        T: SupportsAll,
+    {
+        let path = grass::dev::get_repository_path_next(api, (&self.category, &self.repository))?;
 
-        print!("{}", path.unwrap_or_default().to_str().unwrap_or_default());
+        print!("{}", path.to_str().unwrap_or_default());
+        Ok(())
     }
 }

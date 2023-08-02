@@ -81,7 +81,7 @@ impl GrassCommand {
             GrassSubcommand::Check(command) => command.handle(),
             GrassSubcommand::Ls(command) => command.handle(api)?,
             GrassSubcommand::Repo(command) => command.handle(api)?,
-            GrassSubcommand::Script(command) => command.handle(),
+            GrassSubcommand::Script(command) => command.handle(api)?,
             GrassSubcommand::ShellInsert(command) => command.handle(),
             GrassSubcommand::Session(command) => command.handle(api)?,
             GrassSubcommand::Cs(command) => command.handle(api)?,
