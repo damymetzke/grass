@@ -1,4 +1,5 @@
 pub mod config;
+pub mod error;
 mod public;
 pub mod repository;
 pub mod strategy;
@@ -21,6 +22,6 @@ pub use public::{
     git::{
         clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
     },
-    strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
     path::get_repository_path as get_repository_path_next,
+    strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
 };
