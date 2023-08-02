@@ -71,6 +71,12 @@ pub fn select_category_and_repository(
         .ok_or(CliError::new("No option selected"))?)
 }
 
+impl Selectable for RepositoryLocation {
+    fn get_select_name(&self) -> &str {
+        self.repository.as_str()
+    }
+}
+
 impl Selectable for SimpleRepositoryDescription {
     fn get_select_name(&self) -> &str {
         self.repository.as_str()
