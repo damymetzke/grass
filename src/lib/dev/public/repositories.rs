@@ -61,6 +61,7 @@ where
     ))
 }
 
+#[deprecated]
 pub fn get_repository<T, U>(
     user_config: &RootConfig,
     category: T,
