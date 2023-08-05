@@ -1,5 +1,6 @@
 pub mod api;
 pub mod categories;
+pub mod changes;
 pub mod discovery;
 pub mod git;
 pub mod path;

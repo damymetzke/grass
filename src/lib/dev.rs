@@ -20,8 +20,9 @@ pub use public::{
         list_repositories_in_category_with_errors, verify_repository_exists,
     },
     git::{
-        clean_repository, clone_repository, clone_repository_default, get_repository_change_status,
+        clean_repository, clone_repository, clone_repository_default,
     },
     path::get_repository_path as get_repository_path_next,
     strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
+    changes::get_repository_change_status,
 };
