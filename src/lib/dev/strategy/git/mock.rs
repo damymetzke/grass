@@ -106,7 +106,7 @@ impl GitStrategy for MockGitStrategy {
             ("with_changes", "first") => Ok(RepositoryChangeStatus::UpToDate),
             ("with_changes", "second") => Ok(RepositoryChangeStatus::NoRepository),
             ("with_changes", "third") => {
-                Ok(RepositoryChangeStatus::FilesChanged { num_changes: 9 })
+                Ok(RepositoryChangeStatus::UncommittedChanges { num_changes: 9 })
             }
             ("with_error", "first") => Err(GitStrategyError::RepositoryError {
                 message: "Mocked error".into(),

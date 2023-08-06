@@ -5,7 +5,7 @@ use thiserror::Error;
 pub use local::LocalGitStrategy;
 pub use mock::MockGitStrategy;
 
-use crate::dev::public::api::RepositoryLocation;
+use crate::dev::{public::api::RepositoryLocation, error::GrassError};
 
 use super::alias::AliasStrategyError;
 
@@ -56,7 +56,21 @@ pub enum RepositoryChangeStatus {
     ///
     /// `num_changes` is not strongly defined, this number may change between versions.
     /// It has no real meaning, and should only be used for generic estimates.
-    FilesChanged { num_changes: usize },
+    UncommittedChanges { num_changes: usize },
+    /// The status is unkown due to an error.
+    Error {reason: GrassError},
+    /// This repository has an unknown status.
+    ///
+    /// This is only applicable if the unkown status is within the expected behavior of the
+    /// implementation.
+    /// For example, if an implementation has to synchronize in the background, then it may result
+    /// in an unkown status.
+    ///
+    /// This means that unknown doesn't mean something is wrong, although it may be.
+    /// If the status is unknown due to an error, use `Error`[^error] instead.
+    ///
+    /// [^error]: [crate::dev::strategy::git::RepositoryChangeStatus::Error]
+    Unknown,
 }
 
 /// Strategy for all git operations.

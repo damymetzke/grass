@@ -101,7 +101,7 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
             return Ok(RepositoryChangeStatus::UpToDate);
         }
 
-        Ok(RepositoryChangeStatus::FilesChanged {
+        Ok(RepositoryChangeStatus::UncommittedChanges {
             num_changes: changes.len(),
         })
     }
