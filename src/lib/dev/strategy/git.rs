@@ -194,7 +194,7 @@ pub trait GitStrategy {
     ///
     ///     assert_eq!(
     ///         strategy.get_changes(("with_changes", "third")),
-    ///         Ok(RepositoryChangeStatus::FilesChanged { num_changes: 9 })
+    ///         Ok(RepositoryChangeStatus::UncommittedChanges { num_changes: 9 })
     ///     );
     /// }
     ///

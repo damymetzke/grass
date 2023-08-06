@@ -33,7 +33,7 @@ use super::strategy::AccessApi;
 /// assert_eq!(no_repository, RepositoryChangeStatus::NoRepository);
 /// assert_eq!(
 ///     with_changes,
-///     RepositoryChangeStatus::FilesChanged { num_changes: 9 }
+///     RepositoryChangeStatus::UncommittedChanges { num_changes: 9 }
 /// );
 /// ```
 pub fn get_repository_change_status<T, U>(
