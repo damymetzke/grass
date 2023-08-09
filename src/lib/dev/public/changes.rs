@@ -1,13 +1,23 @@
 use crate::dev::{
+    error::GrassError,
     strategy::{
         alias::{AliasStrategy, SupportsAlias},
-        discovery::SupportsDiscovery,
-        git::{GitStrategy, GitStrategyError, RepositoryChangeStatus, SupportsGit},
+        discovery::{DiscoveryStrategy, DiscoveryStrategyError, SupportsDiscovery},
+        git::{
+            GitStrategy, GitStrategyError, RepositoryChangeStatus, RepositoryChangeStatusWithError,
+            SupportsGit,
+        },
     },
     Api, Category, RepositoryLocation,
 };
 
 use super::strategy::AccessApi;
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct ChangeStatusResult {
+    pub location: Option<RepositoryLocation>,
+    pub change_status: RepositoryChangeStatusWithError,
+}
 
 /// Get the change status of a specific repository
 ///
@@ -52,16 +62,96 @@ where
     )
 }
 
-pub fn list_repositories_with_change_status<T>(api: &Api<T>)
+fn location_result_to_change_status_result<T: GitStrategy>(
+    value: (Result<RepositoryLocation, DiscoveryStrategyError>, &T),
+) -> ChangeStatusResult {
+    let (location, git) = value;
+
+    let location = match location {
+        Ok(location) => location.clone(),
+        Err(error) => {
+            return ChangeStatusResult {
+                location: None,
+                change_status: error.into(),
+            }
+        }
+    };
+    ChangeStatusResult {
+        location: Some(location.clone()),
+        change_status: git.get_changes(location).into(),
+    }
+}
+
+/// List all repositories, including their change status.
+///
+/// This will also list repositories which are up to date.
+///
+/// # Example
+///
+/// ```rust
+/// # use std::collections::HashSet;
+/// # 
+/// # use grass::dev::{
+/// #     self,
+/// #     ChangeStatusResult,
+/// #     strategy::{
+/// #         api::MockApiStrategy,
+/// #         discovery::SupportsDiscovery,
+/// #         git::{RepositoryChangeStatusWithError, SupportsGit},
+/// #     },
+/// #     Api,
+/// # };
+/// #
+/// # let api = Api::from(MockApiStrategy::default());
+/// # 
+/// fn test_api<T: SupportsGit + SupportsDiscovery>(api: &Api<T>) {
+///     let repositories: HashSet<_> =
+///         dev::list_repositories_with_change_status_next(api).unwrap();
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "first").into()),
+///         change_status: RepositoryChangeStatusWithError::UpToDate,
+///     }));
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "second").into()),
+///         change_status: RepositoryChangeStatusWithError::NoRepository,
+///     }));
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "third").into()),
+///         change_status: RepositoryChangeStatusWithError::UncommittedChanges {
+///             num_changes: 9
+///         },
+///     }));
+/// }
+///
+/// test_api(&api)
+/// ```
+pub fn list_repositories_with_change_status<T, U>(api: &Api<T>) -> Result<U, GrassError>
 where
-    T: SupportsGit + SupportsAlias + SupportsDiscovery,
+    T: SupportsGit + SupportsDiscovery,
+    U: FromIterator<ChangeStatusResult>,
 {
-    todo!()
+    let api = api.get_strategy();
+    let git = api.get_git_strategy();
+    let discovery = api.get_discovery_strategy();
+
+    let categories: Vec<_> = discovery.list_categories()?;
+    Ok(categories
+        .iter()
+        .filter_map(|category| discovery.list_repositories_in_category(category).ok())
+        .flat_map(|repositories| {
+            repositories
+                .map(|repository| (repository, git))
+                .map(location_result_to_change_status_result)
+        })
+        .collect())
 }
 
 pub fn list_repositories_with_uncommitted_changes<T>(api: &Api<T>)
 where
-    T: SupportsGit + SupportsAlias + SupportsDiscovery,
+    T: SupportsGit + SupportsDiscovery,
 {
     todo!()
 }

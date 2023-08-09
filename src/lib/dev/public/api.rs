@@ -11,10 +11,10 @@ use crate::dev::strategy::alias::{Alias, ResolveAliasResult};
 /// But when used as a category, just the category should be used.
 ///
 /// [^alias]: [crate::dev::strategy::alias::Alias]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub struct Category(pub String);
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub struct RepositoryLocation {
     pub category: Category,
     pub repository: String,

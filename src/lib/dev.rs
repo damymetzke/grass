@@ -15,14 +15,16 @@ pub use public::{
 
 pub use public::{
     api::{Category, RepositoryLocation},
+    changes::{
+        get_repository_change_status,
+        list_repositories_with_change_status as list_repositories_with_change_status_next,
+        ChangeStatusResult,
+    },
     discovery::{
         list_all_repositories, list_categories, list_repositories_in_category,
         list_repositories_in_category_with_errors, verify_repository_exists,
     },
-    git::{
-        clean_repository, clone_repository, clone_repository_default,
-    },
+    git::{clean_repository, clone_repository, clone_repository_default},
     path::get_repository_path as get_repository_path_next,
     strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
-    changes::get_repository_change_status,
 };

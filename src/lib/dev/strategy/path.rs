@@ -10,7 +10,7 @@ use crate::dev::RepositoryLocation;
 pub use local::LocalPathStrategy;
 pub use mock::MockPathStrategy;
 
-#[derive(Error, Debug, PartialEq, Eq)]
+#[derive(Error, Debug, PartialEq, Eq, Hash)]
 pub enum PathStrategyError {
     #[error("Cannot find repository:\nContext: {context}\nReason: {reason}")]
     RepositoryNotFound { context: String, reason: String },

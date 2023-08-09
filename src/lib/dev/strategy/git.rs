@@ -16,7 +16,7 @@ use super::alias::AliasStrategyError;
 /// - [ ] Change to `context` and `reason` fields.
 ///
 /// [^strategy]: [crate::dev::strategy::git::GitStrategy]
-#[derive(Error, Debug, PartialEq, Eq)]
+#[derive(Error, Debug, PartialEq, Eq, Hash)]
 pub enum GitStrategyError {
     #[error("Cannot find repository:\n{message}\nReason: {reason}")]
     RepositoryNotFound { message: String, reason: String },
@@ -74,7 +74,7 @@ pub enum RepositoryChangeStatus {
 /// Describes the status of a repository.
 ///
 /// The status is related to whether or not there are changes.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum RepositoryChangeStatusWithError {
     /// All changes have been committed.
     UpToDate,
@@ -298,9 +298,7 @@ impl<T: Into<GrassError>> From<std::result::Result<RepositoryChangeStatus, T>>
     fn from(value: std::result::Result<RepositoryChangeStatus, T>) -> Self {
         match value {
             Ok(change_status) => change_status.into(),
-            Err(error) => RepositoryChangeStatusWithError::Error {
-                reason: error.into(),
-            },
+            Err(error) => Into::<RepositoryChangeStatusWithError>::into(error),
         }
     }
 }
@@ -314,6 +312,14 @@ impl From<RepositoryChangeStatus> for RepositoryChangeStatusWithError {
                 RepositoryChangeStatusWithError::UncommittedChanges { num_changes }
             }
             RepositoryChangeStatus::Unknown => RepositoryChangeStatusWithError::Unknown,
+        }
+    }
+}
+
+impl<T: Into<GrassError>> From<T> for RepositoryChangeStatusWithError {
+    fn from(value: T) -> Self {
+        RepositoryChangeStatusWithError::Error {
+            reason: value.into(),
         }
     }
 }

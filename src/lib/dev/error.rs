@@ -5,7 +5,7 @@ use super::strategy::{
     path::PathStrategyError,
 };
 
-#[derive(Debug, Error, PartialEq, Eq)]
+#[derive(Debug, Error, PartialEq, Eq, Hash)]
 pub enum GrassError {
     #[error(transparent)]
     AliasStrategy(#[from] AliasStrategyError),

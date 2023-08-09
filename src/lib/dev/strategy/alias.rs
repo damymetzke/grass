@@ -19,7 +19,7 @@ use crate::dev::{public::api::Category, RepositoryLocation};
 /// - `reason`: What went wrong, often provided by third party crates.
 ///
 /// [^strategy]: [crate::dev::strategy::alias::AliasStrategy]
-#[derive(Debug, Error, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Error, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AliasStrategyError {
     #[error("There is a problem:\nContext: {context}\nReason: {reason}")]
     UnkownError { context: String, reason: String },

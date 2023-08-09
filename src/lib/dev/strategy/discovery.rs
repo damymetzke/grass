@@ -18,7 +18,7 @@ use super::alias::AliasStrategyError;
 /// - `reason`: What went wrong, often this is provided by errors generated from crates.
 ///
 /// See: [crate::dev::strategy::discovery::DiscoveryStrategy]
-#[derive(Error, Debug, PartialEq, Eq)]
+#[derive(Error, Debug, PartialEq, Eq, Hash)]
 pub enum DiscoveryStrategyError {
     #[error("Cannot find repository:\nContext: {context}\nReason: {reason}")]
     CategoryNotFound { context: String, reason: String },
