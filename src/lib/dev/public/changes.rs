@@ -82,6 +82,16 @@ fn location_result_to_change_status_result<T: GitStrategy>(
     }
 }
 
+fn filter_away_up_to_date_repositories(value: &ChangeStatusResult) -> bool {
+    !matches!(
+        value,
+        ChangeStatusResult {
+            change_status: RepositoryChangeStatusWithError::UpToDate,
+            ..
+        }
+    )
+}
+
 /// List all repositories, including their change status.
 ///
 /// This will also list repositories which are up to date.
@@ -90,7 +100,7 @@ fn location_result_to_change_status_result<T: GitStrategy>(
 ///
 /// ```rust
 /// # use std::collections::HashSet;
-/// # 
+/// #
 /// # use grass::dev::{
 /// #     self,
 /// #     ChangeStatusResult,
@@ -103,7 +113,7 @@ fn location_result_to_change_status_result<T: GitStrategy>(
 /// # };
 /// #
 /// # let api = Api::from(MockApiStrategy::default());
-/// # 
+/// #
 /// fn test_api<T: SupportsGit + SupportsDiscovery>(api: &Api<T>) {
 ///     let repositories: HashSet<_> =
 ///         dev::list_repositories_with_change_status_next(api).unwrap();
@@ -149,11 +159,72 @@ where
         .collect())
 }
 
-pub fn list_repositories_with_uncommitted_changes<T>(api: &Api<T>)
+/// List all repositories with uncommitted changes, including their change status.
+///
+/// This won't list repositories that are up to date.
+///
+/// # Example
+///
+/// ```rust
+/// # use std::collections::HashSet;
+/// #
+/// # use grass::dev::{
+/// #     self,
+/// #     ChangeStatusResult,
+/// #     strategy::{
+/// #         api::MockApiStrategy,
+/// #         discovery::SupportsDiscovery,
+/// #         git::{RepositoryChangeStatusWithError, SupportsGit},
+/// #     },
+/// #     Api,
+/// # };
+/// #
+/// # let api = Api::from(MockApiStrategy::default());
+/// #
+/// fn test_api<T: SupportsGit + SupportsDiscovery>(api: &Api<T>) {
+///     let repositories: HashSet<_> =
+///         dev::list_repositories_with_uncommitted_changes(api).unwrap();
+///
+///     assert!(!repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "first").into()),
+///         change_status: RepositoryChangeStatusWithError::UpToDate,
+///     }));
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "second").into()),
+///         change_status: RepositoryChangeStatusWithError::NoRepository,
+///     }));
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "third").into()),
+///         change_status: RepositoryChangeStatusWithError::UncommittedChanges {
+///             num_changes: 9
+///         },
+///     }));
+/// }
+///
+/// test_api(&api)
+/// ```
+pub fn list_repositories_with_uncommitted_changes<T, U>(api: &Api<T>) -> Result<U, GrassError>
 where
     T: SupportsGit + SupportsDiscovery,
+    U: FromIterator<ChangeStatusResult>,
 {
-    todo!()
+    let api = api.get_strategy();
+    let git = api.get_git_strategy();
+    let discovery = api.get_discovery_strategy();
+
+    let categories: Vec<_> = discovery.list_categories()?;
+    Ok(categories
+        .iter()
+        .filter_map(|category| discovery.list_repositories_in_category(category).ok())
+        .flat_map(|repositories| {
+            repositories
+                .map(|repository| (repository, git))
+                .map(location_result_to_change_status_result)
+                .filter(filter_away_up_to_date_repositories)
+        })
+        .collect())
 }
 
 pub fn list_repositories_with_change_status_in_category<T, U>(api: &Api<T>, category: U)
