@@ -227,12 +227,70 @@ where
         .collect())
 }
 
-pub fn list_repositories_with_change_status_in_category<T, U>(api: &Api<T>, category: U)
+/// List all repositories in a specified category, including their change status.
+///
+/// This will also list repositories which are up to date.
+///
+/// # Example
+///
+/// ```rust
+/// # use std::collections::HashSet;
+/// #
+/// # use grass::dev::{
+/// #     self,
+/// #     ChangeStatusResult,
+/// #     strategy::{
+/// #         alias::SupportsAlias,
+/// #         api::MockApiStrategy,
+/// #         discovery::SupportsDiscovery,
+/// #         git::{RepositoryChangeStatusWithError, SupportsGit},
+/// #     },
+/// #     Api,
+/// # };
+/// #
+/// # let api = Api::from(MockApiStrategy::default());
+/// #
+/// fn test_api<T: SupportsGit + SupportsDiscovery + SupportsAlias>(api: &Api<T>) {
+///     let repositories: HashSet<_> =
+///         dev::list_repositories_with_change_status_in_category(api, "with_changes").unwrap();
+///
+///     assert!(repositories.contains(&ChangeStatusResult {
+///         location: Some(("with_changes", "second").into()),
+///         change_status: RepositoryChangeStatusWithError::NoRepository,
+///     }));
+///
+///     assert!(!repositories.contains(&ChangeStatusResult {
+///         location: Some(("all_good", "second").into()),
+///         change_status: RepositoryChangeStatusWithError::UncommittedChanges {
+///             num_changes: 9
+///         },
+///     }));
+/// }
+///
+/// test_api(&api)
+/// ```
+pub fn list_repositories_with_change_status_in_category<T, U, V>(
+    api: &Api<T>,
+    category: U,
+) -> Result<V, GrassError>
 where
     T: SupportsGit + SupportsAlias + SupportsDiscovery,
     U: Into<Category>,
+    V: FromIterator<ChangeStatusResult>,
 {
-    todo!()
+    let api = api.get_strategy();
+    let alias = api.get_alias_strategy();
+    let git = api.get_git_strategy();
+    let discovery = api.get_discovery_strategy();
+
+    let category: Category = alias.resolve_alias(category.into())?.into();
+
+    let repositories = discovery.list_repositories_in_category::<Category>(category)?;
+
+    Ok(repositories
+        .map(|repository| (repository, git))
+        .map(location_result_to_change_status_result)
+        .collect())
 }
 
 pub fn list_repositories_with_uncommitted_changes_in_category<T, U>(api: &Api<T>, category: U)

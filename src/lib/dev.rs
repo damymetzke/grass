@@ -18,6 +18,7 @@ pub use public::{
     changes::{
         get_repository_change_status,
         list_repositories_with_change_status as list_repositories_with_change_status_next,
+        list_repositories_with_change_status_in_category,
         list_repositories_with_uncommitted_changes, ChangeStatusResult,
     },
     discovery::{
