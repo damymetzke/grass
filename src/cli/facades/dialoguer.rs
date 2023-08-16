@@ -1,9 +1,6 @@
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, FuzzySelect};
-use grass::dev::{
-    types::{SimpleCategoryDescription, SimpleRepositoryDescription},
-    RepositoryLocation,
-};
+use grass::dev::RepositoryLocation;
 use thiserror::Error;
 
 use crate::error::CliError;
@@ -74,18 +71,6 @@ pub fn select_category_and_repository(
 impl Selectable for RepositoryLocation {
     fn get_select_name(&self) -> &str {
         self.repository.as_str()
-    }
-}
-
-impl Selectable for SimpleRepositoryDescription {
-    fn get_select_name(&self) -> &str {
-        self.repository.as_str()
-    }
-}
-
-impl Selectable for SimpleCategoryDescription {
-    fn get_select_name(&self) -> &str {
-        self.category.as_str()
     }
 }
 
