@@ -1,3 +1,4 @@
+#![deprecated]
 use crate::dev::config::RootConfig;
 use std::path::PathBuf;
 

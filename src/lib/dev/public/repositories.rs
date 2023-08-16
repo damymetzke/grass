@@ -119,6 +119,7 @@ where
 }
 
 // TODO: Add error handling
+#[deprecated]
 pub fn list_repositories_with_change_status<T>(
     user_config: &RootConfig,
     category: T,
@@ -146,6 +147,7 @@ where
     ))
 }
 
+#[deprecated]
 pub fn list_all_repositories_with_change_status(
     user_config: &RootConfig,
 ) -> Vec<

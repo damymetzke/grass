@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use crate::dev::config::GrassConfig;
 
 // TODO: Return Result instead of Option
+#[deprecated]
 pub fn get_category_path<T>(user_config: &GrassConfig, category: T) -> Option<PathBuf>
 where
     T: AsRef<str>,
