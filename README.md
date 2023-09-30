@@ -47,7 +47,7 @@ cargo add --git https://github.com/damymetzke/grass.git
 
 ## Contributing
 
-See [CONTRIBUTE.md](./blob/main/CONTRIBUTE.md).
+See [CONTRIBUTE.md](./CONTRIBUTE.md).
 
 ## Configuration
 
