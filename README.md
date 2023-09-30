@@ -45,6 +45,10 @@ To add this to your own rust project as a dependency, run the following command:
 cargo add --git https://github.com/damymetzke/grass.git
 ```
 
+## Contributing
+
+See <CONTRIBUTE.md>.
+
 ## Configuration
 
 All configuration is located in the default configuration directory.
