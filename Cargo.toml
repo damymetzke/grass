@@ -1,8 +1,23 @@
 [package]
-name = "grass"
+name = "grass-repository-assistant"
 version = "0.1.0"
 edition = "2021"
 default-run = "grass"
+license = "MIT OR Apache-2.0"
+description = "Grouped Repository Assistant - Manage your repositories throught the CLI"
+homepage = "https://github.com/damymetzke/grass"
+repository = "https://github.com/damymetzke/grass"
+keywords = [
+  "cli",
+  "git",
+  "repositories",
+  "tool",
+]
+categories = [
+  "command-line-utilities",
+  "filesystem",
+]
+readme = "README.md"
 
 [lib]
 name = "grass"
