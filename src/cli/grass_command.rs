@@ -6,6 +6,7 @@ mod repo;
 mod script;
 mod session;
 mod shell_insert;
+mod config;
 
 use std::process::Command;
 
@@ -25,6 +26,7 @@ pub enum GrassSubcommand {
     ShellInsert(shell_insert::ShellInsertCommand),
     Session(session::SessionCommand),
     Cs(session::create::CreateCommand),
+    Config(config::ConfigCommand),
     #[cfg(debug_assertions)]
     Debug(debug::DebugCommand),
     #[clap(external_subcommand)]
@@ -85,6 +87,7 @@ impl GrassCommand {
             GrassSubcommand::ShellInsert(command) => command.handle(),
             GrassSubcommand::Session(command) => command.handle(api)?,
             GrassSubcommand::Cs(command) => command.handle(api)?,
+            GrassSubcommand::Config(command) => command.handle(api)?,
             #[cfg(debug_assertions)]
             GrassSubcommand::Debug(command) => command.handle(),
             GrassSubcommand::External(parts) => {
