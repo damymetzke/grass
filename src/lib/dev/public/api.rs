@@ -20,6 +20,12 @@ pub struct RepositoryLocation {
     pub repository: String,
 }
 
+impl RepositoryLocation {
+    pub fn to_session_string(&self) -> String {
+        format!("{}@{}", self.category, self.repository)
+    }
+}
+
 impl From<String> for Category {
     fn from(value: String) -> Self {
         Category(value)

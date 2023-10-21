@@ -5,8 +5,12 @@ use itertools::Itertools;
 use crate::dev::{
     config::{GrassConfig, RootConfig},
     repository::{get_repository_changes, RepositoryChangeStatus},
+    strategy::alias::{AliasStrategy, AliasStrategyError, ResolveAliasResult, SupportsAlias},
     types::{FilteredCategoryDescription, SimpleCategoryDescription, SimpleRepositoryDescription},
+    Api, RepositoryLocation,
 };
+
+use super::strategy::AccessApi;
 
 /// List repositories in a single category
 ///
@@ -162,4 +166,28 @@ pub fn list_all_repositories_with_change_status(
         .iter()
         .filter_map(|(key, _)| list_repositories_with_change_status(user_config, key))
         .collect()
+}
+
+pub fn resolve_repository_alias_from_str<T, U>(
+    api: &Api<T>,
+    value: U,
+) -> Result<ResolveAliasResult, AliasStrategyError>
+where
+    T: SupportsAlias,
+    U: AsRef<str>,
+{
+    api.get_strategy().get_alias_strategy().resolve_alias(value)
+}
+
+pub fn resolve_repository_alias_from_location<T, U>(
+    api: &Api<T>,
+    value: U,
+) -> Result<RepositoryLocation, AliasStrategyError>
+where
+    T: SupportsAlias,
+    U: Into<RepositoryLocation>,
+{
+    api.get_strategy()
+        .get_alias_strategy()
+        .resolve_location_alias(value)
 }

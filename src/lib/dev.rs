@@ -27,5 +27,6 @@ pub use public::{
     },
     git::{clean_repository, clone_repository, clone_repository_default},
     path::get_repository_path as get_repository_path_next,
+    repositories::{resolve_repository_alias_from_location, resolve_repository_alias_from_str},
     strategy::{use_local_strategy_with_default_config, use_mock_strategy, Api},
 };
