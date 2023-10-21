@@ -1,4 +1,5 @@
 use thiserror::Error;
+use tracing::info;
 
 use crate::dev::{
     config,
@@ -75,6 +76,7 @@ where
         &path_strategy,
     );
 
+    info!("Using local strategy with default config");
     closure(api_strategy.into())
 }
 

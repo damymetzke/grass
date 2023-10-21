@@ -32,7 +32,7 @@ required-features = ["cli"]
 
 [features]
 dev = []
-cli = ["dep:clap", "dep:colored", "dep:dialoguer"]
+cli = ["dep:clap", "dep:colored", "dep:dialoguer", "dep:tracing-subscriber"]
 default = ["cli", "dev"]
 
 [dependencies]
@@ -44,6 +44,8 @@ git2 = "0.17.0"
 clap_complete = "4.2.1"
 thiserror = "1.0.40"
 anyhow = "1.0.71"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.17", optional = true }
 
 [dependencies.clap]
 version = "4.1.8"
