@@ -18,7 +18,7 @@ pub struct ExplainCommand {
 }
 
 impl ExplainCommand {
-    pub fn handle<T>(&self, api: &Api<T>) -> Result<()>
+    pub fn handle<T>(&self, _api: &Api<T>) -> Result<()>
     where
         T: SupportsAll,
     {

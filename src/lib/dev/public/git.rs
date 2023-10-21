@@ -2,7 +2,7 @@ use crate::dev::{
     public::strategy::Api,
     strategy::{
         alias::{AliasStrategy, SupportsAlias},
-        git::{GitStrategy, GitStrategyError, RepositoryChangeStatus, SupportsGit},
+        git::{GitStrategy, GitStrategyError, SupportsGit},
     },
 };
 
