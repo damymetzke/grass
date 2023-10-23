@@ -22,7 +22,13 @@ pub struct RepositoryLocation {
 
 impl RepositoryLocation {
     pub fn to_session_string(&self) -> String {
-        format!("{}@{}", self.category, self.repository)
+        format!("{}", self)
+    }
+}
+
+impl Display for RepositoryLocation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}@{}", self.category, self.repository)
     }
 }
 

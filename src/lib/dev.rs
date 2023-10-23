@@ -1,5 +1,6 @@
 pub mod config;
 pub mod error;
+pub mod iterator;
 mod public;
 pub mod repository;
 pub mod strategy;

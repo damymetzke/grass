@@ -80,7 +80,7 @@ impl GrassCommand {
         T: SupportsAll,
     {
         match &self.command {
-            GrassSubcommand::Check(command) => command.handle(),
+            GrassSubcommand::Check(command) => command.handle(api)?,
             GrassSubcommand::Ls(command) => command.handle(api)?,
             GrassSubcommand::Repo(command) => command.handle(api)?,
             GrassSubcommand::Script(command) => command.handle(api)?,

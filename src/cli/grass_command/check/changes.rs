@@ -1,15 +1,17 @@
-use std::io::{self, Write};
-
+use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use grass::dev::{
     config,
-    repository::RepositoryChangeStatus,
-    types::{FilteredCategoryDescription, SimpleRepositoryDescription},
+    iterator::{
+        location::LocationIterExtensions,
+        location_and_change_status::LocationAndChangeStatusIterExtensions,
+    },
+    list_all_repositories, list_repositories_in_category,
+    strategy::api::SupportsAll,
+    Api,
 };
-use itertools::Itertools;
 
-use crate::output::generate_fancy_vertical_list;
-use colored::*;
+use crate::error::CliError;
 
 #[derive(ValueEnum, Debug, Clone, Default)]
 enum Format {
@@ -28,97 +30,49 @@ pub struct ChangesCommand {
 }
 
 impl ChangesCommand {
-    fn handle_category<T>(
-        category: FilteredCategoryDescription<T, RepositoryChangeStatus>,
-        format: &Format,
-    ) -> String
-    where
-        T: Iterator<Item = (SimpleRepositoryDescription, RepositoryChangeStatus)>,
-    {
-        match format {
-            Format::Fancy => generate_fancy_vertical_list(
-                format!(
-                    "Repositories with uncommitted changes for '{}'",
-                    category.category
-                ),
-                category.repository_iterator.map(|(repository, status)| {
-                    format!(
-                        "{} ({})",
-                        repository.repository.bright_blue(),
-                        status.to_string().red()
-                    )
-                }),
-            ),
-            Format::Simple => category
-                .repository_iterator
-                .map(|(repository, status)| match status {
-                    RepositoryChangeStatus::UpToDate => {
-                        panic!("No up-to-date should exist at this point")
-                    }
-                    RepositoryChangeStatus::NoRepository => format!(
-                        "{}/{} no_repository 0",
-                        repository.category, repository.repository
-                    ),
-                    RepositoryChangeStatus::UncommittedChanges(n) => format!(
-                        "{}/{} uncommitted_changes {}",
-                        repository.category, repository.repository, n
-                    ),
-                })
-                .join("\n"),
-        }
-    }
-
-    pub fn handle(&self) {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
         // TODO: Handle error
         let user_config = config::load_user_config().unwrap();
 
-        match self {
+        let mut repositories: Box<[_]> = match self {
             Self {
                 category: Some(category),
                 all: false,
                 format,
             } => {
-                let category =
-                    grass::dev::list_repositories_with_change_status(&user_config, category);
-                let category = if let Some(repositories) = category {
-                    repositories
-                        .filter(|(_, status)| !matches!(status, RepositoryChangeStatus::UpToDate))
-                } else {
-                    eprintln!("Category or alias not found");
-                    return;
-                };
-                Self::handle_category(category, &format.clone().unwrap_or_default());
+                let repositories: Vec<_> = list_repositories_in_category(api, category)?;
+                repositories
+                    .into_iter()
+                    .with_change_status(api)
+                    .uncommitted_changes_only()
+                    .collect()
             }
             Self {
                 category: None,
                 all: true,
                 format,
             } => {
-                let result = grass::dev::list_all_repositories_with_change_status(&user_config)
+                let repositories: Vec<_> = list_all_repositories(api)?;
+                repositories
                     .into_iter()
-                    .map(|category| {
-                        let category = category.filter(|(_, status)| {
-                            !matches!(status, RepositoryChangeStatus::UpToDate)
-                        });
-                        Self::handle_category(category, &format.clone().unwrap_or_default())
-                    })
-                    .join(match format.clone().unwrap_or_default() {
-                        Format::Fancy => "\n\n",
-                        Format::Simple => "\n",
-                    });
-                print!("{}", result);
-                io::stdout().flush().expect("Unable to flush");
+                    .with_change_status(api)
+                    .uncommitted_changes_only()
+                    .collect()
             }
             Self {
                 category: Some(_),
                 all: true,
                 format: _,
-            } => eprintln!("Received incompatible category with all flag"),
+            } => return Err(CliError::new("Received incompatible category with all flag").into()),
             Self {
                 category: None,
                 all: false,
                 format: _,
-            } => eprintln!("Provide either a category, or the --all flag"),
-        }
+            } => return Err(CliError::new("Provide either a category, or the --all flag").into()),
+        };
+
+        repositories.sort();
+        eprintln!("{:?}", repositories);
+        Ok(())
     }
 }

@@ -46,7 +46,7 @@ pub type Result<T> = std::result::Result<T, GitStrategyError>;
 /// Describes the status of a repository.
 ///
 /// The status is related to whether or not there are changes.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum RepositoryChangeStatus {
     /// All changes have been committed.
     UpToDate,
