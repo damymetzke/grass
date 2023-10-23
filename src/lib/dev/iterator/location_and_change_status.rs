@@ -26,7 +26,7 @@ impl<'a, T: Iterator<Item = (RepositoryLocation, RepositoryChangeStatus)>> Itera
                 continue;
             };
 
-            Some(next);
+            return Some(next);
         }
         None
     }
