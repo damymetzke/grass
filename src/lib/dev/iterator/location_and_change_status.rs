@@ -1,3 +1,5 @@
+use tracing::trace;
+
 use crate::dev::{
     strategy::git::RepositoryChangeStatus,
     RepositoryLocation,
@@ -18,6 +20,7 @@ impl<'a, T: Iterator<Item = (RepositoryLocation, RepositoryChangeStatus)>> Itera
                 Some(next) => next,
                 None => break, // Iteration complete, break loop and return None
             };
+            trace!("Considering repository '{}';\nWith change status {}", next.0, next.1);
 
             if matches!(next.1, RepositoryChangeStatus::UpToDate) {
                 continue;

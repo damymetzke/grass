@@ -1,5 +1,6 @@
 use git2::{build::RepoBuilder, ErrorCode, Repository, Status};
 use itertools::Itertools;
+use tracing::trace;
 
 use crate::dev::strategy::path::{PathStrategy, PathStrategyError};
 
@@ -70,12 +71,19 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
     where
         U: Into<RepositoryLocation>,
     {
-        let repository_path = self.path_strategy.get_directory(repository)?;
+        let repository_location = repository.into();
+        let repository_path = self
+            .path_strategy
+            .get_directory(repository_location.clone())?;
 
         let repository = match Repository::open(repository_path) {
             Ok(repository) => Ok(repository),
             Err(error) => {
                 if error.code() == ErrorCode::NotFound {
+                    trace!(
+                        "Repository '{}' not found, assumed up to date",
+                        repository_location
+                    );
                     return Ok(RepositoryChangeStatus::UpToDate);
                 }
 
@@ -98,9 +106,15 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
             .collect();
 
         if changes.is_empty() {
+            trace!("Repository '{}' has no changes", repository_location);
             return Ok(RepositoryChangeStatus::UpToDate);
         }
 
+        trace!(
+            "Repository '{}' has ({}) changes",
+            repository_location,
+            changes.len()
+        );
         Ok(RepositoryChangeStatus::UncommittedChanges {
             num_changes: changes.len(),
         })

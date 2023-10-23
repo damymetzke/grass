@@ -1,5 +1,7 @@
 mod local;
 mod mock;
+use std::fmt::Display;
+
 use thiserror::Error;
 
 pub use local::LocalGitStrategy;
@@ -69,6 +71,17 @@ pub enum RepositoryChangeStatus {
     ///
     /// [^error]: [crate::dev::strategy::git::RepositoryChangeStatus::Error]
     Unknown,
+}
+
+impl Display for RepositoryChangeStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RepositoryChangeStatus::UpToDate => write!(f, "Up to date"),
+            RepositoryChangeStatus::NoRepository => write!(f, "Missing repository"),
+            RepositoryChangeStatus::UncommittedChanges { num_changes } => write!(f, "({}) Uncommitted changes", num_changes),
+            RepositoryChangeStatus::Unknown => write!(f, "Status unknown"),
+        }
+    }
 }
 
 /// Describes the status of a repository.
