@@ -47,11 +47,20 @@ pub enum GrassSubcommand {
 pub struct GrassCommand {
     #[command(subcommand)]
     command: GrassSubcommand,
+    #[arg(short='v', action=clap::ArgAction::Count)]
+    verbose: u8,
 }
 
 enum HandleExternalResult {
     CommandFound,
     CommandNotFound(String),
+}
+
+pub enum Verbosity {
+    Warn,
+    Info,
+    Debug,
+    Trace,
 }
 
 impl GrassCommand {
@@ -110,5 +119,14 @@ impl GrassCommand {
             }
         };
         Ok(())
+    }
+
+    pub fn get_verbosity(&self) -> Verbosity {
+        match self.verbose {
+            0 => Verbosity::Warn,
+            1 => Verbosity::Info,
+            2 => Verbosity::Debug,
+            _ => Verbosity::Trace,
+        }
     }
 }
