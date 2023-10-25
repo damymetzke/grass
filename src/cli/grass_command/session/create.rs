@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use clap::Parser;
 use grass::dev::{
-    config::{self, RootConfig},
     strategy::api::SupportsAll,
     Api,
 };

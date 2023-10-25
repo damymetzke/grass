@@ -12,7 +12,7 @@ use grass::dev::{
 };
 use itertools::Itertools;
 
-use crate::{error::CliError, more_itertools::MoreItertools};
+use crate::error::CliError;
 
 #[derive(ValueEnum, Debug, Clone, Default)]
 enum Format {
@@ -31,7 +31,7 @@ pub struct ChangesCommand {
 }
 
 impl ChangesCommand {
-    fn display_plain(&self, repositories: Box<[(RepositoryLocation, RepositoryChangeStatus)]>) {
+    fn display_plain(&self, repositories: &[(RepositoryLocation, RepositoryChangeStatus)]) {
         for (location, change_status) in repositories.iter() {
             let change_status = match change_status {
                 RepositoryChangeStatus::UpToDate => String::from("up_to_date"),
@@ -49,9 +49,9 @@ impl ChangesCommand {
         }
     }
 
-    fn display_pretty(&self, repositories: Box<[(RepositoryLocation, RepositoryChangeStatus)]>) {
+    fn display_pretty(&self, repositories: &[(RepositoryLocation, RepositoryChangeStatus)]) {
         let result = (&repositories
-            .into_iter()
+            .iter()
             .group_by(|(location, _)| &location.category))
             .into_iter()
             .map(|(category, repositories)| {
@@ -118,8 +118,8 @@ impl ChangesCommand {
         repositories.sort();
 
         match self.format {
-            Some(Format::Simple) => self.display_plain(repositories),
-            _ => self.display_pretty(repositories),
+            Some(Format::Simple) => self.display_plain(repositories.as_ref()),
+            _ => self.display_pretty(repositories.as_ref()),
         };
 
         Ok(())

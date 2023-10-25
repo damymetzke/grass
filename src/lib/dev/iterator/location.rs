@@ -24,12 +24,7 @@ impl<'a, T: Iterator<Item = RepositoryLocation>, U: SupportsGit + SupportsAlias>
     type Item = (RepositoryLocation, RepositoryChangeStatus);
 
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            let next = match self.source.next() {
-                Some(next) => next,
-                None => break, // Iteration complete, break loop and return None
-            };
-
+        for next in &mut self.source {
             let change_status = match get_repository_change_status(self.api, next.clone()) {
                 Ok(change_status) => change_status,
                 Err(error) => {
@@ -42,34 +37,6 @@ impl<'a, T: Iterator<Item = RepositoryLocation>, U: SupportsGit + SupportsAlias>
             };
 
             return Some((next, change_status));
-        }
-        None
-    }
-}
-
-pub struct UncommittedChangesOnlyIterator<'a, T> {
-    source: &'a mut T,
-}
-
-impl<
-        'a,
-        T: Iterator<Item = (RepositoryLocation, RepositoryChangeStatus)>,
-    > Iterator for UncommittedChangesOnlyIterator<'a, T>
-{
-    type Item = (RepositoryLocation, RepositoryChangeStatus);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            let next = match self.source.next() {
-                Some(next) => next,
-                None => break, // Iteration complete, break loop and return None
-            };
-
-            if matches!(next.1, RepositoryChangeStatus::UpToDate) {
-                continue
-            };
-
-            Some(next);
         }
         None
     }
