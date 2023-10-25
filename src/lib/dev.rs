@@ -6,14 +6,6 @@ pub mod repository;
 pub mod strategy;
 
 pub use public::{
-    repositories::{
-        get_repository, get_repository_path, list_all_repositories_with_change_status,
-        list_repositories_with_change_status,
-    },
-    types,
-};
-
-pub use public::{
     api::{Category, RepositoryLocation},
     changes::{
         get_repository_change_status,
