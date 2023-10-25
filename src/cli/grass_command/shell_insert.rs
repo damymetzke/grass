@@ -1,8 +1,11 @@
 use std::{env, process::Command as ProcessCommand, str};
 
+use anyhow::Result;
 use clap::{CommandFactory, Parser, ValueEnum};
 use clap_complete::{shells::Bash, Generator};
-use grass::dev::config;
+use grass::dev::{Api, strategy::api::SupportsAll};
+
+use crate::error::CliError;
 
 use super::GrassCommand;
 
@@ -17,10 +20,12 @@ pub struct ShellInsertCommand {
 }
 
 impl ShellInsertCommand {
-    pub fn handle(&self) {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
         match self.shell {
-            Shells::Bash => Self::handle_bash(),
+            Shells::Bash => Self::handle_bash(api)?,
         };
+
+        Ok(())
     }
 
     fn print_shell_complete<T: Generator>(generator: T) {
@@ -30,10 +35,9 @@ impl ShellInsertCommand {
         println!("{}", String::from_utf8(buf).unwrap_or_default());
     }
 
-    fn handle_bash() {
+    fn handle_bash<T: SupportsAll>(api: &Api<T>) -> Result<()> {
         Self::print_shell_complete(Bash);
 
-        let user_config = config::load_user_config().unwrap();
         println!(r#"gr() {{ cd "$(grass script path $@)"; }}"#);
         // Check for TMUX variable
         if env::var("TMUX").is_ok() {
@@ -45,14 +49,12 @@ impl ShellInsertCommand {
                 if let [repository, category] =
                     output.trim().split('@').collect::<Vec<_>>().as_slice()
                 {
-                    if let Some(Some(path)) =
-                        grass::dev::get_repository_path(&user_config.grass, category, repository)
-                            .map(|path| path.to_str().map(String::from))
-                    {
-                        println!("cd {}", path);
-                    };
+                    let path = grass::dev::get_repository_path_next(api, (*category, *repository))?;
+                    let path = path.to_str().ok_or(CliError::new("Could not convert repository path to str"))?;
+                    println!("cd {}", path);
                 };
             };
         };
+        Ok(())
     }
 }
