@@ -48,7 +48,7 @@ pub type Result<T> = std::result::Result<T, GitStrategyError>;
 /// Describes the status of a repository.
 ///
 /// The status is related to whether or not there are changes.
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Default)]
 pub enum RepositoryChangeStatus {
     /// All changes have been committed.
     UpToDate,
@@ -70,6 +70,7 @@ pub enum RepositoryChangeStatus {
     /// If the status is unknown due to an error, use `Error`[^error] instead.
     ///
     /// [^error]: [crate::dev::strategy::git::RepositoryChangeStatus::Error]
+    #[default]
     Unknown,
 }
 

@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use grass::dev::{
     iterator::{
+        iter::{IterExtensions, TakeUntilIteratorItem},
         location::LocationIterExtensions,
         location_and_change_status::LocationAndChangeStatusIterExtensions,
     },
@@ -54,17 +55,20 @@ impl ChangesCommand {
             .group_by(|(location, _)| &location.category))
             .into_iter()
             .map(|(category, repositories)| {
-                let repositories: Box<[_]> = repositories.sandwich_map(
-                    |(RepositoryLocation { repository, .. }, change_status)| {
-                        format!("\n├ {} {}", repository, change_status)
-                    },
-                    |(RepositoryLocation { repository, .. }, change_status)| {
-                        format!("\n├ {} {}", repository, change_status)
-                    },
-                    |(RepositoryLocation { repository, .. }, change_status)| {
-                        format!("\n└ {} {}", repository, change_status)
-                    },
-                ).collect();
+                let mut repositories = repositories.cloned();
+                let mut repositories =
+                    repositories
+                        .take_until(1)
+                        .map(|repository| match repository {
+                            TakeUntilIteratorItem::Start((
+                                RepositoryLocation { repository, .. },
+                                change_status,
+                            )) => format!("\n├─ {}: {}", repository, change_status),
+                            TakeUntilIteratorItem::End((
+                                RepositoryLocation { repository, .. },
+                                change_status,
+                            )) => format!("\n└─ {}: {}", repository, change_status),
+                        });
 
                 format!("┌── {}\n│{}\n", category, repositories.join(""))
             })
