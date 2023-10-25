@@ -26,6 +26,8 @@ pub enum DiscoveryStrategyError {
     FilesystemError { context: String, reason: String },
     #[error("There is a problem:\nContext: {context}\nReason: {reason}")]
     UnknownError { context: String, reason: String },
+    #[error("Repository already exists:\nContext: {context}\nReason: {reason}")]
+    RepositoryExists { context: Box<str>, reason: Box<str> },
 }
 
 /// Methods of [DiscoveryStrategy] return this alias
@@ -221,6 +223,8 @@ pub trait DiscoveryStrategy {
     fn list_categories<T>(&self) -> Result<T>
     where
         T: FromIterator<String>;
+
+    fn create_repository(&self, location: RepositoryLocation) -> Result<()>;
 }
 
 pub trait SupportsDiscovery {
@@ -238,6 +242,15 @@ impl From<AliasStrategyError> for DiscoveryStrategyError {
             AliasStrategyError::CategoryNotFound { context, reason } => {
                 DiscoveryStrategyError::CategoryNotFound { context, reason }
             }
+        }
+    }
+}
+
+impl From<std::io::Error> for DiscoveryStrategyError {
+    fn from(value: std::io::Error) -> Self {
+        Self::FilesystemError {
+            context: "".into(),
+            reason: value.to_string(),
         }
     }
 }

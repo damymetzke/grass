@@ -1,4 +1,5 @@
 mod clean;
+mod create;
 mod clone;
 
 use anyhow::Result;
@@ -9,6 +10,7 @@ use grass::dev::{strategy::api::SupportsAll, Api};
 pub enum RepoSubcommand {
     Clean(clean::CleanCommand),
     Clone(clone::CloneCommand),
+    Create(create::CreateCommand),
 }
 
 #[derive(Parser, Debug)]
@@ -25,6 +27,7 @@ impl RepoCommand {
         match &self.command {
             RepoSubcommand::Clean(command) => command.handle(api),
             RepoSubcommand::Clone(command) => command.handle(api),
+            RepoSubcommand::Create(command) => command.handle(api),
         }
     }
 }

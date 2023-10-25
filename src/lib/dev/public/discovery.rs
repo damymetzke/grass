@@ -131,3 +131,21 @@ where
 
     Ok(result)
 }
+
+pub fn create_repository<T, U>(
+    api: &Api<T>,
+    location: U,
+) -> Result<(), DiscoveryStrategyError>
+where
+    T: SupportsDiscovery + SupportsAlias,
+    U: Into<RepositoryLocation>,
+{
+    let api = api.get_strategy();
+    let alias = api.get_alias_strategy();
+    let discovery = api.get_discovery_strategy();
+
+    let location = alias.resolve_alias(location.into())?;
+    discovery.create_repository(location)?;
+
+    Ok(())
+}

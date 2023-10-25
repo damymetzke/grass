@@ -161,6 +161,24 @@ where
     {
         Ok(self.config.category.keys().cloned().collect())
     }
+
+    fn create_repository(&self, location: RepositoryLocation) -> Result<()> {
+        if matches!(
+            self.check_repository_exists(location.clone()),
+            Ok(DiscoveryExists::Exists)
+        ) {
+            return Err(DiscoveryStrategyError::RepositoryExists {
+                context: "Before creating a new repository".into(),
+                reason: "Repository already exists".into(),
+            });
+        }
+
+        let repository_directory = self.path_strategy.get_directory(location)?;
+
+        fs::create_dir_all(repository_directory)?;
+
+        Ok(())
+    }
 }
 
 impl From<PathStrategyError> for DiscoveryStrategyError {

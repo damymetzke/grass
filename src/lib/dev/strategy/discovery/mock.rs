@@ -81,4 +81,19 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
             .map(String::from)
             .collect())
     }
+
+    fn create_repository(&self, location: RepositoryLocation) -> Result<()> {
+        match (location.category.as_ref(), location.repository.as_ref()) {
+            ("all_good" | "with_changes" | "with_error", "first" | "second")
+            | ("all_good" | "with_changes", "third") => {
+                return Err(DiscoveryStrategyError::RepositoryExists {
+                    context: "When mocking".into(),
+                    reason: "Repository already exists".into(),
+                })
+            }
+            _ => (),
+        };
+
+        Ok(())
+    }
 }

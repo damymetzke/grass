@@ -15,7 +15,7 @@ pub use public::{
         list_repositories_with_uncommitted_changes_in_category, ChangeStatusResult,
     },
     discovery::{
-        list_all_repositories, list_categories, list_repositories_in_category,
+        create_repository, list_all_repositories, list_categories, list_repositories_in_category,
         list_repositories_in_category_with_errors, verify_repository_exists,
     },
     git::{clean_repository, clone_repository, clone_repository_default},
