@@ -23,10 +23,14 @@ impl AliasStrategy for NopAliasStrategy {
         [].into_iter().collect()
     }
 
-    fn resolve_alias<T>(&self, alias: T) -> Result<ResolveAliasResult>
+    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
     where
         T: AsRef<str>,
     {
         Ok(ResolveAliasResult::NoAlias(alias.as_ref().into()))
+    }
+
+    fn resolve_alias<T: super::ResolvesAlias>(&self, input: T) -> Result<T::Resolved> {
+        input.resolve_alias(|value| Ok(Box::from(value)))
     }
 }

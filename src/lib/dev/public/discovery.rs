@@ -22,7 +22,7 @@ where
     let category: Category = api
         .get_strategy()
         .get_alias_strategy()
-        .resolve_alias(category)?
+        .resolve_alias_old(category)?
         .into();
     let iterator = api
         .get_strategy()
@@ -49,7 +49,7 @@ where
     let category: Category = api
         .get_strategy()
         .get_alias_strategy()
-        .resolve_alias(category)?
+        .resolve_alias_old(category)?
         .into();
 
     Ok(api

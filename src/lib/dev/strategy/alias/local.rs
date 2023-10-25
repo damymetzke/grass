@@ -61,7 +61,7 @@ impl<'a> AliasStrategy for LocalAliasStrategy<'a> {
         Ok(result)
     }
 
-    fn resolve_alias<T>(&self, alias: T) -> Result<ResolveAliasResult>
+    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
     where
         T: AsRef<str>,
     {
@@ -74,6 +74,13 @@ impl<'a> AliasStrategy for LocalAliasStrategy<'a> {
         };
 
         Ok(result)
+    }
+
+    fn resolve_alias<T: super::ResolvesAlias>(&self, input: T) -> Result<T::Resolved> {
+        input.resolve_alias(|input| match self.config.aliases.get(input) {
+            Some(alias) => Ok(Box::from((*alias.as_ref()).borrow().name.as_ref())),
+            None => Ok(Box::from(input)),
+        })
     }
 }
 

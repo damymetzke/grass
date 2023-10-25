@@ -1,10 +1,12 @@
 mod local;
 mod mock;
 mod nop;
+mod resolves;
 
 pub use local::LocalAliasStrategy;
 pub use mock::MockAliasStrategy;
 pub use nop::NopAliasStrategy;
+pub use resolves::ResolvesAlias;
 use thiserror::Error;
 
 use crate::dev::{public::api::Category, RepositoryLocation};
@@ -124,7 +126,7 @@ pub trait AliasStrategy {
     /// #
     /// fn test_strategy<T: AliasStrategy>(strategy: &T) {
     ///     assert_eq!(
-    ///         strategy.resolve_alias("allg"),
+    ///         strategy.resolve_alias_old("allg"),
     ///         Ok(ResolveAliasResult::Alias(Alias {
     ///             alias: "allg".into(),
     ///             category: "all_good".into()
@@ -132,14 +134,15 @@ pub trait AliasStrategy {
     ///     );
     ///
     ///     assert_eq!(
-    ///         strategy.resolve_alias("mispel"),
+    ///         strategy.resolve_alias_old("mispel"),
     ///         Ok(ResolveAliasResult::NoAlias("mispel".into()),)
     ///     );
     /// }
     ///
     /// test_strategy(&strategy)
     /// ```
-    fn resolve_alias<T>(&self, alias: T) -> Result<ResolveAliasResult>
+    #[deprecated = "Use resolve_alias instead"]
+    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
     where
         T: AsRef<str>;
 
@@ -150,6 +153,7 @@ pub trait AliasStrategy {
     /// The repository will not be changed.
     ///
     /// [^resolve]: [crate::dev::strategy::alias::AliasStrategy::resolve_alias]
+    #[deprecated = "Use resolve_alias instead"]
     fn resolve_location_alias<T>(&self, location: T) -> Result<RepositoryLocation>
     where
         T: Into<RepositoryLocation>,
@@ -160,10 +164,41 @@ pub trait AliasStrategy {
         } = location.into();
 
         Ok(RepositoryLocation {
-            category: self.resolve_alias(category)?.into(),
+            category: self.resolve_alias_old(category)?.into(),
             repository,
         })
     }
+
+    /// Resolves the alias of a type
+    ///
+    /// The input must implement 'ResolvesAlias'[^resolve].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use grass::dev::strategy::alias::{
+    /// #     Alias, AliasStrategy, MockAliasStrategy, ResolveAliasResult,
+    /// # };
+    /// #
+    /// # let strategy = MockAliasStrategy;
+    /// #
+    /// fn test_strategy<T: AliasStrategy>(strategy: &T) {
+    ///     assert_eq!(
+    ///         strategy.resolve_alias("allg"),
+    ///         Ok(Box::from("all_good")),
+    ///     );
+    ///
+    ///     assert_eq!(
+    ///         strategy.resolve_alias("mispel"),
+    ///         Ok(Box::from("mispel")),
+    ///     );
+    /// }
+    ///
+    /// test_strategy(&strategy)
+    /// ```
+    ///
+    /// [^resolve]: [crate::dev::strategy::alias::ResolvesAlias]
+    fn resolve_alias<T: ResolvesAlias>(&self, input: T) -> Result<T::Resolved>;
 }
 
 pub trait SupportsAlias {

@@ -45,7 +45,7 @@ impl AliasStrategy for MockAliasStrategy {
         Ok(result.into_iter().map(Into::<Alias>::into).collect())
     }
 
-    fn resolve_alias<T>(&self, alias: T) -> super::Result<super::ResolveAliasResult>
+    fn resolve_alias_old<T>(&self, alias: T) -> super::Result<super::ResolveAliasResult>
     where
         T: AsRef<str>,
     {
@@ -57,5 +57,16 @@ impl AliasStrategy for MockAliasStrategy {
         };
 
         Ok(super::ResolveAliasResult::Alias(result.into()))
+    }
+
+    fn resolve_alias<T: super::ResolvesAlias>(&self, input: T) -> super::Result<T::Resolved> {
+        input.resolve_alias(|input| {
+            Ok(Box::from(match input {
+                "allg" => "all_good",
+                "with_changes" => "with_changes",
+                "with_error" => "with_error",
+                value => value,
+            }))
+        })
     }
 }

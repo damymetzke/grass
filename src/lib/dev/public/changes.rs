@@ -283,7 +283,7 @@ where
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
-    let category: Category = alias.resolve_alias(category.into())?.into();
+    let category: Category = alias.resolve_alias_old(category.into())?.into();
 
     let repositories = discovery.list_repositories_in_category::<Category>(category)?;
 
@@ -354,7 +354,7 @@ where
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
-    let category: Category = alias.resolve_alias(category.into())?.into();
+    let category: Category = alias.resolve_alias_old(category.into())?.into();
 
     let repositories = discovery.list_repositories_in_category::<Category>(category)?;
 
