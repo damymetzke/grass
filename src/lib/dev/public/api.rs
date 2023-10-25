@@ -50,6 +50,12 @@ impl From<&str> for Category {
     }
 }
 
+impl From<Box<str>> for Category {
+    fn from(value: Box<str>) -> Self {
+        Category(String::from(value))
+    }
+}
+
 impl From<Alias> for Category {
     fn from(value: Alias) -> Self {
         value.category

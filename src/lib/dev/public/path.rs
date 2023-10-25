@@ -62,7 +62,7 @@ pub fn get_repository_path<T: SupportsPath + SupportsAlias, U: Into<RepositoryLo
     let path = api.get_path_strategy();
     let alias = api.get_alias_strategy();
 
-    let result = path.get_directory(alias.resolve_location_alias(repository)?)?;
+    let result = path.get_directory(alias.resolve_alias(repository.into())?)?;
 
     Ok(result)
 }

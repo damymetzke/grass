@@ -1,6 +1,6 @@
 use crate::dev::config::GrassConfig;
 
-use super::{Alias, AliasStrategy, AliasStrategyError, ResolveAliasResult, Result};
+use super::{Alias, AliasStrategy, AliasStrategyError, Result};
 
 pub struct LocalAliasStrategy<'a> {
     config: &'a GrassConfig,
@@ -57,21 +57,6 @@ impl<'a> AliasStrategy for LocalAliasStrategy<'a> {
                 category: category.name.clone().into(),
             })
             .collect();
-
-        Ok(result)
-    }
-
-    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
-    where
-        T: AsRef<str>,
-    {
-        let result = match self.config.aliases.get(alias.as_ref()) {
-            Some(category) => ResolveAliasResult::Alias(Alias {
-                alias: alias.as_ref().into(),
-                category: category.borrow().name.clone().into(),
-            }),
-            None => ResolveAliasResult::NoAlias(alias.as_ref().into()),
-        };
 
         Ok(result)
     }

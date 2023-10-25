@@ -22,7 +22,7 @@ where
     let category: Category = api
         .get_strategy()
         .get_alias_strategy()
-        .resolve_alias_old(category)?
+        .resolve_alias(category.as_ref())?
         .into();
     let iterator = api
         .get_strategy()
@@ -49,7 +49,7 @@ where
     let category: Category = api
         .get_strategy()
         .get_alias_strategy()
-        .resolve_alias_old(category)?
+        .resolve_alias(category.as_ref())?
         .into();
 
     Ok(api
@@ -126,7 +126,7 @@ where
     let api = api.get_strategy();
     let result = api.get_discovery_strategy().check_repository_exists(
         api.get_alias_strategy()
-            .resolve_location_alias(repository)?,
+            .resolve_alias(repository.into())?,
     )?;
 
     Ok(result)

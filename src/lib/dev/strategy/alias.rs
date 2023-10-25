@@ -9,7 +9,7 @@ pub use nop::NopAliasStrategy;
 pub use resolves::ResolvesAlias;
 use thiserror::Error;
 
-use crate::dev::{public::api::Category, RepositoryLocation};
+use crate::dev::public::api::Category;
 
 /// Error returned by methods of `AliasStrategy`[^strategy].
 ///
@@ -110,64 +110,6 @@ pub trait AliasStrategy {
     where
         T: AsRef<str>,
         U: FromIterator<Alias>;
-
-    /// Returns the alias if it exists.
-    ///
-    /// This function is unaware of categories.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use grass::dev::strategy::alias::{
-    /// #     Alias, AliasStrategy, MockAliasStrategy, ResolveAliasResult,
-    /// # };
-    /// #
-    /// # let strategy = MockAliasStrategy;
-    /// #
-    /// fn test_strategy<T: AliasStrategy>(strategy: &T) {
-    ///     assert_eq!(
-    ///         strategy.resolve_alias_old("allg"),
-    ///         Ok(ResolveAliasResult::Alias(Alias {
-    ///             alias: "allg".into(),
-    ///             category: "all_good".into()
-    ///         })),
-    ///     );
-    ///
-    ///     assert_eq!(
-    ///         strategy.resolve_alias_old("mispel"),
-    ///         Ok(ResolveAliasResult::NoAlias("mispel".into()),)
-    ///     );
-    /// }
-    ///
-    /// test_strategy(&strategy)
-    /// ```
-    #[deprecated = "Use resolve_alias instead"]
-    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
-    where
-        T: AsRef<str>;
-
-    /// Resolve the alias in a RepositoryLocation
-    ///
-    /// Wraps `resolve_alias`[^resolve].
-    /// This will resolve the `category` part of the location.
-    /// The repository will not be changed.
-    ///
-    /// [^resolve]: [crate::dev::strategy::alias::AliasStrategy::resolve_alias]
-    #[deprecated = "Use resolve_alias instead"]
-    fn resolve_location_alias<T>(&self, location: T) -> Result<RepositoryLocation>
-    where
-        T: Into<RepositoryLocation>,
-    {
-        let RepositoryLocation {
-            category,
-            repository,
-        } = location.into();
-
-        Ok(RepositoryLocation {
-            category: self.resolve_alias_old(category)?.into(),
-            repository,
-        })
-    }
 
     /// Resolves the alias of a type
     ///

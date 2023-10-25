@@ -1,4 +1,4 @@
-use super::{Alias, AliasStrategy, AliasStrategyError, ResolveAliasResult};
+use super::{Alias, AliasStrategy, AliasStrategyError};
 
 /// Mocking implementation for `AliasStrategy`[^strategy].
 ///
@@ -43,20 +43,6 @@ impl AliasStrategy for MockAliasStrategy {
         };
 
         Ok(result.into_iter().map(Into::<Alias>::into).collect())
-    }
-
-    fn resolve_alias_old<T>(&self, alias: T) -> super::Result<super::ResolveAliasResult>
-    where
-        T: AsRef<str>,
-    {
-        let result = match alias.as_ref() {
-            "allg" => ("allg", "all_good"),
-            "with_changes" => ("change", "with_changes"),
-            "with_error" => ("err", "with_error"),
-            _ => return Ok(ResolveAliasResult::NoAlias(alias.as_ref().into())),
-        };
-
-        Ok(super::ResolveAliasResult::Alias(result.into()))
     }
 
     fn resolve_alias<T: super::ResolvesAlias>(&self, input: T) -> super::Result<T::Resolved> {

@@ -29,7 +29,7 @@ where
     api.get_strategy().get_git_strategy().clean(
         api.get_strategy()
             .get_alias_strategy()
-            .resolve_location_alias(repository)?,
+            .resolve_alias(repository.into())?,
     )
 }
 
@@ -64,8 +64,7 @@ where
 {
     let api = api.get_strategy();
     api.get_git_strategy().clone(
-        api.get_alias_strategy()
-            .resolve_location_alias(repository)?,
+        api.get_alias_strategy().resolve_alias(repository.into())?,
         remote,
     )
 }

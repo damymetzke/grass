@@ -1,4 +1,4 @@
-use super::{AliasStrategy, ResolveAliasResult, Result};
+use super::{AliasStrategy, Result};
 
 /// Implementation for `AliasStrategy`[^strategy], which does nothing.
 ///
@@ -21,13 +21,6 @@ impl AliasStrategy for NopAliasStrategy {
         U: FromIterator<super::Alias>,
     {
         [].into_iter().collect()
-    }
-
-    fn resolve_alias_old<T>(&self, alias: T) -> Result<ResolveAliasResult>
-    where
-        T: AsRef<str>,
-    {
-        Ok(ResolveAliasResult::NoAlias(alias.as_ref().into()))
     }
 
     fn resolve_alias<T: super::ResolvesAlias>(&self, input: T) -> Result<T::Resolved> {

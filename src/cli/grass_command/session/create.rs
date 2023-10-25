@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use clap::Parser;
-use grass::dev::{strategy::api::SupportsAll, Api};
+use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 
 use std::process::Command as ProcessCommand;
 
@@ -22,9 +22,9 @@ impl CreateCommand {
         U: AsRef<str>,
         V: AsRef<str>,
     {
-        let repository_location = grass::dev::resolve_repository_alias_from_location(
+        let repository_location = grass::dev::resolve_repository_alias(
             api,
-            (category.as_ref(), repository.as_ref()),
+            RepositoryLocation::from((category.as_ref(), repository.as_ref())),
         )?;
 
         let mut child = if let Ok(child) = ProcessCommand::new("tmux")

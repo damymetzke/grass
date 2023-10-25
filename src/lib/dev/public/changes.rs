@@ -58,7 +58,7 @@ where
 
     api.get_git_strategy().get_changes(
         api.get_alias_strategy()
-            .resolve_location_alias(repository)?,
+            .resolve_alias(repository.into())?,
     )
 }
 
@@ -283,7 +283,7 @@ where
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
-    let category: Category = alias.resolve_alias_old(category.into())?.into();
+    let category: Category = alias.resolve_alias(category.into().as_ref())?.into();
 
     let repositories = discovery.list_repositories_in_category::<Category>(category)?;
 
@@ -354,7 +354,7 @@ where
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
-    let category: Category = alias.resolve_alias_old(category.into())?.into();
+    let category: Category = alias.resolve_alias(category.into().as_ref())?.into();
 
     let repositories = discovery.list_repositories_in_category::<Category>(category)?;
 
