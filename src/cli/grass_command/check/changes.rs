@@ -58,7 +58,7 @@ impl ChangesCommand {
                 let mut repositories = repositories.cloned();
                 let mut repositories =
                     repositories
-                        .take_until(1)
+                        .mark_end(1)
                         .map(|repository| match repository {
                             TakeUntilIteratorItem::Start((
                                 RepositoryLocation { repository, .. },
