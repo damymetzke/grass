@@ -1,5 +1,8 @@
 use crate::dev::strategy::{
-    discovery::LocalDiscoveryStrategy, git::LocalGitStrategy, path::LocalPathStrategy, alias::{LocalAliasStrategy, SupportsAlias},
+    alias::{LocalAliasStrategy, SupportsAlias},
+    discovery::LocalDiscoveryStrategy,
+    git::LocalGitStrategy,
+    path::LocalPathStrategy,
 };
 
 use super::{SupportsDiscovery, SupportsGit, SupportsPath};

@@ -340,7 +340,10 @@ where
 ///
 /// test_api(&api)
 /// ```
-pub fn list_repositories_with_uncommitted_changes_in_category<T, U, V>(api: &Api<T>, category: U) -> Result<V, GrassError>
+pub fn list_repositories_with_uncommitted_changes_in_category<T, U, V>(
+    api: &Api<T>,
+    category: U,
+) -> Result<V, GrassError>
 where
     T: SupportsGit + SupportsAlias + SupportsDiscovery,
     U: Into<Category>,

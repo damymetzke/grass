@@ -2,8 +2,8 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use grass::dev::{strategy::api::SupportsAll, Api};
 
-mod list;
 mod explain;
+mod list;
 
 #[derive(Debug, Subcommand, Clone)]
 pub enum ConfigSubcommand {

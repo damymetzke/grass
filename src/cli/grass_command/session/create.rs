@@ -1,9 +1,6 @@
 use anyhow::{Context, Result};
 use clap::Parser;
-use grass::dev::{
-    strategy::api::SupportsAll,
-    Api,
-};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 use std::process::Command as ProcessCommand;
 

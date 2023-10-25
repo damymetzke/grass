@@ -57,18 +57,16 @@ impl ChangesCommand {
             .map(|(category, repositories)| {
                 let mut repositories = repositories.cloned();
                 let mut repositories =
-                    repositories
-                        .mark_end(1)
-                        .map(|repository| match repository {
-                            TakeUntilIteratorItem::Start((
-                                RepositoryLocation { repository, .. },
-                                change_status,
-                            )) => format!("\n├─ {}: {}", repository, change_status),
-                            TakeUntilIteratorItem::End((
-                                RepositoryLocation { repository, .. },
-                                change_status,
-                            )) => format!("\n└─ {}: {}", repository, change_status),
-                        });
+                    repositories.mark_end(1).map(|repository| match repository {
+                        TakeUntilIteratorItem::Start((
+                            RepositoryLocation { repository, .. },
+                            change_status,
+                        )) => format!("\n├─ {}: {}", repository, change_status),
+                        TakeUntilIteratorItem::End((
+                            RepositoryLocation { repository, .. },
+                            change_status,
+                        )) => format!("\n└─ {}: {}", repository, change_status),
+                    });
 
                 format!("┌── {}\n│{}\n", category, repositories.join(""))
             })

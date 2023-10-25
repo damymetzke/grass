@@ -79,7 +79,9 @@ impl Display for RepositoryChangeStatus {
         match self {
             RepositoryChangeStatus::UpToDate => write!(f, "Up to date"),
             RepositoryChangeStatus::NoRepository => write!(f, "Missing repository"),
-            RepositoryChangeStatus::UncommittedChanges { num_changes } => write!(f, "({}) Uncommitted changes", num_changes),
+            RepositoryChangeStatus::UncommittedChanges { num_changes } => {
+                write!(f, "({}) Uncommitted changes", num_changes)
+            }
             RepositoryChangeStatus::Unknown => write!(f, "Status unknown"),
         }
     }

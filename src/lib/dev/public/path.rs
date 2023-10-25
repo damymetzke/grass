@@ -44,7 +44,7 @@ pub enum PathOrAliasError {
 /// # };
 /// # use std::path::PathBuf;
 /// # let api = Api::from(MockApiStrategy::default());
-/// # 
+/// #
 /// fn test_public<T: SupportsPath + SupportsAlias>(api: &Api<T>) {
 ///     assert_eq!(
 ///         dev::get_repository_path_next(api, ("all_good", "first")).unwrap(),

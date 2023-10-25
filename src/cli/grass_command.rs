@@ -1,4 +1,5 @@
 mod check;
+mod config;
 #[cfg(debug_assertions)]
 mod debug;
 mod ls;
@@ -6,7 +7,6 @@ mod repo;
 mod script;
 mod session;
 mod shell_insert;
-mod config;
 
 use std::process::Command;
 

@@ -4,11 +4,11 @@ use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Debug, Clone, ValueEnum)]
 enum ConfigKey {
-    #[value(name="base_dir")]
+    #[value(name = "base_dir")]
     Basedir,
-    #[value(name="category.*")]
+    #[value(name = "category.*")]
     CategoryKey,
-    #[value(name="category.*.alias")]
+    #[value(name = "category.*.alias")]
     CategoryKeyAlias,
 }
 

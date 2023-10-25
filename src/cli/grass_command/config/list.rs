@@ -20,4 +20,3 @@ impl ListCommand {
         Ok(())
     }
 }
-

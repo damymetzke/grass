@@ -2,7 +2,6 @@ use std::iter::repeat_with;
 
 use tracing::error;
 
-
 pub struct MarkEndIterator<'a, T: Iterator> {
     source: &'a mut T,
     result: Vec<Option<T::Item>>,
@@ -50,7 +49,7 @@ impl<'a, T: Iterator<Item = U>, U: Clone> Iterator for MarkEndIterator<'a, T> {
                     }
                     let length = self.result.len();
                     self.result[length - 1] = Some(next);
-                },
+                }
                 None => {
                     error!("TakeUntilIterator called with size 0");
                     break;
@@ -69,7 +68,7 @@ impl<T: Iterator<Item = U> + Sized, U: Default> IterExtensions for T {
     fn mark_end(&mut self, n: usize) -> MarkEndIterator<T> {
         MarkEndIterator {
             source: self,
-            result: Vec::from_iter(repeat_with(Default::default).take(n))
+            result: Vec::from_iter(repeat_with(Default::default).take(n)),
         }
     }
 }

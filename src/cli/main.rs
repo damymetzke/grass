@@ -13,8 +13,10 @@ use std::{
 use clap::Parser;
 use grass::dev::use_local_strategy_with_default_config;
 use grass_command::GrassCommand;
-use tracing::{info, error};
-use tracing_subscriber::{filter, Layer, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
+use tracing::{error, info};
+use tracing_subscriber::{
+    filter, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt, Layer,
+};
 
 use crate::grass_command::Verbosity;
 
@@ -23,7 +25,11 @@ fn setup_logging(output_level: filter::LevelFilter) -> Option<()> {
 
     fs::create_dir_all(&logging_directory).ok()?;
 
-    let file = OpenOptions::new().create(true).append(true).open(logging_directory.join("log")).ok()?;
+    let file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(logging_directory.join("log"))
+        .ok()?;
 
     let file_layer = tracing_subscriber::fmt::layer()
         .with_writer(file)
@@ -35,7 +41,10 @@ fn setup_logging(output_level: filter::LevelFilter) -> Option<()> {
         .with_filter(output_level);
 
     // TODO: Handle this more gracefully
-    tracing_subscriber::registry().with(file_layer).with(stderr_layer).init();
+    tracing_subscriber::registry()
+        .with(file_layer)
+        .with(stderr_layer)
+        .init();
     Some(())
 }
 
@@ -51,7 +60,6 @@ fn main() {
     setup_logging(level);
 
     info!("GRAss CLI started");
-
 
     match use_local_strategy_with_default_config(|api| {
         Ok(grass_command.handle(&api, &external_command::get_external_commands()))

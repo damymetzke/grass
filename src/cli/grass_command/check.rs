@@ -2,7 +2,7 @@ mod changes;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use grass::dev::{Api, strategy::api::SupportsAll};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 #[derive(Debug, Subcommand)]
 enum CheckSubCommand {
