@@ -1,0 +1,56 @@
+name: Feature request
+description: Request a feature
+title: "[Feat]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for considering contributing to grass!
+        There are some considerations you should make before suggesting a feature.
+        I'm a single developer developing this for fun.
+        As a result, I will only add features that interest me personally.
+        You're always welcome to make whatever suggestion you want.
+        But if you'd like the biggest chance of it being integrated, consider the following:
+
+        - Consider if a feature integrates clearly into the current project and vision.
+           If a feature is a natural fit, then it's more likely I'll implement it.
+        - For as long as a feature fits the vision of a project, then implementing it yourself is more likely to be accepted.
+
+        ## Features are for the CLI
+        
+        The way grass is developed is through the CLI.
+        While there is an independent library, its features are implemented in order to support the CLI.
+        As such, I don't accept features unique to the library.
+        You're free to make your own extensions though, as I've made sure that the library is extensible.
+  - type: textarea
+    attributes:
+      label: Value to the user
+      description: Describe what benefits the user will get from this feature
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+       label: Are you willing to implement this feature yourself?
+       description: Implementing it yourself will yield a higher chance of it being accepted.
+       options:
+         - I will not be implementing this myself.
+         - I'm willing to implement this feature, but I require help to get it done.
+         - I'm willing to implement this feature, I only need a confirmation that the feature is desired.
+    valiations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Explain your feature
+      description: |
+        Explain your feature in depth.
+        This includes the specific behavior you'd suggest implementing.
+        As well as considerations and alternative solutions you've considered.
+      placeholder: |
+        My feature would work like such...
+
+        I have considered implementing it this way...
+
+        This feature is similar to this other feature...
+    validations:
+      required: true
