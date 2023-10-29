@@ -3,7 +3,11 @@ use clap::{Parser, ValueEnum};
 use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 use itertools::Itertools;
 
-use crate::{error::CliError, output::generate_fancy_vertical_list};
+use crate::{
+    cli_result::{CliOutput, CliResult},
+    error::CliError,
+    output::generate_fancy_vertical_list,
+};
 
 #[derive(ValueEnum, Debug, Clone, Default)]
 enum Format {
@@ -34,23 +38,31 @@ impl LsCommand {
         category: String,
         repositories: Vec<RepositoryLocation>,
         format: &Format,
-    ) -> String {
+    ) -> CliOutput {
         match format {
-            Format::Fancy => generate_fancy_vertical_list(
-                format!("Repos for category '{}'", category),
-                repositories.iter().map(|repository| &repository.repository),
+            Format::Fancy => CliOutput::Stderr(
+                generate_fancy_vertical_list(
+                    format!("Repos for category '{}'", category),
+                    repositories.iter().map(|repository| &repository.repository),
+                )
+                .into(),
             ),
-            Format::Simple => repositories
-                .iter()
-                .map(|repository| format!("{}/{}", &repository.category, &repository.repository))
-                .join(" "),
+            Format::Simple => CliOutput::Stdout(
+                repositories
+                    .iter()
+                    .map(|repository| {
+                        format!("{}/{}", &repository.category, &repository.repository)
+                    })
+                    .join(" ")
+                    .into(),
+            ),
         }
     }
 
     fn generate_output_all_repositories<T: Iterator<Item = RepositoryLocation>>(
         format: &Format,
         categories: T,
-    ) -> String {
+    ) -> CliOutput {
         let mut previous_category = String::new();
         let mut result = String::new();
 
@@ -96,20 +108,25 @@ impl LsCommand {
             result += additional.as_str();
         }
 
-        result
+        match format {
+            Format::Fancy => CliOutput::Stderr(result.into()),
+            Format::Simple => CliOutput::Stdout(result.into()),
+        }
     }
 
-    fn generate_output_category_name_only<'a, T>(categories: T, format: &Format) -> String
+    fn generate_output_category_name_only<'a, T>(categories: T, format: &Format) -> CliOutput
     where
         T: IntoIterator<Item = &'a String>,
     {
         match format {
-            Format::Fancy => generate_fancy_vertical_list("Categories", categories),
-            Format::Simple => categories.into_iter().join(" "),
+            Format::Fancy => {
+                CliOutput::Stderr(generate_fancy_vertical_list("Categories", categories).into())
+            }
+            Format::Simple => CliOutput::Stdout(categories.into_iter().join(" ").into()),
         }
     }
 
-    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> Result<()> {
+    pub fn handle<T: SupportsAll>(&self, api: &Api<T>) -> CliResult {
         let output = match self {
             LsCommand {
                 category: None,
@@ -145,7 +162,6 @@ impl LsCommand {
             }
         };
 
-        println!("{}", output);
-        Ok(())
+        Ok(output.append_newline())
     }
 }

@@ -15,7 +15,7 @@ use clap::{Parser, Subcommand};
 use colored::Colorize;
 use grass::dev::{strategy::api::SupportsAll, Api};
 
-use crate::external_command::ExternalCommand;
+use crate::{external_command::ExternalCommand, cli_result::{CliOutput, CliResult}};
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
@@ -84,21 +84,21 @@ impl GrassCommand {
         HandleExternalResult::CommandFound
     }
 
-    pub fn handle<T>(&self, api: &Api<T>, external_commands: &[ExternalCommand]) -> Result<()>
+    pub fn handle<T>(&self, api: &Api<T>, external_commands: &[ExternalCommand]) -> CliResult
     where
         T: SupportsAll,
     {
-        match &self.command {
-            GrassSubcommand::Check(command) => command.handle(api)?,
+        Ok(match &self.command {
+            GrassSubcommand::Check(command) => {command.handle(api)?; CliOutput::None},
             GrassSubcommand::Ls(command) => command.handle(api)?,
-            GrassSubcommand::Repo(command) => command.handle(api)?,
-            GrassSubcommand::Script(command) => command.handle(api)?,
-            GrassSubcommand::ShellInsert(command) => command.handle(api)?,
-            GrassSubcommand::Session(command) => command.handle(api)?,
-            GrassSubcommand::Cs(command) => command.handle(api)?,
-            GrassSubcommand::Config(command) => command.handle(api)?,
+            GrassSubcommand::Repo(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Script(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::ShellInsert(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Session(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Cs(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Config(command) => {command.handle(api)?; CliOutput::None},
             #[cfg(debug_assertions)]
-            GrassSubcommand::Debug(command) => command.handle(),
+            GrassSubcommand::Debug(command) => {command.handle(); CliOutput::None},
             GrassSubcommand::External(parts) => {
                 let result = Self::handle_external(parts, external_commands);
                 if let HandleExternalResult::CommandNotFound(cmd) = result {
@@ -115,10 +115,10 @@ impl GrassCommand {
                     );
                     eprintln!();
                     eprintln!("For more information, try '{}'.", "--help".bold());
-                }
+                };
+                CliOutput::None
             }
-        };
-        Ok(())
+        })
     }
 
     pub fn get_verbosity(&self) -> Verbosity {
