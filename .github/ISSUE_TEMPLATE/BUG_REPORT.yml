@@ -7,21 +7,24 @@ body:
     attributes:
       label: Expected behavior
       description: What behavior would you expect if the code was working correctly?
+    validation:
       required: true
   - type: textarea
     attributes:
       label: Observed behavior
       description: What behavior do you observe in the program?
+    validation:
       required: true
   - type: textarea
     attributes:
       label: Steps to reproduce
       description: What steps can someone take to reproduce the issue?
-      required: true
       placeholder: |
         1. Step 1...
         2. Step 2...
         3. Step 3...
+    validation:
+      required: true
   - type: input
     attributes:
       label: Reproduce repository
@@ -36,13 +39,19 @@ body:
       label: Rust toolchain
       description: To display the current active toolchain, run `rustup show active-toolchain`.
       placeholder: "stable-x86_64-unknown-linux-gnu"
+    validation:
+      required: true
   - type: input
     attributes:
       label: Rustc version
       description: To display the current rustc version, run `rustc --version`.
       placeholder: "rustc 1.73.0 (cc66ad468 2023-10-03)"
+    validation:
+      required: true
   - type: input
     attributes:
       label: Cargo version
       description: To display the current cargo version, run `cargo --version`.
       placeholder: "cargo 1.73.0 (9c4383fb5 2023-08-26)"
+    validation:
+      required: true
