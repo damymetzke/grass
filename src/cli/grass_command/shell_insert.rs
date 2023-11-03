@@ -3,7 +3,7 @@ use std::{env, process::Command as ProcessCommand, str};
 use anyhow::Result;
 use clap::{CommandFactory, Parser, ValueEnum};
 use clap_complete::{shells::Bash, Generator};
-use grass::dev::{Api, strategy::api::SupportsAll};
+use grass::dev::{strategy::api::SupportsAll, Api};
 
 use crate::error::CliError;
 
@@ -50,10 +50,21 @@ impl ShellInsertCommand {
                     output.trim().split('@').collect::<Vec<_>>().as_slice()
                 {
                     let path = grass::dev::get_repository_path_next(api, (*category, *repository))?;
-                    let path = path.to_str().ok_or(CliError::new("Could not convert repository path to str"))?;
+                    let path = path
+                        .to_str()
+                        .ok_or(CliError::new("Could not convert repository path to str"))?;
                     println!("cd {}", path);
                 };
             };
+        } else if let Ok(session_name) = env::var("ZELLIJ_SESSION_NAME") {
+            println!("{}", session_name);
+            if let [repository, category] = session_name.split('@').collect::<Box<[_]>>().as_ref() {
+                let path = grass::dev::get_repository_path_next(api, (*category, *repository))?;
+                let path = path
+                    .to_str()
+                    .ok_or(CliError::new("Could not convert repository path to str"))?;
+                println!("cd {}", path);
+            }
         };
         Ok(())
     }
