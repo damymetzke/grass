@@ -1,22 +1,50 @@
 use anyhow::{Context, Result};
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 
-use std::process::Command as ProcessCommand;
+use std::{
+    io::Write,
+    process::{Child, Command as ProcessCommand},
+};
 
 use crate::{
     error::CliError,
     facades::dialoguer::{select_category_and_repository, select_selectable},
 };
 
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum Multiplexer {
+    #[default]
+    Tmux,
+    Zellij,
+}
+
 #[derive(Parser, Debug)]
 pub struct CreateCommand {
     category: Option<String>,
     repository: Option<String>,
+    #[clap(short)]
+    target: Option<Multiplexer>,
+}
+
+fn session_command_tmux(name: &str) -> Result<Child, CliError> {
+    ProcessCommand::new("tmux")
+        .args(["new-session", "-d", "-s", name])
+        .spawn()
+        .map_err(|_| CliError::new("Could not start tmux session!"))
+}
+
+fn session_command_zellij(_name: &str) -> Result<Child, CliError> {
+    Err(CliError::not_supported("Currently it is not possible to create sessions in Zellij, workaround may come at some point"))
 }
 
 impl CreateCommand {
-    fn create_session<T, U, V>(api: &Api<T>, category: U, repository: V) -> Result<()>
+    fn create_session<T, U, V>(
+        api: &Api<T>,
+        category: U,
+        repository: V,
+        target: Multiplexer,
+    ) -> Result<()>
     where
         T: SupportsAll,
         U: AsRef<str>,
@@ -27,19 +55,14 @@ impl CreateCommand {
             RepositoryLocation::from((category.as_ref(), repository.as_ref())),
         )?;
 
-        let mut child = if let Ok(child) = ProcessCommand::new("tmux")
-            .args([
-                "new-session",
-                "-d",
-                "-s",
-                &repository_location.to_session_string(),
-            ])
-            .spawn()
-        {
-            child
-        } else {
-            return Err(CliError::new("Could not start tmux session!").into());
-        };
+        let mut child = match target {
+            Multiplexer::Tmux => {
+                session_command_tmux(repository_location.to_session_string().as_str())
+            }
+            Multiplexer::Zellij => {
+                session_command_zellij(repository_location.to_session_string().as_str())
+            }
+        }?;
 
         match child.wait() {
             Ok(status) => {
@@ -57,7 +80,11 @@ impl CreateCommand {
         Ok(())
     }
 
-    fn select_repository<T: SupportsAll>(api: &Api<T>, category: &String) -> Result<()> {
+    fn select_repository<T: SupportsAll>(
+        api: &Api<T>,
+        category: &String,
+        target: Multiplexer,
+    ) -> Result<()> {
         let repositories: Vec<_> = grass::dev::list_repositories_in_category(api, category)?;
         let repositories: Vec<_> = repositories
             .into_iter()
@@ -66,16 +93,16 @@ impl CreateCommand {
 
         let repository = select_selectable(&repositories).unwrap();
 
-        Self::create_session(api, category, repository)?;
+        Self::create_session(api, category, repository, target)?;
         Ok(())
     }
 
-    fn select_category<T: SupportsAll>(api: &Api<T>) -> Result<()> {
+    fn select_category<T: SupportsAll>(api: &Api<T>, target: Multiplexer) -> Result<()> {
         let categories: Vec<_> = grass::dev::list_all_repositories(api)?;
 
         let repository = select_category_and_repository(categories.as_slice())
             .context("When running the command 'grass session create'")?;
-        Self::create_session(api, &repository.category, &repository.repository)?;
+        Self::create_session(api, &repository.category, &repository.repository, target)?;
         Ok(())
     }
 
@@ -84,12 +111,21 @@ impl CreateCommand {
             CreateCommand {
                 category: Some(category),
                 repository: Some(repository),
-            } => Self::create_session(api, category, repository)?,
+                target,
+            } => Self::create_session(
+                api,
+                category,
+                repository,
+                target.clone().unwrap_or_default(),
+            )?,
             CreateCommand {
                 category: Some(category),
                 repository: None,
-            } => Self::select_repository(api, category)?,
-            _ => Self::select_category(api)?,
+                target,
+            } => Self::select_repository(api, category, target.clone().unwrap_or_default())?,
+            CreateCommand { target, .. } => {
+                Self::select_category(api, target.clone().unwrap_or_default())?
+            }
         };
         Ok(())
     }
