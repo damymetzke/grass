@@ -56,10 +56,8 @@ where
 {
     let api = api.get_strategy();
 
-    api.get_git_strategy().get_changes(
-        api.get_alias_strategy()
-            .resolve_alias(repository.into())?,
-    )
+    api.get_git_strategy()
+        .get_changes(api.get_alias_strategy().resolve_alias(repository.into())?)
 }
 
 fn location_result_to_change_status_result<T: GitStrategy>(

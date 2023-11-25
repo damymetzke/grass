@@ -19,7 +19,7 @@ use tracing_subscriber::{
     filter, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt, Layer,
 };
 
-use crate::{grass_command::Verbosity, cli_result::CliOutput};
+use crate::{cli_result::CliOutput, grass_command::Verbosity};
 
 fn setup_logging(output_level: filter::LevelFilter) -> Option<()> {
     let logging_directory = dirs::data_dir().map(|data_dir| data_dir.join("grass").join("logs"))?;
@@ -67,12 +67,10 @@ fn main() {
     }) {
         Err(error) => error!("Something went wrong!\n{}", error),
         Ok(Err(error)) => error!("Something went wrong!\n{}", error),
-        Ok(Ok(output)) => {
-                match output {
-                    CliOutput::None => (),
-                    CliOutput::Stdout(content) => print!("{}", content),
-                    CliOutput::Stderr(content) => eprint!("{}", content),
-                }
-            }
+        Ok(Ok(output)) => match output {
+            CliOutput::None => (),
+            CliOutput::Stdout(content) => print!("{}", content),
+            CliOutput::Stderr(content) => eprint!("{}", content),
+        },
     };
 }

@@ -79,7 +79,6 @@ impl ResolvesAlias for &str {
     }
 }
 
-
 impl ResolvesAlias for RepositoryLocation {
     type Resolved = RepositoryLocation;
 

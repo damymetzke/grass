@@ -124,18 +124,14 @@ where
     U: Into<RepositoryLocation>,
 {
     let api = api.get_strategy();
-    let result = api.get_discovery_strategy().check_repository_exists(
-        api.get_alias_strategy()
-            .resolve_alias(repository.into())?,
-    )?;
+    let result = api
+        .get_discovery_strategy()
+        .check_repository_exists(api.get_alias_strategy().resolve_alias(repository.into())?)?;
 
     Ok(result)
 }
 
-pub fn create_repository<T, U>(
-    api: &Api<T>,
-    location: U,
-) -> Result<(), DiscoveryStrategyError>
+pub fn create_repository<T, U>(api: &Api<T>, location: U) -> Result<(), DiscoveryStrategyError>
 where
     T: SupportsDiscovery + SupportsAlias,
     U: Into<RepositoryLocation>,

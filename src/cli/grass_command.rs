@@ -15,7 +15,10 @@ use clap::{Parser, Subcommand};
 use colored::Colorize;
 use grass::dev::{strategy::api::SupportsAll, Api};
 
-use crate::{external_command::ExternalCommand, cli_result::{CliOutput, CliResult}};
+use crate::{
+    cli_result::{CliOutput, CliResult},
+    external_command::ExternalCommand,
+};
 
 #[derive(Debug, Subcommand)]
 pub enum GrassSubcommand {
@@ -89,16 +92,40 @@ impl GrassCommand {
         T: SupportsAll,
     {
         Ok(match &self.command {
-            GrassSubcommand::Check(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Check(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
             GrassSubcommand::Ls(command) => command.handle(api)?,
-            GrassSubcommand::Repo(command) => {command.handle(api)?; CliOutput::None},
-            GrassSubcommand::Script(command) => {command.handle(api)?; CliOutput::None},
-            GrassSubcommand::ShellInsert(command) => {command.handle(api)?; CliOutput::None},
-            GrassSubcommand::Session(command) => {command.handle(api)?; CliOutput::None},
-            GrassSubcommand::Cs(command) => {command.handle(api)?; CliOutput::None},
-            GrassSubcommand::Config(command) => {command.handle(api)?; CliOutput::None},
+            GrassSubcommand::Repo(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
+            GrassSubcommand::Script(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
+            GrassSubcommand::ShellInsert(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
+            GrassSubcommand::Session(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
+            GrassSubcommand::Cs(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
+            GrassSubcommand::Config(command) => {
+                command.handle(api)?;
+                CliOutput::None
+            }
             #[cfg(debug_assertions)]
-            GrassSubcommand::Debug(command) => {command.handle(); CliOutput::None},
+            GrassSubcommand::Debug(command) => {
+                command.handle();
+                CliOutput::None
+            }
             GrassSubcommand::External(parts) => {
                 let result = Self::handle_external(parts, external_commands);
                 if let HandleExternalResult::CommandNotFound(cmd) = result {
