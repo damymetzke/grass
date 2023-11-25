@@ -28,7 +28,7 @@ impl RepositoryLocation {
 
 impl Display for RepositoryLocation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}@{}", self.category, self.repository)
+        write!(f, "{}@{}", self.repository, self.category)
     }
 }
 
