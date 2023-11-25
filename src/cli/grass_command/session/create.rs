@@ -2,10 +2,7 @@ use anyhow::{Context, Result};
 use clap::{Parser, ValueEnum};
 use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 
-use std::{
-    io::Write,
-    process::{Child, Command as ProcessCommand},
-};
+use std::process::{Child, Command as ProcessCommand};
 
 use crate::{
     error::CliError,

@@ -10,7 +10,6 @@ mod shell_insert;
 
 use std::process::Command;
 
-use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use grass::dev::{strategy::api::SupportsAll, Api};

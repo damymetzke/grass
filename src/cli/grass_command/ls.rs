@@ -1,4 +1,3 @@
-use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use grass::dev::{strategy::api::SupportsAll, Api, RepositoryLocation};
 use itertools::Itertools;
