@@ -97,8 +97,15 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
         Ok(())
     }
 
-    fn move_repository(&self, old_location: RepositoryLocation, new_location: RepositoryLocation) -> Result<()> {
-        match (old_location.category.as_ref(), old_location.repository.as_ref()) {
+    fn move_repository(
+        &self,
+        old_location: RepositoryLocation,
+        new_location: RepositoryLocation,
+    ) -> Result<()> {
+        match (
+            old_location.category.as_ref(),
+            old_location.repository.as_ref(),
+        ) {
             ("all_good" | "with_changes" | "with_error", "first" | "second")
             | ("all_good" | "with_changes", "third") => (),
             _ => {
@@ -106,10 +113,13 @@ impl DiscoveryStrategy for MockDiscoveryStrategy {
                     context: "When mocking".into(),
                     reason: "Repository already exists".into(),
                 })
-            },
+            }
         };
 
-        match (new_location.category.as_ref(), new_location.repository.as_ref()) {
+        match (
+            new_location.category.as_ref(),
+            new_location.repository.as_ref(),
+        ) {
             ("all_good" | "with_changes" | "with_error", "first" | "second")
             | ("all_good" | "with_changes", "third") => {
                 return Err(DiscoveryStrategyError::RepositoryExists {

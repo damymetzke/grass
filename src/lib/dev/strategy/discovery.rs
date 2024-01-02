@@ -3,7 +3,7 @@ mod mock;
 
 use thiserror::Error;
 
-use crate::dev::public::api::RepositoryLocation;
+use crate::{dev::public::api::RepositoryLocation, support_strategy};
 
 pub use local::LocalDiscoveryStrategy;
 pub use mock::MockDiscoveryStrategy;
@@ -228,14 +228,14 @@ pub trait DiscoveryStrategy {
 
     fn create_repository(&self, location: RepositoryLocation) -> Result<()>;
 
-    fn move_repository(&self, old_location: RepositoryLocation, new_location: RepositoryLocation) -> Result<()>;
+    fn move_repository(
+        &self,
+        old_location: RepositoryLocation,
+        new_location: RepositoryLocation,
+    ) -> Result<()>;
 }
 
-pub trait SupportsDiscovery {
-    type Discovery: DiscoveryStrategy;
-
-    fn get_discovery_strategy(&self) -> &Self::Discovery;
-}
+support_strategy!(SupportsDiscovery, get_discovery_strategy, DiscoveryStrategy);
 
 impl From<AliasStrategyError> for DiscoveryStrategyError {
     fn from(value: AliasStrategyError) -> Self {

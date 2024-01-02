@@ -7,7 +7,10 @@ use thiserror::Error;
 pub use local::LocalGitStrategy;
 pub use mock::MockGitStrategy;
 
-use crate::dev::{error::GrassError, public::api::RepositoryLocation};
+use crate::{
+    dev::{error::GrassError, public::api::RepositoryLocation},
+    support_strategy,
+};
 
 use super::alias::AliasStrategyError;
 
@@ -249,19 +252,7 @@ pub trait GitStrategy {
         T: Into<RepositoryLocation>;
 }
 
-/// Implement to support actions requiring the `GitStrategy`[^strategy].
-///
-/// # See
-///
-/// - [crate::dev::strategy]
-/// - [crate::dev::Api]
-///
-/// [^strategy]: [crate::dev::strategy::git::GitStrategy]
-pub trait SupportsGit {
-    type Git: GitStrategy;
-
-    fn get_git_strategy(&self) -> &Self::Git;
-}
+support_strategy!(SupportsGit, get_git_strategy, GitStrategy);
 
 impl GitStrategyError {
     pub fn with_message<T>(self, message: T) -> Self

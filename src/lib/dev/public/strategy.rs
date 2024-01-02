@@ -45,21 +45,21 @@ impl<T> AccessApi<T> for Api<T> {
 
 #[macro_export]
 macro_rules! support_strategy {
-    ($trait_name:ident, $type_name:ident, $method_name:ident, $strategy_type:ident) => {
+    ($trait_name:ident, $method_name:ident, $strategy_type:ident) => {
         pub trait $trait_name {
-            type $type_name: $strategy_type;
+            type Strategy: $strategy_type;
 
-            fn $method_name(&self) -> &Self::$type_name;
+            fn $method_name(&self) -> &Self::Strategy;
         }
 
         impl<T> $trait_name for $crate::dev::public::strategy::Api<T>
         where
             T: $trait_name,
         {
-            type $type_name = T::$type_name;
+            type Strategy = T::Strategy;
 
-            fn $method_name(&self) -> &Self::$type_name {
-                self.get_strategy().$method_name()
+            fn $method_name(&self) -> &Self::Strategy {
+                $crate::dev::public::strategy::AccessApi::get_strategy(self).$method_name()
             }
         }
     };

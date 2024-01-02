@@ -22,33 +22,33 @@ impl MockApiStrategy {
 }
 
 impl SupportsAlias for MockApiStrategy {
-    type Alias = MockAliasStrategy;
+    type Strategy = MockAliasStrategy;
 
-    fn get_alias_strategy(&self) -> &Self::Alias {
+    fn get_alias_strategy(&self) -> &Self::Strategy {
         &self.alias_strategy
     }
 }
 
 impl SupportsDiscovery for MockApiStrategy {
-    type Discovery = MockDiscoveryStrategy;
+    type Strategy = MockDiscoveryStrategy;
 
-    fn get_discovery_strategy(&self) -> &Self::Discovery {
+    fn get_discovery_strategy(&self) -> &Self::Strategy {
         &self.discovery_strategy
     }
 }
 
 impl SupportsGit for MockApiStrategy {
-    type Git = MockGitStrategy;
+    type Strategy = MockGitStrategy;
 
-    fn get_git_strategy(&self) -> &Self::Git {
+    fn get_git_strategy(&self) -> &Self::Strategy {
         &self.git_strategy
     }
 }
 
 impl SupportsPath for MockApiStrategy {
-    type Path = MockPathStrategy;
+    type Strategy = MockPathStrategy;
 
-    fn get_path_strategy(&self) -> &Self::Path {
+    fn get_path_strategy(&self) -> &Self::Strategy {
         &self.path_strategy
     }
 }

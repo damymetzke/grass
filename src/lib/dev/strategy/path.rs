@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use thiserror::Error;
 
-use crate::dev::RepositoryLocation;
+use crate::{dev::RepositoryLocation, support_strategy};
 
 pub use local::LocalPathStrategy;
 pub use mock::MockPathStrategy;
@@ -96,8 +96,4 @@ pub trait PathStrategy {
         T: Into<RepositoryLocation>;
 }
 
-pub trait SupportsPath {
-    type Path: PathStrategy;
-
-    fn get_path_strategy(&self) -> &Self::Path;
-}
+support_strategy!(SupportsPath, get_path_strategy, PathStrategy);

@@ -9,7 +9,7 @@ pub use nop::NopAliasStrategy;
 pub use resolves::ResolvesAlias;
 use thiserror::Error;
 
-use crate::{dev::public::{api::Category, strategy::AccessApi}, support_strategy};
+use crate::{dev::public::api::Category, support_strategy};
 
 /// Error returned by methods of `AliasStrategy`[^strategy].
 ///
@@ -143,7 +143,7 @@ pub trait AliasStrategy {
     fn resolve_alias<T: ResolvesAlias>(&self, input: T) -> Result<T::Resolved>;
 }
 
-support_strategy!(SupportsAlias, Alias, get_alias_strategy, AliasStrategy);
+support_strategy!(SupportsAlias, get_alias_strategy, AliasStrategy);
 
 impl<T: Into<String>, U: Into<Category>> From<(T, U)> for Alias {
     fn from(value: (T, U)) -> Self {

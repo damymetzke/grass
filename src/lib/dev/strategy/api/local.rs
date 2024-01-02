@@ -31,33 +31,33 @@ impl<'a> LocalApiStrategy<'a> {
 }
 
 impl<'a> SupportsDiscovery for LocalApiStrategy<'a> {
-    type Discovery = LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>;
+    type Strategy = LocalDiscoveryStrategy<'a, LocalPathStrategy<'a>>;
 
-    fn get_discovery_strategy(&self) -> &Self::Discovery {
+    fn get_discovery_strategy(&self) -> &Self::Strategy {
         self.discovery_strategy
     }
 }
 
 impl<'a> SupportsGit for LocalApiStrategy<'a> {
-    type Git = LocalGitStrategy<'a, LocalPathStrategy<'a>>;
+    type Strategy = LocalGitStrategy<'a, LocalPathStrategy<'a>>;
 
-    fn get_git_strategy(&self) -> &Self::Git {
+    fn get_git_strategy(&self) -> &Self::Strategy {
         self.git_strategy
     }
 }
 
 impl<'a> SupportsPath for LocalApiStrategy<'a> {
-    type Path = LocalPathStrategy<'a>;
+    type Strategy = LocalPathStrategy<'a>;
 
-    fn get_path_strategy(&self) -> &Self::Path {
+    fn get_path_strategy(&self) -> &Self::Strategy {
         self.path_strategy
     }
 }
 
 impl<'a> SupportsAlias for LocalApiStrategy<'a> {
-    type Alias = LocalAliasStrategy<'a>;
+    type Strategy = LocalAliasStrategy<'a>;
 
-    fn get_alias_strategy(&self) -> &Self::Alias {
+    fn get_alias_strategy(&self) -> &Self::Strategy {
         self.alias_strategy
     }
 }
