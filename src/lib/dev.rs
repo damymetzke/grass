@@ -16,7 +16,7 @@ pub use public::{
     },
     discovery::{
         create_repository, list_all_repositories, list_categories, list_repositories_in_category,
-        list_repositories_in_category_with_errors, verify_repository_exists,
+        list_repositories_in_category_with_errors, move_repository, verify_repository_exists,
     },
     git::{clean_repository, clone_repository, clone_repository_default},
     path::get_repository_path as get_repository_path_next,

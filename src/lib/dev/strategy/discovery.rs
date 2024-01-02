@@ -28,6 +28,8 @@ pub enum DiscoveryStrategyError {
     UnknownError { context: String, reason: String },
     #[error("Repository already exists:\nContext: {context}\nReason: {reason}")]
     RepositoryExists { context: Box<str>, reason: Box<str> },
+    #[error("Repository does not exist:\nContext: {context}\nReason: {reason}")]
+    RepositoryDoesNotExist { context: Box<str>, reason: Box<str> },
 }
 
 /// Methods of [DiscoveryStrategy] return this alias
@@ -225,6 +227,8 @@ pub trait DiscoveryStrategy {
         T: FromIterator<String>;
 
     fn create_repository(&self, location: RepositoryLocation) -> Result<()>;
+
+    fn move_repository(&self, old_location: RepositoryLocation, new_location: RepositoryLocation) -> Result<()>;
 }
 
 pub trait SupportsDiscovery {

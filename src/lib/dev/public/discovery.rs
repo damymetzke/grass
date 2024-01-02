@@ -145,3 +145,24 @@ where
 
     Ok(())
 }
+
+pub fn move_repository<T, U, V>(
+    api: &Api<T>,
+    old_location: U,
+    new_location: V,
+) -> Result<(), DiscoveryStrategyError>
+where
+    T: SupportsDiscovery + SupportsAlias,
+    U: Into<RepositoryLocation>,
+    V: Into<RepositoryLocation>,
+{
+    let api = api.get_strategy();
+    let alias = api.get_alias_strategy();
+    let discovery = api.get_discovery_strategy();
+
+    let old_location = alias.resolve_alias(old_location.into())?;
+    let new_location = alias.resolve_alias(new_location.into())?;
+    discovery.move_repository(old_location, new_location)?;
+
+    Ok(())
+}

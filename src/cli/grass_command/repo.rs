@@ -1,6 +1,7 @@
 mod clean;
 mod clone;
 mod create;
+mod rename;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -11,6 +12,7 @@ pub enum RepoSubcommand {
     Clean(clean::CleanCommand),
     Clone(clone::CloneCommand),
     Create(create::CreateCommand),
+    Rename(rename::RenameCommand),
 }
 
 #[derive(Parser, Debug)]
@@ -28,6 +30,7 @@ impl RepoCommand {
             RepoSubcommand::Clean(command) => command.handle(api),
             RepoSubcommand::Clone(command) => command.handle(api),
             RepoSubcommand::Create(command) => command.handle(api),
+            RepoSubcommand::Rename(command) => command.handle(api),
         }
     }
 }

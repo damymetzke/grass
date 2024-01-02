@@ -179,6 +179,39 @@ where
 
         Ok(())
     }
+
+    fn move_repository(
+        &self,
+        old_location: RepositoryLocation,
+        new_location: RepositoryLocation,
+    ) -> Result<()> {
+        if !matches!(
+            self.check_repository_exists(old_location.clone()),
+            Ok(DiscoveryExists::Exists)
+        ) {
+            return Err(DiscoveryStrategyError::RepositoryDoesNotExist {
+                context: "Before moving a repository".into(),
+                reason: "Old repository does not exists".into(),
+            });
+        }
+
+        if matches!(
+            self.check_repository_exists(new_location.clone()),
+            Ok(DiscoveryExists::Exists)
+        ) {
+            return Err(DiscoveryStrategyError::RepositoryExists {
+                context: "Before moving a repository".into(),
+                reason: "New repository already exists".into(),
+            });
+        }
+
+        let old_repository_directory = self.path_strategy.get_directory(old_location)?;
+        let new_repository_directory = self.path_strategy.get_directory(new_location)?;
+
+        fs::rename(old_repository_directory, new_repository_directory)?;
+
+        Ok(())
+    }
 }
 
 impl From<PathStrategyError> for DiscoveryStrategyError {
