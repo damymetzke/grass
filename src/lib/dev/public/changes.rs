@@ -11,8 +11,6 @@ use crate::dev::{
     Api, Category, RepositoryLocation,
 };
 
-use super::strategy::AccessApi;
-
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct ChangeStatusResult {
     pub location: Option<RepositoryLocation>,
@@ -54,8 +52,6 @@ where
     T: SupportsGit + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    let api = api.get_strategy();
-
     api.get_git_strategy()
         .get_changes(api.get_alias_strategy().resolve_alias(repository.into())?)
 }
@@ -141,7 +137,6 @@ where
     T: SupportsGit + SupportsDiscovery,
     U: FromIterator<ChangeStatusResult>,
 {
-    let api = api.get_strategy();
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
@@ -208,7 +203,6 @@ where
     T: SupportsGit + SupportsDiscovery,
     U: FromIterator<ChangeStatusResult>,
 {
-    let api = api.get_strategy();
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
 
@@ -276,7 +270,6 @@ where
     U: Into<Category>,
     V: FromIterator<ChangeStatusResult>,
 {
-    let api = api.get_strategy();
     let alias = api.get_alias_strategy();
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();
@@ -347,7 +340,6 @@ where
     U: Into<Category>,
     V: FromIterator<ChangeStatusResult>,
 {
-    let api = api.get_strategy();
     let alias = api.get_alias_strategy();
     let git = api.get_git_strategy();
     let discovery = api.get_discovery_strategy();

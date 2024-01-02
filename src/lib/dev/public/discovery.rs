@@ -8,8 +8,6 @@ use crate::dev::{
     Api, Category, RepositoryLocation,
 };
 
-use super::strategy::AccessApi;
-
 pub fn list_repositories_in_category<T, U, V>(
     api: &Api<T>,
     category: U,
@@ -20,12 +18,10 @@ where
     V: FromIterator<RepositoryLocation>,
 {
     let category: Category = api
-        .get_strategy()
         .get_alias_strategy()
         .resolve_alias(category.as_ref())?
         .into();
     let iterator = api
-        .get_strategy()
         .get_discovery_strategy()
         .list_repositories_in_category(category)?;
 
@@ -47,13 +43,11 @@ where
     V: FromIterator<Result<RepositoryLocation, DiscoveryStrategyError>>,
 {
     let category: Category = api
-        .get_strategy()
         .get_alias_strategy()
         .resolve_alias(category.as_ref())?
         .into();
 
     Ok(api
-        .get_strategy()
         .get_discovery_strategy()
         .list_repositories_in_category(category)?
         .collect())
@@ -80,9 +74,7 @@ where
 pub fn list_categories<T: SupportsDiscovery, U: FromIterator<String>>(
     api: &Api<T>,
 ) -> Result<U, DiscoveryStrategyError> {
-    api.get_strategy()
-        .get_discovery_strategy()
-        .list_categories()
+    api.get_discovery_strategy().list_categories()
 }
 
 /// Returns whether or not a repository exists
@@ -123,7 +115,6 @@ where
     T: SupportsDiscovery + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    let api = api.get_strategy();
     let result = api
         .get_discovery_strategy()
         .check_repository_exists(api.get_alias_strategy().resolve_alias(repository.into())?)?;
@@ -136,7 +127,6 @@ where
     T: SupportsDiscovery + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    let api = api.get_strategy();
     let alias = api.get_alias_strategy();
     let discovery = api.get_discovery_strategy();
 
@@ -157,7 +147,6 @@ where
     V: Into<RepositoryLocation>,
 {
     let alias = api.get_alias_strategy();
-    let api = api.get_strategy();
     let discovery = api.get_discovery_strategy();
 
     let old_location = alias.resolve_alias(old_location.into())?;

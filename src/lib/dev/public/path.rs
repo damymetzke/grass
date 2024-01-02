@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 use crate::dev::{
-    public::strategy::AccessApi,
     strategy::{
         alias::{AliasStrategy, AliasStrategyError, SupportsAlias},
         path::{PathStrategy, PathStrategyError, SupportsPath},
@@ -58,7 +57,6 @@ pub fn get_repository_path<T: SupportsPath + SupportsAlias, U: Into<RepositoryLo
     api: &Api<T>,
     repository: U,
 ) -> Result<PathBuf, PathOrAliasError> {
-    let api = api.get_strategy();
     let path = api.get_path_strategy();
     let alias = api.get_alias_strategy();
 

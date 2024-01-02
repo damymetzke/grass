@@ -3,8 +3,6 @@ use crate::dev::{
     Api,
 };
 
-use super::strategy::AccessApi;
-
 pub fn resolve_repository_alias<T, U>(
     api: &Api<T>,
     value: U,
@@ -13,5 +11,5 @@ where
     T: SupportsAlias,
     U: ResolvesAlias,
 {
-    api.get_strategy().get_alias_strategy().resolve_alias(value)
+    api.get_alias_strategy().resolve_alias(value)
 }

@@ -6,7 +6,7 @@ use crate::dev::{
     },
 };
 
-use super::{api::RepositoryLocation, strategy::AccessApi};
+use super::api::RepositoryLocation;
 
 /// Clean a git repository, by removing untracked and ignored files
 ///
@@ -26,11 +26,8 @@ where
     T: SupportsGit + SupportsAlias,
     U: Into<RepositoryLocation>,
 {
-    api.get_strategy().get_git_strategy().clean(
-        api.get_strategy()
-            .get_alias_strategy()
-            .resolve_alias(repository.into())?,
-    )
+    api.get_git_strategy()
+        .clean(api.get_alias_strategy().resolve_alias(repository.into())?)
 }
 
 /// Clone a git repository from a remote.
@@ -62,7 +59,6 @@ where
     U: Into<RepositoryLocation>,
     V: AsRef<str>,
 {
-    let api = api.get_strategy();
     api.get_git_strategy().clone(
         api.get_alias_strategy().resolve_alias(repository.into())?,
         remote,
