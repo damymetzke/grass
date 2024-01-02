@@ -43,6 +43,28 @@ impl<T> AccessApi<T> for Api<T> {
     }
 }
 
+#[macro_export]
+macro_rules! support_strategy {
+    ($trait_name:ident, $type_name:ident, $method_name:ident, $strategy_type:ident) => {
+        pub trait $trait_name {
+            type $type_name: $strategy_type;
+
+            fn $method_name(&self) -> &Self::$type_name;
+        }
+
+        impl<T> $trait_name for $crate::dev::public::strategy::Api<T>
+        where
+            T: $trait_name,
+        {
+            type $type_name = T::$type_name;
+
+            fn $method_name(&self) -> &Self::$type_name {
+                self.get_strategy().$method_name()
+            }
+        }
+    };
+}
+
 #[derive(Error, Debug)]
 pub enum LocalStrategyError {
     #[error("Could not load user configuration\nReason: {reason}")]

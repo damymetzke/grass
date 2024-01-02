@@ -156,8 +156,8 @@ where
     U: Into<RepositoryLocation>,
     V: Into<RepositoryLocation>,
 {
-    let api = api.get_strategy();
     let alias = api.get_alias_strategy();
+    let api = api.get_strategy();
     let discovery = api.get_discovery_strategy();
 
     let old_location = alias.resolve_alias(old_location.into())?;
