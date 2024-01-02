@@ -32,7 +32,7 @@ impl<'a, T: Iterator<Item = U>, U: Clone> Iterator for MarkEndIterator<'a, T> {
                 break;
             };
 
-            let value = self.result.get(0).map(|value| (*value).clone());
+            let value = self.result.first().map(|value| (*value).clone());
             match value {
                 Some(Some(value)) => {
                     for i in 0..self.result.len() - 1 {
