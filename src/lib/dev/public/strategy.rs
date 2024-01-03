@@ -52,13 +52,11 @@ macro_rules! support_strategy {
             fn $method_name(&self) -> &Self::Strategy;
         }
 
-        impl<T> $trait_name for $crate::dev::public::strategy::Api<T>
+        impl<T> $crate::dev::public::strategy::Api<T>
         where
             T: $trait_name,
         {
-            type Strategy = T::Strategy;
-
-            fn $method_name(&self) -> &Self::Strategy {
+            pub(crate) fn $method_name(&self) -> &T::Strategy {
                 $crate::dev::public::strategy::AccessApi::get_strategy(self).$method_name()
             }
         }
