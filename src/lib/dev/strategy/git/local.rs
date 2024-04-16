@@ -1,10 +1,41 @@
-use git2::{build::RepoBuilder, ErrorCode, Repository, Status};
-use itertools::Itertools;
-use tracing::trace;
+use std::{fs, process::Command};
 
 use crate::dev::strategy::path::{PathStrategy, PathStrategyError};
 
 use super::{GitStrategy, GitStrategyError, RepositoryChangeStatus, RepositoryLocation, Result};
+
+// I may be using this later, but for now allow it to exist
+#[allow(dead_code)]
+#[derive(Debug)]
+enum GitInternalChangeRepresentation<'a> {
+    Untracked {
+        path: &'a str,
+    },
+    Ignored {
+        path: &'a str,
+    },
+    Ordinary {
+        status: &'a str,
+        sub_module: &'a str,
+        file_mode_head: &'a str,
+        file_mode_index: &'a str,
+        file_mode_worktree: &'a str,
+        object_name_head: &'a str,
+        object_name_index: &'a str,
+        path: &'a str,
+    },
+    Moved {
+        status: &'a str,
+        sub_module: &'a str,
+        file_mode_head: &'a str,
+        file_mode_index: &'a str,
+        file_mode_worktree: &'a str,
+        object_name_head: &'a str,
+        object_name_index: &'a str,
+        score: &'a str,
+        path: &'a str,
+    },
+}
 
 pub struct LocalGitStrategy<'a, T: PathStrategy> {
     path_strategy: &'a T,
@@ -17,42 +48,13 @@ impl<'a, T: PathStrategy> LocalGitStrategy<'a, T> {
 }
 
 impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
-    fn clean<U>(&self, repository: U) -> Result<()>
+    fn clean<U>(&self, _repository: U) -> Result<()>
     where
         U: Into<RepositoryLocation>,
     {
-        let repository_path = self.path_strategy.get_directory(repository)?;
-
-        let repository = Repository::open(&repository_path)?;
-
-        let statuses = repository.statuses(None)?;
-
-        let results: Vec<_> = statuses
-            .iter()
-            .filter_map(|entry| match entry.path() {
-                Some(file_path) if entry.status().is_ignored() => Some(file_path.to_owned()),
-                _ => None,
-            })
-            .map(|file| {
-                let path = repository_path.join(file);
-                if path.is_dir() {
-                    std::fs::remove_dir_all(path)
-                } else {
-                    std::fs::remove_file(path)
-                }
-            })
-            .filter_map(std::result::Result::err)
-            .map(|error| error.to_string())
-            .collect();
-
-        match results.len() {
-            0 => Ok(()),
-            _ => Err(GitStrategyError::FileSystemError {
-                message: "Something went wrong when trying to clean a repository".into(),
-                reason: results.iter().map(ToString::to_string).join("\n"),
-                reasons: results,
-            }),
-        }
+        // TODO: This should be implemented later, I want to rethink cleaning first.
+        // TODO: See <https://github.com/damymetzke/grass/issues/7>.
+        Ok(())
     }
 
     fn clone<U, V>(&self, repository: U, remote: V) -> Result<()>
@@ -60,9 +62,35 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
         U: Into<RepositoryLocation>,
         V: AsRef<str>,
     {
-        let repo_path = self.path_strategy.get_directory(repository)?;
+        let repository: RepositoryLocation = repository.into();
+        let repo_path = self.path_strategy.get_directory(repository.clone())?;
 
-        RepoBuilder::new().clone(remote.as_ref(), &repo_path)?;
+        fs::create_dir_all(&repo_path).map_err(|error| GitStrategyError::FileSystemError {
+            message: String::from("Cannot create directory to clone into"),
+            reason: error.to_string(),
+            reasons: vec![],
+        })?;
+
+        let repo_path = repo_path.to_str().ok_or(GitStrategyError::UnknownError {
+            message: String::from("Cannot resolve path"),
+            reason: String::from("String conversion failed"),
+        })?;
+
+        let output = Command::new("git")
+            .args(["-C", repo_path, "clone", remote.as_ref(), "."])
+            .output()
+            .map_err(|error| GitStrategyError::RemoteFetchError {
+                message: String::from("Could not clone repository"),
+                reason: error.to_string(),
+            })?;
+
+        if !matches!(output.status.code(), Some(0)) {
+            return Err(GitStrategyError::RemoteFetchError {
+                message: String::from("Error when running git clone"),
+                reason: String::from_utf8(output.stderr)
+                    .unwrap_or(String::from("stderr is not valid utf8")),
+            });
+        }
 
         Ok(())
     }
@@ -76,47 +104,59 @@ impl<'a, T: PathStrategy> GitStrategy for LocalGitStrategy<'a, T> {
             .path_strategy
             .get_directory(repository_location.clone())?;
 
-        let repository = match Repository::open(repository_path) {
-            Ok(repository) => Ok(repository),
-            Err(error) => {
-                if error.code() == ErrorCode::NotFound {
-                    trace!(
-                        "Repository '{}' not found, assumed up to date",
-                        repository_location
-                    );
-                    return Ok(RepositoryChangeStatus::UpToDate);
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(repository_path)
+            .arg("status")
+            .arg("--porcelain=v2")
+            .output()
+            .map_err(|error| GitStrategyError::RemoteFetchError {
+                message: String::from("Could not clone repository"),
+                reason: error.to_string(),
+            })?;
+
+        let output =
+            String::from_utf8(output.stdout).map_err(|_| GitStrategyError::UnknownError {
+                message: String::from("Cannot parse git output"),
+                reason: String::from("Output is not valid utf8"),
+            })?;
+
+        let output: Box<_> = output.split('\n').filter_map(|line| {
+            if line.chars().all(|char| char.is_whitespace()) {
+                return None;
+            };
+
+            if let Some(path) = line.strip_prefix("? ") {
+                return Some(GitInternalChangeRepresentation::Untracked { path });
+            };
+
+            if let Some(path) = line.strip_prefix("! ") {
+                return Some(GitInternalChangeRepresentation::Ignored { path });
+            };
+
+            if let Some(content) = line.strip_prefix("1 ") {
+                let parts: Box<_> = content.splitn(8, ' ').collect();
+                if let[status, sub_module, file_mode_head, file_mode_index, file_mode_worktree, object_name_head, object_name_index, path] = parts.as_ref() {
+                    return Some(GitInternalChangeRepresentation::Ordinary { status, sub_module, file_mode_head, file_mode_index, file_mode_worktree, object_name_head, object_name_index, path })
                 }
+            };
 
-                Err(error)
-            }
-        };
+            if let Some(content) = line.strip_prefix("2 ") {
+                let parts: Box<_> = content.splitn(9, ' ').collect();
+                if let[status, sub_module, file_mode_head, file_mode_index, file_mode_worktree, object_name_head, object_name_index, score, path] = parts.as_ref() {
+                    return Some(GitInternalChangeRepresentation::Moved { status, sub_module, file_mode_head, file_mode_index, file_mode_worktree, object_name_head, object_name_index, score, path })
+                }
+            };
 
-        let repository = repository.map_err(|error| {
-            GitStrategyError::from(error).with_message("There was a problem opening the repository")
-        })?;
+            None
+        }).filter(|change| !matches!(change, GitInternalChangeRepresentation::Ignored{..})).collect();
 
-        let statuses = repository.statuses(None).map_err(|error| {
-            GitStrategyError::from(error)
-                .with_message("There was a problem retrieving the repository status")
-        })?;
-
-        let changes: Vec<_> = statuses
-            .iter()
-            .filter(|status| status.status().contains(Status::IGNORED))
-            .collect();
-
-        if changes.is_empty() {
-            trace!("Repository '{}' has no changes", repository_location);
+        if output.is_empty() {
             return Ok(RepositoryChangeStatus::UpToDate);
         }
 
-        trace!(
-            "Repository '{}' has ({}) changes",
-            repository_location,
-            changes.len()
-        );
         Ok(RepositoryChangeStatus::UncommittedChanges {
-            num_changes: changes.len(),
+            num_changes: output.len(),
         })
     }
 }
@@ -139,61 +179,6 @@ impl From<PathStrategyError> for GitStrategyError {
             }
             PathStrategyError::Unknown { context, reason } => GitStrategyError::UnknownError {
                 message: context,
-                reason,
-            },
-        }
-    }
-}
-
-impl From<git2::Error> for GitStrategyError {
-    fn from(value: git2::Error) -> Self {
-        let reason = value.message().to_string();
-        match value.code() {
-            git2::ErrorCode::NotFound => GitStrategyError::RepositoryNotFound {
-                message: "There was a problem running an unspecified git2 command".into(),
-                reason,
-            },
-
-            git2::ErrorCode::Exists => GitStrategyError::RepositryExists {
-                message: "There was a problem running an unspecified git2 command".into(),
-                reason,
-            },
-
-            git2::ErrorCode::Ambiguous
-            | git2::ErrorCode::BufSize
-            | git2::ErrorCode::User
-            | git2::ErrorCode::BareRepo
-            | git2::ErrorCode::UnbornBranch
-            | git2::ErrorCode::Unmerged
-            | git2::ErrorCode::NotFastForward
-            | git2::ErrorCode::InvalidSpec
-            | git2::ErrorCode::Conflict
-            | git2::ErrorCode::Locked
-            | git2::ErrorCode::Modified
-            | git2::ErrorCode::Applied
-            | git2::ErrorCode::Peel
-            | git2::ErrorCode::Eof
-            | git2::ErrorCode::Invalid
-            | git2::ErrorCode::Uncommitted
-            | git2::ErrorCode::Directory
-            | git2::ErrorCode::MergeConflict
-            | git2::ErrorCode::HashsumMismatch
-            | git2::ErrorCode::IndexDirty
-            | git2::ErrorCode::ApplyFail
-            | git2::ErrorCode::Owner => GitStrategyError::RepositoryError {
-                message: "There was a problem running an unspecified git2 command".into(),
-                reason,
-            },
-
-            git2::ErrorCode::Auth | git2::ErrorCode::Certificate => {
-                GitStrategyError::RemoteAuthenticationError {
-                    message: "There was a problem running an unspecified git2 command".into(),
-                    reason,
-                }
-            }
-
-            _ => GitStrategyError::UnknownError {
-                message: "There was a problem running an unspecified git2 command".into(),
                 reason,
             },
         }
