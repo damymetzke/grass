@@ -36,7 +36,7 @@ cli = ["dep:clap", "dep:colored", "dep:dialoguer", "dep:tracing-subscriber"]
 default = ["cli", "dev"]
 
 [dependencies]
-itertools = "0.12.0"
+itertools = "0.13.0"
 serde = { version = "1.0.152", features = ["derive"] }
 dirs = "5.0.0"
 toml = "0.8.2"

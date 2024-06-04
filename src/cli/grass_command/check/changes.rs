@@ -52,7 +52,7 @@ impl ChangesCommand {
     fn display_pretty(&self, repositories: &[(RepositoryLocation, RepositoryChangeStatus)]) {
         let result = (&repositories
             .iter()
-            .group_by(|(location, _)| &location.category))
+            .chunk_by(|(location, _)| &location.category))
             .into_iter()
             .map(|(category, repositories)| {
                 let mut repositories = repositories.cloned();
