@@ -36,26 +36,22 @@ cli = ["dep:clap", "dep:colored", "dep:dialoguer", "dep:tracing-subscriber"]
 default = ["cli", "dev"]
 
 [dependencies]
-itertools = "0.13.0"
-serde = { version = "1.0.152", features = ["derive"] }
-dirs = "5.0.0"
-toml = "0.8.2"
-clap_complete = "4.2.1"
-thiserror = "1.0.40"
 anyhow = "1.0.71"
+clap.features = ["derive"]
+clap.optional = true
+clap.version = "4.1.8"
+clap_complete = "4.2.1"
+colored.optional = true
+colored.version = "2.0.0"
+dialoguer.features = ["fuzzy-select"]
+dialoguer.optional = true
+dialoguer.version = "0.11.0"
+dirs = "5.0.0"
+itertools = "0.13.0"
+serde.features = ["derive"]
+serde.version = "1.0.152"
+thiserror = "1.0.40"
+toml = "0.8.2"
 tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.17", optional = true }
-
-[dependencies.clap]
-version = "4.1.8"
-optional = true
-features = ["derive"]
-
-[dependencies.colored]
-version = "2.0.0"
-optional = true
-
-[dependencies.dialoguer]
-version = "0.11.0"
-features = ["fuzzy-select"]
-optional = true
+tracing-subscriber.optional = true
+tracing-subscriber.version = "0.3.17"
